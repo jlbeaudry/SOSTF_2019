@@ -1,4 +1,4 @@
-# Our private repo for the 2019 version of the Swinburne Open Science Survey
+# The Swinburne Open Science Survey (2019)
 
 ## Explanation of key files  
 

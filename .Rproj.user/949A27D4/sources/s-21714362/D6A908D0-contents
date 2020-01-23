@@ -1,0 +1,24 @@
+
+#CONVERT TO A FACTOR
+#convert the crisis variable to a FACTOR (fct). 
+#plus it changes the names of the levels
+#df$crisis <- factor(df$crisis)
+#str(df$crisis) #test to make sure it's reading it as a factor
+df$crisis <- factor(df$crisis) %>% 
+  mapvalues(
+  c("1", "2", "3", "4"), 
+  c("Significant", "Slight", "No Crisis", "Don't Know")
+  )
+#str(df, list.len = ncol(df))  #allows me to see the column types for all variables
+#&prevents it from being truncated
+
+
+# FIGURE OUT COLUMN NAMES & TYPES
+
+str(df, list.len = ncol(df)) #allows me to see the column types for all variables
+#&prevents it from being truncated
+#problems(df)
+#pec(df) #shows me the column types, but for some reason this isn't working
+#cols(df) gives me an error that I shouldn't get re "some 'col_types' are not 
+#S3 collector objects: 1" --> there is some sort of problem with the list of 
+#column names as far as I can tell, but this will be NEXT STEP!

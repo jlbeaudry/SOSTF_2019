@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1579735024010.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "67D7BE1",
+    "lastKnownWriteTime" : 1579771686,
+    "last_content_update" : 1579771686650,
+    "path" : "~/Documents/GitHub/SOSTF_Survey/R/open_science_survey_2019.Rmd",
+    "project_path" : "R/open_science_survey_2019.Rmd",
+    "properties" : {
+        "cursorPosition" : "92,74",
+        "last_setup_crc32" : "21714362214197e6",
+        "scrollLine" : "83"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

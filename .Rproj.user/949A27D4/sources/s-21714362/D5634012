@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1579771305516.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "D5634012",
+    "lastKnownWriteTime" : 1579747552,
+    "last_content_update" : 1579747552,
+    "path" : "~/Dropbox/R/SOSTF_Survey_OLD/R/crisis_by_estimate_figure.R",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "32,0",
+        "scrollLine" : "22"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

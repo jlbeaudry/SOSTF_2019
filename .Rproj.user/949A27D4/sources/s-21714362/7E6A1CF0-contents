@@ -1,0 +1,37 @@
+library(reshape2)
+
+# takes a wide format data.frame and converts to long
+# the id variables must be the leftmost columns
+# 	default is that the first four are id variables, but that can be changed by specifying num.id
+# assumes that the names of the other variables are specified such that:
+# 	it must consist of two elements separated by a separator string (default is _ but that can be changed)
+# 	first element is the name of the variable (e.g., acc or conf)
+# 	second element is the trial number (or identifier, doesn't have to be a number but typically will be)
+# 	e.g., acc_1, acc_2, conf_1, conf_2, etc
+# assumes that second element is trial number so will coerce variable to numeric
+# 	set trial.numeric as FALSE if this is not true 
+# note, if some vars are characters, all vars will be recoded as text rather than numbers
+# 	to avoid this, provide a vector of the name of all variables that should be numeric
+# 	e.g., numeric.vars = c("acc", "conf")
+
+tolong <- function(data, num.id = 4, separator = "_", trial.var.name = "trial", trial.numeric = TRUE, numeric.vars = NULL)
+{
+	ids <- names(data)[1:num.id]
+	out <- melt(data, id.vars = ids, measure.vars = names(data)[(num.id + 1):length(names(data))])
+	out[,trial.var.name] <- substr(out$variable, regexpr(pattern = separator, out$variable, fixed = TRUE) + 1, length(out$variable))
+	out$variable <- substr(out$variable, 1, regexpr(pattern = separator, out$variable, fixed = TRUE) - 1)
+	form <- paste(paste(c(ids, "trial"), collapse = " + "), "variable", sep = " ~ ")
+	if (trial.numeric)
+	{
+		out[,trial.var.name] <- as.numeric(out[,trial.var.name])
+	}
+	out <- dcast(out, as.formula(form))
+	if (!is.null(numeric.vars))
+	{
+		for (var in numeric.vars)
+		{
+			out[,var] <- as.numeric(out[,var])
+		}
+	}
+	out
+}

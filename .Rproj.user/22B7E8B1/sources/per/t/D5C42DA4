@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1573508733608.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3973539987",
+    "id" : "D5C42DA4",
+    "lastKnownWriteTime" : 1573508811,
+    "last_content_update" : 1573508811770,
+    "path" : "~/Dropbox/R/SOSTF_Survey/Code_Graveyard.R",
+    "project_path" : "Code_Graveyard.R",
+    "properties" : {
+        "cursorPosition" : "0,0",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

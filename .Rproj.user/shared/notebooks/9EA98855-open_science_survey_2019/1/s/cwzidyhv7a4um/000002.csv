@@ -1,0 +1,18 @@
+"0","#load the library"
+"0","library(tinytex)"
+"0","library(knitr)"
+"0","library(here)"
+"0","library(tidyverse)"
+"0","library(skimr)"
+"0","library(plyr)"
+"0","library(ggbeeswarm)"
+"0","library(ggridges)"
+"2","
+Attaching package: ‘ggridges’
+
+"
+"2","The following object is masked from ‘package:ggplot2’:
+
+    scale_discrete_manual
+
+"

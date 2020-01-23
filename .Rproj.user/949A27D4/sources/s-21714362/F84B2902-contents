@@ -1,0 +1,120 @@
+---
+title: "Swinburne Open Science Task Force Survey (2019)"
+author: "Jennifer L Beaudry"
+date: "January 23, 2020"
+output: html_document 
+csl: apa-old-doi-prefix.csl
+bibliography: Beaudry_Library.bib
+---
+
+# Overview
+
+We conducted a 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(scipen = 999)
+```
+
+
+```{r library, include=FALSE}
+#load the library
+library(tinytex)
+library(knitr)
+library(here)
+library(tidyverse)
+library(skimr)
+library(plyr)
+library(ggbeeswarm)
+library(ggridges)
+```
+
+
+```{r import data, include=TRUE}
+#import the data. Here I'm using my data, rather than Jordy's revised one.
+
+loc <- here("data", "clean_data.csv")
+df <- read_csv(file = loc)
+```
+
+Finally, as a quick first pass, we can use the 'skim()' function to get a simple overview of each variable:
+
+```{r skim df}
+skim(df)
+```
+
+Now learning about group_by which appears to be a wonderful development!
+
+```{r summary stats by group, eval = FALSE}
+frames %>%
+  group_by(test_item, sample_size, n_obs, condition) %>%
+  summarise(response = mean(response)) %>% #can call "response" anything you want.
+  ungroup() #get in this habit because otherwise you might retain the grouping elsewhere.
+```
+
+Now playing around with it to include more summary statistics, and to print out the different summary stats in a tiblle.
+
+```{r more summary stats by group, eval=FALSE}
+frames %>%
+  group_by(test_item) %>%
+  summarise(
+    mean_resp = mean(response),
+    sd_resp = sd(response),
+    count = n()
+  ) %>%
+  ungroup
+
+```
+
+Now play with filter to get summary stats from just a subset of the sample (their responses to only the 'small' objects).
+
+```{r fitlersmall, eval=FALSE}
+average_response <- frames %>%
+  group_by(test_item, sample_size, n_obs, condition) %>%
+  summarise(response = mean(response)) %>%
+  ungroup ()
+
+average_response %>%
+  filter(sample_size == "small") #this is not changing the average response variable because it still has everything in it.
+```
+
+Now play with arrange to get summary stats from just a subset of the sample (their responses to only the 'small' objects), and arrange by condition.
+
+```{r arrangesmall, eval=FALSE}
+average_response <- frames %>%
+  group_by (test_item, sample_size, n_obs, condition) %>%
+  summarise (response = mean(response)) %>%
+  ungroup ()
+
+average_response %>%
+  filter (sample_size == "small") %>%
+  arrange (condition)
+```
+
+Now play with select to build on filter & arrange, but to only show some of the columns.
+
+```{r selectsmall, eval=FALSE}
+average_response <- frames %>%
+  group_by (test_item, sample_size, n_obs, condition) %>%
+  summarise (response = mean(response)) %>%
+  ungroup ()
+
+average_response_small <- average_response %>%
+  filter (sample_size == "small") %>%
+  arrange (condition) %>%
+  select (condition, test_item, response)
+
+average_response_small
+
+```
+
+Now use mutate to create a new variable, which takes into account how many trials they completed.
+
+```{r average response time small, eval=FALSE}
+average_response_small <- average_response_small %>%
+  mutate (generalisation = response/9) %>%
+  select (-response) #now remove response because we don't need it any longer
+
+average_response_small
+
+```
+

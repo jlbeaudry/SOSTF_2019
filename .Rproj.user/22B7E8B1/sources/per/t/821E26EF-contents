@@ -1,0 +1,64 @@
+library(tidyverse)
+library(here)
+library(plyr)
+library(ggbeeswarm)
+library(skimr)
+library(ggridges)
+library(jtools)
+
+
+#playing with the theme of it... 
+  #Note: APA gets rid of the title by default because it shouldn't be part of the image...
+  #so, no point in this 'p2 + ggtitle("Estimates of reproducibility by perceived crisis in field")' 
+
+p2 <- ggplot(data = subset(df, !is.na(crisis)), 
+             aes(x=crisis, y=RepEstimate_1)) + 
+  geom_jitter(position=position_jitter(height=0,width=.15),
+              fill="blue",
+              colour="blue",
+              size = 2.2,
+              alpha=.5) +
+  stat_summary(fun.y=mean,
+               fun.ymin=mean,
+               fun.ymax=mean,
+               geom='crossbar',
+               width=0.5) +
+  scale_x_discrete(name = "Do you think your field is experiencing a 'Reproducibility Crisis'?",
+                  limits=c("4","3","2","1"),
+                  labels=c("Don't Know", "No Crisis", "Slight", "Significant")) +
+  scale_y_continuous(name = "Estimated percentage of reproducible studies")
+  coord_cartesian(ylim = c(0,100))
+  #labs(x = "Do you think your field is experiencing a 'Reproducibility Crisis'?",
+      # y = "Estimated percentage of reproducible studies")
+p2 + theme_classic(base_size = 12) #I cannot use this and increase the size
+  #of the labels for the x values, but it works.
+ggsave(here::here("figs", "reprod_estimates_by_crisis.png"))
+
+
+
+#trying to get a boxplot. Well, this works, but it needs to be transparent & it
+#also is showing the median rather than the mean (I presume? it's certainly not 
+#the mean). KEEP TRYING.
+p <- ggplot(data = subset(df, !is.na(crisis)), 
+            aes(x=crisis, y=RepEstimate_1)) + 
+  geom_jitter(position=position_jitter(height=0,width=.15),
+              fill="blue",
+              colour="blue",
+              size = 2.2,
+              alpha=.5) +
+  stat_boxplot(geom = 'boxplot',
+               position = 'dodge',
+               na.rm=TRUE,
+               coef = 1.5) +
+  scale_x_discrete(name = "Do you think your field is experiencing a 'Reprodubility Crisis'?",
+                   limits=c("4","3","2","1"),
+                   labels=c("Don't Know", "No Crisis", "Slight", "Significant")) +
+  scale_y_continuous(name = "Estimated percentage of reproducible studies") +
+  coord_cartesian(ylim = c(0,100))
+p + ggtitle("Estimates of reproducibility by perceived crisis in field")
+ggsave(here::here("figs", "reprod_estimates_by_crisis_box.png"))
+
+
+
+#makes NAs explicit but I don't want that for now
+#forcats::fct_explicit_na

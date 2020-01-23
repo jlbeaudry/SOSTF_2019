@@ -1,0 +1,52 @@
+
+library(tidyverse)
+library(here)
+library(plyr)
+library(ggbeeswarm)
+library(skimr)
+library(ggridges)
+
+
+#estimates of reproducibility by levels of crisis as a stripchart 
+  #and the !is.na removes NA from the crisis variable). This works fine, but can tweak
+  #to increase font size & perhaps add boxplot & remove background grid.
+x <- as.factor(df$OverallExperience)
+
+p <- ggplot(data = subset(df, !is.na(crisis)), 
+       aes(x=crisis, y=RepEstimate_1)) + 
+  geom_jitter(position=position_jitter(height=0,width=.15),
+              fill="blue",
+              colour="blue",
+              size = 2.2,
+              alpha=.5) +
+  stat_summary(fun.y=mean,
+               fun.ymin=mean,
+               fun.ymax=mean,
+               geom='crossbar',
+               width=0.5) +
+  scale_x_discrete(name = "Do you think your field is experiencing a 'Reprodubility Crisis'?",
+                   limits=c("4","3","2","1"),
+                   labels=c("Don't Know", "No Crisis", "Slight", "Significant")) +
+  scale_y_continuous(name = "Estimated %age of reproducible studies") +
+  coord_cartesian(ylim = c(0,100))
+p + ggtitle("Estimates of reproducibility by perceived crisis in field")
+ggsave(here::here("figs", "reprod_estimates_by_crisis.png"))
+
+
+#setting text label sizes, but this isn't actually being used in the figure
+my_theme = theme(
+  plot.title = element_text(size = 12),
+  axis.title.x = element_text(size = 12), 
+  axis.text.x = element_text(size = 12), 
+  axis.title.y = element_text(size = 12)
+)
+
+
+#calculating the RepEstimate_1 mean by crisis levels to double check this plot
+df %>%
+  group_by(crisis) %>%
+  dplyr::summarise(mean=mean(RepEstimate_1, na.rm=TRUE))
+
+
+
+       

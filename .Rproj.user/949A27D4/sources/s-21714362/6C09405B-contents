@@ -1,0 +1,102 @@
+# find the data
+here("FVD.csv")
+
+#this tells R that we want to use the data.csv file (and that it's in wide format with multiple trials per row.)
+#the trickiest part of this code is changing the data from wide format to long format 
+#(each row represents a different trial). Long format is required to run the LME analyses. 
+wide <- read.csv("FVD.csv")
+
+
+#The next few blocks change the format of the data. 
+#When you are using this, most of this will stay the same, but you will need to change the names of the DVs.
+#Alternatively, once your data file is complete, you can include ALL of the DVs in this code and then 
+#you won't have to play with it again. 
+
+#When you are ready to change this, leave everything the same except the variables that you need to put into 
+#long form (e.g., stm, pres, exp, order, acc, conf, & the DV).
+#you will need to expand this to include additional variables, which you'll do by copying and pasting the vars 
+#and temp line for one variable. For example, if you copy the code for the "stm_" variable, then you will replace 
+#"stm_" with whatever variable you are working on
+
+vars <- c("Participant","Age","AgeD","Program","LineupType",paste("stm_",c(1:8), sep=""))
+temp_stm <- melt(wide[,vars], id=c("Participant","Age","AgeD","Program","LineupType"))
+vars <- c("Participant","Age","AgeD","Program","LineupType",paste("pres_",c(1:8), sep=""))
+temp_pres <- melt(wide[,vars], id=c("Participant","Age","AgeD","Program","LineupType"))
+vars <- c("Participant","Age","AgeD","Program","LineupType",paste("exp_",c(1:8), sep=""))
+temp_exp <- melt(wide[,vars], id=c("Participant","Age","AgeD","Program","LineupType"))
+vars <- c("Participant","Age","AgeD","Program","LineupType",paste("order_",c(1:8), sep=""))
+temp_order <- melt(wide[,vars], id=c("Participant","Age","AgeD","Program","LineupType"))
+vars <- c("Participant","Age","AgeD","Program","LineupType",paste("acc_",c(1:8), sep=""))
+temp_acc <- melt(wide[,vars], id=c("Participant","Age","AgeD","Program","LineupType"))
+vars <- c("Participant","Age","AgeD","Program","LineupType",paste("decis_",c(1:8), sep=""))
+temp_decis <- melt(wide[,vars], id=c("Participant","Age","AgeD","Program","LineupType"))
+vars <- c("Participant","Age","AgeD","Program","LineupType",paste("selFVD_",c(1:8), sep=""))
+temp_selFVD <- melt(wide[,vars], id=c("Participant","Age","AgeD","Program","LineupType"))
+
+#Again, you will add to this by copying one line and replace the variable name as required.
+#Note: R is case sensitive, so if the variable name is capitalized in the data file, it needs to be capitalized here.
+
+colnames(temp_stm) <- c("Participant", "Age","AgeD", "Program","LineupType", "variable", "stm")
+colnames(temp_pres) <- c("Participant","Age","AgeD", "Program","LineupType", "variable","pres")
+colnames(temp_exp) <- c("Participant","Age","AgeD", "Program","LineupType", "variable","exp")
+colnames(temp_order) <- c("Participant","Age","AgeD","Program","LineupType","variable", "order")
+colnames(temp_acc) <- c("Participant","Age","AgeD","Program","LineupType", "variable","acc")
+colnames(temp_decis) <- c("Participant","Age","AgeD","Program","LineupType","variable", "decis")
+colnames(temp_selFVD) <- c("Participant", "Age","AgeD", "Program","LineupType", "variable", "selFVD")
+
+#This will create a temporary variable with the information we need about the order in which the data was presented.
+#In order to extract that, you will need to change not only the variable name (stm), but also the number associated with it. 
+#If you look in the data file, you'll see that the first target presented is listed in the "stm_1
+#column. This code tells R to grab the fifth letter in the variable name (stm) and to put it in the column named "variable."
+#If the variable name (e.g. pres) has four letters, then you need to update the code to grab the sixth character.
+#That's because in the variable name "pres_1", the number one is the sixth character. Update accordingly. 
+temp_stm$variable <- substr(temp_stm$variable,5,nchar(as.character(temp_stm$variable)))
+temp_pres$variable <- substr(temp_pres$variable,6,nchar(as.character(temp_pres$variable)))
+temp_exp$variable <- substr(temp_exp$variable,5,nchar(as.character(temp_exp$variable)))
+temp_order$variable <- substr(temp_order$variable,7,nchar(as.character(temp_order$variable)))
+temp_acc$variable <- substr(temp_acc$variable,5,nchar(as.character(temp_acc$variable)))
+temp_decis$variable <- substr(temp_decis$variable,7,nchar(as.character(temp_decis$variable)))
+temp_selFVD$variable <- substr(temp_selFVD$variable,8,nchar(as.character(temp_selFVD$variable)))
+
+
+#This code takes all of the variables we created and merges them into one file.
+#if you want to make sure it's working without any errors, you can ask it to print the
+#data file (eye) after each merge (or at any point) by typing "print(eye)". 
+eye <- merge(temp_stm, temp_pres)
+eye <- merge(eye, temp_exp)
+eye <- merge(eye, temp_order)
+eye <- merge(eye, temp_acc)
+eye <- merge(eye, temp_decis)
+eye <- merge(eye, temp_selFVD)
+
+#Log transforms the DV - used due to issues with skewness and kurtosis (see below)
+eye <- cbind(eye, log(eye$selFVD))
+
+#This removes all trials containing a missing value. If any missing values are present in a trial, 
+#that entire trial will be removed from the analysis!
+eye <- na.omit(eye) 
+
+#Summary statistics, skewness and kurtosis for the untransformed DV.
+library("pastecs")
+stat.desc(eye$selFVD, basic=F)
+library("moments")
+skewness(eye$selFVD)
+kurtosis(eye$selFVD) - 3
+
+#The same for the transformed DV.
+stat.desc(log(eye$selFVD), basic=F)
+skewness(log(eye$selFVD))
+kurtosis(log(eye$selFVD)) - 3
+
+#Tells R to treat these variables as a factor (i.e., categorical)
+eye$stm <- factor(eye$stm)
+eye$AgeD <- factor(eye$AgeD)
+eye$pres <- factor(eye$pres)
+eye$exp <- factor(eye$exp)
+eye$acc <- factor(eye$acc)
+eye$decis <- factor(eye$decis)
+eye$order <- factor(eye$order)
+eye$LineupType <- factor(eye$LineupType)
+
+# export the data file
+write.csv(eye, file = "eye.FVD.csv")

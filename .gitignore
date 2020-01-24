@@ -4,3 +4,4 @@
 .README.html
 data_to_clean.csv
 clean_data.csv
+*.html

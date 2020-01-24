@@ -31,6 +31,7 @@ library(here)
 library(tidyverse)
 library(skimr)
 library(ggbeeswarm)
+library(plyr) #this is really important for factors
 ```
 
 
@@ -81,7 +82,8 @@ p + ggtitle("Estimates of reproducibility by perceived crisis in field (n = 137)
    
 ## Open Science Experience
 
-This figure shows how many people have experience with open science practices. 
+This figure shows how many people have experience with open science practices. A
+total of XXX answered this question. I need to figure out how to insert the r output here!
 
 ```{r os_experience_figure, echo=FALSE, warning=TRUE}
 #and the !is.na removes NA from the 'RepEstimate_1' variable). This works fine, but can tweak
@@ -90,37 +92,33 @@ This figure shows how many people have experience with open science practices.
 # NEXT STEPS: MAKE THE VARIABLE A FACTOR IN THE DATASET ITSELF IN '2_CLEAN_DATA.R'
   # THEN ADJUST THIS CODE TO ACCOUNT FOR THAT...RE THE LIMITS & LABELS....
 
-#df$OverallExperience <- as.factor(df$OverallExperience)
-
 p <- ggplot(data = subset(df, !is.na(OverallExperience)), 
        aes(OverallExperience)) + 
   geom_bar(
-  colour = "black", 
-  fill = "blue") 
+  colour = "black" , 
+  fill = "blue") +
+  scale_x_discrete(name = "What is your experience with open science practices?",
+                   limits=c("Unaware", "Aware, But Not Used", "Some Experience", "Extensive Experience")) + 
+  theme (text = element_text(size = 12)) +
+  scale_y_continuous(name = "Frequency") +
+  coord_cartesian(ylim = c(0,100)) 
+p + ggtitle("Experience with open science practices (n = 208)")
 
-p +  scale_x_discrete(name = "What is your experience with open science practices? (n = 208)",
-                   limits=c("1","2","3","4"),
-                   labels=c("Unaware", "Aware, but Not Used", "Some", "Extensive")) + 
-  theme (text = element_text(size = 12))
-  #scale_y_continuous(name = "Estimated %age of reproducible studies") +
-  #coord_cartesian(ylim = c(0,100)) +
-  #theme (text = element_text(size = 12))
-#p + ggtitle("Estimates of reproducibility by perceived crisis in field (n = 137)")
-
+# count (df$OverallExperience) # to see the frequencies
+total <- count (df$OverallExperience != "NA") # to see the total of real responses
 ```
+
+### I need to figure out how to insert inline R code
 
 ```{r figuring out code, eval = FALSE}
 
-df %>% 
- count (OverallExperience) %>% 
- mutate ((freq = n / sum(n))*100) %>% 
-  round(digits = 2)
+#I had this working & now it's not... and now it's probably garbage...
+# df %>% 
+#table(OverallExperience)
+# %>% 
+# mutate ((freq = n / sum(n))*100) %>% 
+#  round(digits = 2)
 
-
-mtcars %>% 
-  count(am, gear) %>% 
-  group_by(am) %>% 
-  mutate(freq = n / sum(n))
 ```
 
 ## Additional questions to include

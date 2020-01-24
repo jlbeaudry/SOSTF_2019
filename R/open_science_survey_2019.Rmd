@@ -53,7 +53,7 @@ that there was a significant reproducibility crisis in their field.
 The black bar is the mean estimate of reproducibility according to the level of 
 perceived crisis. 
 
-```{r crisis_by_estimate_figure, echo=FALSE, warning=TRUE}
+```{r crisis_by_estimate_barchart, echo=FALSE, warning=TRUE}
 #estimates of reproducibility by levels of crisis as a stripchart 
   #and the !is.na removes NA from the 'RepEstimate_1' variable). 
 # This works fine, but can tweak to increase font size & perhaps add boxplot & remove background grid.

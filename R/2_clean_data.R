@@ -28,9 +28,15 @@ df$crisis <- factor(df$crisis) %>%
     c("Significant Crisis", "Slight Crisis", "No Crisis", "Don't Know")
   )
 
+df$OverallExperience <- factor(df$OverallExperience) %>% 
+  mapvalues(
+    c("1", "2", "3", "4"), 
+    c("Unaware", "Aware, But Not Used", "Some Experience", "Extensive Experience")
+  )
+  
 
 # when done cleaning, write the data to a new file
-write.csv(df, here("data", "clean_data.csv"))
+write.csv(df, here::here("data", "clean_data.csv"))
 
 
 

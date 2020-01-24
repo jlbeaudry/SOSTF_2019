@@ -30,9 +30,7 @@ library(knitr)
 library(here)
 library(tidyverse)
 library(skimr)
-library(plyr)
 library(ggbeeswarm)
-library(ggridges)
 ```
 
 
@@ -92,7 +90,7 @@ This figure shows how many people have experience with open science practices.
 # NEXT STEPS: MAKE THE VARIABLE A FACTOR IN THE DATASET ITSELF IN '2_CLEAN_DATA.R'
   # THEN ADJUST THIS CODE TO ACCOUNT FOR THAT...RE THE LIMITS & LABELS....
 
-df$OverallExperience <- as.factor(df$OverallExperience)
+#df$OverallExperience <- as.factor(df$OverallExperience)
 
 p <- ggplot(data = subset(df, !is.na(OverallExperience)), 
        aes(OverallExperience)) + 
@@ -111,7 +109,19 @@ p +  scale_x_discrete(name = "What is your experience with open science practice
 
 ```
 
+```{r figuring out code, eval = FALSE}
 
+df %>% 
+ count (OverallExperience) %>% 
+ mutate ((freq = n / sum(n))*100) %>% 
+  round(digits = 2)
+
+
+mtcars %>% 
+  count(am, gear) %>% 
+  group_by(am) %>% 
+  mutate(freq = n / sum(n))
+```
 
 ## Additional questions to include
 

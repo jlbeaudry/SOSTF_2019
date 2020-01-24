@@ -112,7 +112,8 @@ total <- count (df$OverallExperience != "NA") # to see the total of real respons
 ```{r figuring_pie, include=FALSE}
 
 # HOLY! This wasn't easy, but I got it. I can play with it more, now that I figured out how
-  # to get it to actually work! 
+  # to get it to actually work! Huh. Well, the code works alone, but doesn't knit. I will need
+  # to play with it more...
 
 x <- df %>% 
   filter(OverallExperience != "NA")

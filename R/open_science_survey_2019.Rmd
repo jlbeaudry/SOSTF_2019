@@ -108,6 +108,19 @@ p + ggtitle("Experience with open science practices (n = 208)")
 total <- count (df$OverallExperience != "NA") # to see the total of real responses
 ```
 
+
+```{r figuring_pie, include=FALSE}
+
+# HOLY! This wasn't easy, but I got it. I can play with it more, now that I figured out how
+  # to get it to actually work! 
+
+x <- df %>% 
+  filter(OverallExperience != "NA")
+
+x2 <- x %>% 
+  dplyr::count(OverallExperience)  
+  pie(x2$n)
+```
 ### I need to figure out how to insert inline R code
 
 ```{r figuring out code, eval = FALSE}

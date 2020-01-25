@@ -109,30 +109,30 @@ total <- count (df$OverallExperience != "NA") # to see the total of real respons
 ```
 
 
-```{r figuring_pie, include=FALSE}
+```{r figuring_pie, include=TRUE}
 
 # HOLY! This wasn't easy, but I got it. I can play with it more, now that I figured out how
   # to get it to actually work! Huh. Well, the code works alone, but doesn't knit. I will need
   # to play with it more...
 
-x <- df %>% 
-  filter(OverallExperience != "NA")
+# I find this formulation much easier than using pipes (%>%)
+x <- filter(df,OverallExperience != "NA")
 
 x2 <- x %>% 
   dplyr::count(OverallExperience)  
-  pie(x2$n)
+  pie(x2$n,labels=x2$OverallExperience)
 ```
 ### I need to figure out how to insert inline R code
 
-```{r figuring out code, eval = FALSE}
+# I had this working & now it's not... and now it's probably garbage...
+# Inserted between backtick r and backtick I think
 
-#I had this working & now it's not... and now it's probably garbage...
-# df %>% 
-#table(OverallExperience)
-# %>% 
-# mutate ((freq = n / sum(n))*100) %>% 
-#  round(digits = 2)
-
+```{r tables-mtcars, eval=TRUE}
+#x3 <- df %>% 
+  #table(df$OverallExperience) %>%
+  #  mutate ((freq = n / sum(n))*100) %>%
+  #    round(digits = 2)
+knitr::kable(x2, caption = 'In table form')
 ```
 
 ## Additional questions to include
@@ -225,3 +225,40 @@ average_response_small
 
 ```
 
+## --------------------------------------------------
+## Tom's stuff on data and code sharing starts here
+## (starting point: copied Open Science section by JB)
+
+## Open Code Experience
+
+```{r echo=FALSE, warning=TRUE}
+
+# calculate number of rows with a valid response for this variable
+nvalid <- nrow(subset(df, !is.na(CodeExp)))
+
+```
+
+This figure shows how many people have experience with open code and/or materials. A
+total of `r nvalid` answered this question.
+
+```{r ocode_experience_figure, echo=FALSE, warning=TRUE}
+
+# create labels for the graph elements
+qtext <- "What is your experience with open materials and/or code?"
+
+# here we use formatting to insert an integer number into the title text
+title = sprintf("experience with open materials and/or code (n = %d)",nvalid)
+                
+# create the plot
+# use the 100*(..count..)/sum(..count..)) thing to create frequencies
+p <- ggplot(data = subset(df, !is.na(CodeExp)), aes(x=CodeExp)) + 
+  geom_bar(aes(y=100*(..count..)/sum(..count..)),colour = "black" , fill = "blue" ) +
+  scale_x_discrete(name = qtext,
+                   limits=c("Unaware", "Aware, But Not Used", "Some Use", "Regular Use")) + 
+  theme (text = element_text(size = 12)) +
+  scale_y_continuous(name = "Frequency") + 
+  coord_cartesian(ylim = c(0,100)) + 
+  ggtitle(title)
+p
+
+```

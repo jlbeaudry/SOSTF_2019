@@ -32,6 +32,7 @@ library(tidyverse)
 library(skimr)
 library(ggbeeswarm)
 library(plyr) #this is really important for factors
+library(plotly)
 ```
 
 
@@ -123,15 +124,12 @@ x2 <- x %>%
   pie(x2$n,labels=x2$OverallExperience)
 ```
 ### I need to figure out how to insert inline R code
+<!-- Inserted between backtick r and backtick - take a look at my section below -->
 
 # I had this working & now it's not... and now it's probably garbage...
-# Inserted between backtick r and backtick I think
 
+<!-- how about the following? -->
 ```{r tables-mtcars, eval=TRUE}
-#x3 <- df %>% 
-  #table(df$OverallExperience) %>%
-  #  mutate ((freq = n / sum(n))*100) %>%
-  #    round(digits = 2)
 knitr::kable(x2, caption = 'In table form')
 ```
 
@@ -233,25 +231,29 @@ average_response_small
 
 ```{r echo=FALSE, warning=TRUE}
 
+# filter rows with valid response for this variable
+validdata <- filter(df,CodeExp != "NA")
+
 # calculate number of rows with a valid response for this variable
-nvalid <- nrow(subset(df, !is.na(CodeExp)))
+nvalid <- nrow(validdata)
 
 ```
 
+<!-- I use the `r ` inline insertion in the following to insert number of valid rows -->
 This figure shows how many people have experience with open code and/or materials. A
 total of `r nvalid` answered this question.
 
-```{r ocode_experience_figure, echo=FALSE, warning=TRUE}
+```{r echo=FALSE, warning=TRUE}
 
 # create labels for the graph elements
 qtext <- "What is your experience with open materials and/or code?"
 
 # here we use formatting to insert an integer number into the title text
-title = sprintf("experience with open materials and/or code (n = %d)",nvalid)
+title = sprintf("Experience with open materials and/or code (n = %d)",nvalid)
                 
 # create the plot
 # use the 100*(..count..)/sum(..count..)) thing to create frequencies
-p <- ggplot(data = subset(df, !is.na(CodeExp)), aes(x=CodeExp)) + 
+p <- ggplot(data = validdata, aes(x=CodeExp)) + 
   geom_bar(aes(y=100*(..count..)/sum(..count..)),colour = "black" , fill = "blue" ) +
   scale_x_discrete(name = qtext,
                    limits=c("Unaware", "Aware, But Not Used", "Some Use", "Regular Use")) + 
@@ -261,4 +263,30 @@ p <- ggplot(data = subset(df, !is.na(CodeExp)), aes(x=CodeExp)) +
   ggtitle(title)
 p
 
+# Now in pie chart form
+
+validdatasummary <- dplyr::count(validdata,CodeExp)  
+
+p <- pie(validdatasummary$n,clockwise=TRUE,labels=validdatasummary$CodeExp, init.angle=90, col=gray.colors(4,start=0.4,end=1.0))
+p
+
+# Now try the plotly pie chart
+
+piedata <- validdata[,'CodeExp']
+
+p <- plot_ly(piedata, labels = ~CodeExp, type = 'pie',
+             textposition = "inside",
+             textinfo = 'label+percent',
+             marker = list(colors = c("red","yellow","palegreen","darkseagreen"), 
+                line=list(color="white", width=10)),
+             showlegend=FALSE,
+             sort=FALSE,
+             direction="clockwise",
+             rotation=0,
+             hole=0.3,
+             pull=0,
+             title=list(text=title,position="top center",font=list(size=20, color="black")))
+p
+
 ```
+

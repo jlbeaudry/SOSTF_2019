@@ -285,13 +285,27 @@ p
 
 # Now try the plotly pie chart
 
+# Extract only valid responses
 piedata <- validdata[,'CodeExp']
 
+# Create new index variable so we can order the data logically
+piedata <- mutate(piedata,CodeExpLev = case_when(
+  CodeExp == "Unaware"  ~ 0,
+  CodeExp == "Aware, But Not Used"  ~ 1,
+  CodeExp == "Some Use"  ~ 2,
+  CodeExp == "Regular Use" ~ 3))
+
+# Order the data
+piedata <- arrange(piedata,CodeExpLev)
+
+# Colors are not working in the pie chart: no idea why
+colours = heat.colors(4, alpha = 1)
+
+# Plot the data in a pie chart
 p <- plot_ly(piedata, labels = ~CodeExp, type = 'pie',
              textposition = "inside",
              textinfo = 'label+percent',
-             marker = list(colors = c("red","yellow","palegreen","darkseagreen"), 
-                line=list(color="white", width=10)),
+             marker = list(colors = colours, line=list(color="white", width=10)),
              showlegend=FALSE,
              sort=FALSE,
              direction="clockwise",

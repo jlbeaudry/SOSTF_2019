@@ -75,26 +75,38 @@ p <- ggplot(data = subset(df, !is.na(RepEstimate_1)),
   theme (text = element_text(size = 12))
 p + ggtitle("Estimates of reproducibility by perceived crisis in field (n = 137)")
 
-# if you want a separate file of the figure, use this code & it will be saved in the
-  # figs folder
+# so, I like your sprintf wrapper for the title...we will need to rebuild this figure
+  # accordingly, mainly for consistency and so the n in the title is automatically 
+  # calculated rather than hand-computed.
+
+# if we want a separate file of the figure, use this code & it will be saved in the
+  # figs folder. This will be handy if we want to create slides.
 #ggsave(here::here("figs", "reprod_estimates_by_crisis.png"))
 ```
 
    
 ## Open Science Experience
+```{r os_experience, include = FALSE}
 
-This figure shows how many people have experience with open science practices. A
-total of XXX answered this question. I need to figure out how to insert the r output here!
+# filter rows with valid response for this variable & rename variable accordingly
+valid_os_exp <- filter(df, OverallExperience != "NA")
+
+# calculate number of rows with a valid response for this variable
+nvalid_os_exp <- nrow(valid_os_exp)
+
+# it works! Thanks, Tom!
+```
+
+This figure shows how many people have experience with any open science practices. A
+total of `r nvalid_os_exp` answered this question.
 
 ```{r os_experience_figure, echo=FALSE, warning=TRUE}
-#and the !is.na removes NA from the 'RepEstimate_1' variable). This works fine, but can tweak
-  #to increase font size & perhaps add boxplot & remove background grid.
 
-# NEXT STEPS: MAKE THE VARIABLE A FACTOR IN THE DATASET ITSELF IN '2_CLEAN_DATA.R'
-  # THEN ADJUST THIS CODE TO ACCOUNT FOR THAT...RE THE LIMITS & LABELS....
+# here we use formatting to insert an integer number into the title text
+title = sprintf("Experience with open science practices (n = %d)",nvalid_os_exp)
 
-p <- ggplot(data = subset(df, !is.na(OverallExperience)), 
-       aes(OverallExperience)) + 
+p <- ggplot(data = valid_os_exp, 
+       aes(x = OverallExperience)) + 
   geom_bar(
   colour = "black" , 
   fill = "blue") +
@@ -102,130 +114,131 @@ p <- ggplot(data = subset(df, !is.na(OverallExperience)),
                    limits=c("Unaware", "Aware, But Not Used", "Some Experience", "Extensive Experience")) + 
   theme (text = element_text(size = 12)) +
   scale_y_continuous(name = "Frequency") +
-  coord_cartesian(ylim = c(0,100)) 
-p + ggtitle("Experience with open science practices (n = 208)")
+  coord_cartesian(ylim = c(0,100)) +
+  ggtitle(title)
 
-# count (df$OverallExperience) # to see the frequencies
-total <- count (df$OverallExperience != "NA") # to see the total of real responses
+p
 ```
 
 
-```{r figuring_pie, include=TRUE}
+```{r os_experience_pie, echo = FALSE}
+# Just a heads up that 'include = FALSE' refers to whether we include the actual 
+  # r chunk and warnings in the knitted document, which we don't want to do.
 
-# HOLY! This wasn't easy, but I got it. I can play with it more, now that I figured out how
-  # to get it to actually work! Huh. Well, the code works alone, but doesn't knit. I will need
-  # to play with it more...
-
-# I find this formulation much easier than using pipes (%>%)
-x <- filter(df,OverallExperience != "NA")
-
-x2 <- x %>% 
+os_exp_count <- valid_os_exp %>% 
   dplyr::count(OverallExperience)  
-  pie(x2$n,labels=x2$OverallExperience)
-```
-### I need to figure out how to insert inline R code
-<!-- Inserted between backtick r and backtick - take a look at my section below -->
 
-# I had this working & now it's not... and now it's probably garbage...
+pie(os_exp_count$n,labels=os_exp_count$OverallExperience)
+# I can play with the pie more to make it look different, but lets decide on one 
+  # consistent style & then go from there....
+  
+
+```
+<!--I need to figure out how to insert inline R code-->
+<!-- Inserted between backtick r and backtick - take a look at my section below -->
+<!-- Thanks. My r skills are a work in progress. I know the gist of how to insert it,
+but not necessarily how to get the specific info that I want-->
+
 
 <!-- how about the following? -->
-```{r tables-mtcars, eval=TRUE}
-knitr::kable(x2, caption = 'In table form')
+<!--that's cool --> 
+<!--Tom, please delete our discussion once you've read it. :) -->
+```{r tables_os_experience, echo = FALSE}
+
+knitr::kable(os_exp_count, caption = 'Overall Experience with Open Science Practices')
+
 ```
 
-## Additional questions to include
+## Experience with different types of open science practices
 
-### Experience with practices..
+
+### Experience with Open Materials and/or Code
+
+```{r code_count, echo=FALSE, warning=TRUE}
+
+# filter rows with valid response for this variable #changing variable name so it's more informative
+valid_code <- filter(df,CodeExp != "NA")
+
+# calculate number of rows with a valid response for this variable
+nvalid_code <- nrow(valid_code)
+
+# That's hilarious. I could not get this to work for me to save my life....I'll
+  # try to use this above....
+```
+
+<!-- I use the `r ` inline insertion in the following to insert number of valid rows -->
+This figure shows how many people have experience with open code and/or materials. A
+total of `r nvalid_code` answered this question.
+
+```{r code_figures, echo=FALSE, warning=TRUE}
+# Tom, can you get in the habit of naming your r chunks, please?
+
+# create labels for the graph elements
+qtext <- "What is your experience with open materials and/or code?"
+
+# here we use formatting to insert an integer number into the title text
+title = sprintf("Experience with open materials and/or code (n = %d)",nvalid_code)
+# Am i missing it? I don't see the integer number, and I don't see what the "n = %d" is
+  # doing....
+                
+# create the plot
+# use the 100*(..count..)/sum(..count..)) thing to create percentages
+
+p <- ggplot(data = valid_code, aes(x=CodeExp)) + 
+  geom_bar(aes(y=100*(..count..)/sum(..count..)),colour = "black" , fill = "blue" ) +
+  scale_x_discrete(name = qtext,
+                   limits=c("Unaware", "Aware, But Not Used", "Some Use", "Regular Use")) + 
+  theme (text = element_text(size = 12)) +
+  scale_y_continuous(name = "Percentage") + 
+  coord_cartesian(ylim = c(0,100)) + 
+  ggtitle(title)
+p
+
+# Now in pie chart form
+
+valid_code_summary <- dplyr::count(valid_code,CodeExp)  
+
+p <- pie(valid_code_summary$n,clockwise=TRUE,labels=valid_code_summary$CodeExp, init.angle=90, col=gray.colors(4,start=0.4,end=1.0))
+p
+
+# Now try the plotly pie chart
+
+piedata <- valid_code[,'CodeExp']
+
+p <- plot_ly(piedata, labels = ~CodeExp, type = 'pie',
+             textposition = "inside",
+             textinfo = 'label+percent',
+             marker = list(colors = c("red","yellow","palegreen","darkseagreen"), 
+                line=list(color="white", width=10)),
+             showlegend=FALSE,
+             sort=FALSE,
+             direction="clockwise",
+             rotation=0,
+             hole=0.3,
+             pull=0,
+             title=list(text=title,position="top center",font=list(size=20, color="black")))
+p
+
+```
+
+```{r code_tables, echo=FALSE}
+
+c2 <- valid_code %>% 
+  dplyr::count(CodeExp)  
+
+knitr::kable(c2, caption = 'Experience with Open Materials & Code')
+```
 
 ### Concerns with practices....
 
 ### Barriers...
 
 
-```{r skim df, eval=FALSE}
-#As a quick first pass, we can use the 'skim()' function to get a simple overview of each variable:
-#skim(df)
-```
-
-Now learning about group_by which appears to be a wonderful development!
-
-```{r summary stats by group, eval = FALSE}
-frames %>%
-  group_by(test_item, sample_size, n_obs, condition) %>%
-  summarise(response = mean(response)) %>% #can call "response" anything you want.
-  ungroup() #get in this habit because otherwise you might retain the grouping elsewhere.
-```
-
-Now playing around with it to include more summary statistics, and to print out the different summary stats in a tiblle.
-
-```{r more summary stats by group, eval=FALSE}
-frames %>%
-  group_by(test_item) %>%
-  summarise(
-    mean_resp = mean(response),
-    sd_resp = sd(response),
-    count = n()
-  ) %>%
-  ungroup
-
-```
-
-Now play with filter to get summary stats from just a subset of the sample (their responses to only the 'small' objects).
-
-```{r fitlersmall, eval=FALSE}
-average_response <- frames %>%
-  group_by(test_item, sample_size, n_obs, condition) %>%
-  summarise(response = mean(response)) %>%
-  ungroup ()
-
-average_response %>%
-  filter(sample_size == "small") #this is not changing the average response variable because it still has everything in it.
-```
-
-Now play with arrange to get summary stats from just a subset of the sample (their responses to only the 'small' objects), and arrange by condition.
-
-```{r arrangesmall, eval=FALSE}
-average_response <- frames %>%
-  group_by (test_item, sample_size, n_obs, condition) %>%
-  summarise (response = mean(response)) %>%
-  ungroup ()
-
-average_response %>%
-  filter (sample_size == "small") %>%
-  arrange (condition)
-```
-
-Now play with select to build on filter & arrange, but to only show some of the columns.
-
-```{r selectsmall, eval=FALSE}
-average_response <- frames %>%
-  group_by (test_item, sample_size, n_obs, condition) %>%
-  summarise (response = mean(response)) %>%
-  ungroup ()
-
-average_response_small <- average_response %>%
-  filter (sample_size == "small") %>%
-  arrange (condition) %>%
-  select (condition, test_item, response)
-
-average_response_small
-
-```
-
-Now use mutate to create a new variable, which takes into account how many trials they completed.
-
-```{r average response time small, eval=FALSE}
-average_response_small <- average_response_small %>%
-  mutate (generalisation = response/9) %>%
-  select (-response) #now remove response because we don't need it any longer
-
-average_response_small
-
-```
-
 ## --------------------------------------------------
 ## Tom's stuff on data and code sharing starts here
 ## (starting point: copied Open Science section by JB)
+## keeping just in case, but I think I've incorporated all of it above. Feel free
+## to delete if you're happy with the edits above...
 
 ## Open Code Experience
 
@@ -290,3 +303,73 @@ p
 
 ```
 
+```{r skim df, eval=FALSE, include=FALSE}
+#These are chunks from the course I took, that I'm keeping now just for reference
+#As a quick first pass, we can use the 'skim()' function to get a simple overview of each variable:
+#skim(df)
+
+# Now learning about group_by which appears to be a wonderful development!
+
+
+frames %>%
+  group_by(test_item, sample_size, n_obs, condition) %>%
+  summarise(response = mean(response)) %>% #can call "response" anything you want.
+  ungroup() #get in this habit because otherwise you might retain the grouping elsewhere.
+
+
+# Now playing around with it to include more summary statistics, and to print out the different summary stats in a tiblle.
+
+frames %>%
+  group_by(test_item) %>%
+  summarise(
+    mean_resp = mean(response),
+    sd_resp = sd(response),
+    count = n()
+  ) %>%
+  ungroup
+
+
+# Now play with filter to get summary stats from just a subset of the sample (their responses to only the 'small' objects).
+
+average_response <- frames %>%
+  group_by(test_item, sample_size, n_obs, condition) %>%
+  summarise(response = mean(response)) %>%
+  ungroup ()
+
+average_response %>%
+  filter(sample_size == "small") #this is not changing the average response variable because it still has everything in it.
+
+#Now play with arrange to get summary stats from just a subset of the sample (their responses to only the 'small' objects), and arrange by condition.
+
+average_response <- frames %>%
+  group_by (test_item, sample_size, n_obs, condition) %>%
+  summarise (response = mean(response)) %>%
+  ungroup ()
+
+average_response %>%
+  filter (sample_size == "small") %>%
+  arrange (condition)
+
+# Now play with select to build on filter & arrange, but to only show some of the columns.
+
+average_response <- frames %>%
+  group_by (test_item, sample_size, n_obs, condition) %>%
+  summarise (response = mean(response)) %>%
+  ungroup ()
+
+average_response_small <- average_response %>%
+  filter (sample_size == "small") %>%
+  arrange (condition) %>%
+  select (condition, test_item, response)
+
+average_response_small
+
+# Now use mutate to create a new variable, which takes into account how many trials they completed.
+
+average_response_small <- average_response_small %>%
+  mutate (generalisation = response/9) %>%
+  select (-response) #now remove response because we don't need it any longer
+
+average_response_small
+
+```

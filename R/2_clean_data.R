@@ -29,6 +29,10 @@ df$crisis <- factor(df$crisis) %>%
     c("Significant Crisis", "Slight Crisis", "No Crisis", "Don't Know")
   )
 
+# 31.1.20 I will try to turn these into functions if possible and then will probably 
+  # save them in a new script that is specifically about recoding data.But, I will
+  # play with this on my own branch.
+
 df$OverallExperience <- factor(df$OverallExperience) %>% 
   mapvalues(
     c("1", "2", "3", "4"), 

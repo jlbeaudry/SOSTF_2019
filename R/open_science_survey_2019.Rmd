@@ -57,6 +57,11 @@ perceived crisis.
 #estimates of reproducibility by levels of crisis as a stripchart 
   #and the !is.na removes NA from the 'RepEstimate_1' variable). 
 # This works fine, but can tweak to increase font size & perhaps add boxplot & remove background grid.
+
+valid_rep_est <- filter(df,  != "NA")
+
+title = sprintf("Estimates of reproducibility by perceived crisis in field (n = %d)",nvalid_code)
+
 p <- ggplot(data = subset(df, !is.na(RepEstimate_1)), 
        aes(x=crisis, y=RepEstimate_1)) + 
   geom_jitter(position=position_jitter(height=0,width=.15),
@@ -73,6 +78,7 @@ p <- ggplot(data = subset(df, !is.na(RepEstimate_1)),
   scale_y_continuous(name = "Estimated %age of reproducible studies") +
   coord_cartesian(ylim = c(0,100)) +
   theme (text = element_text(size = 12))
+
 p + ggtitle("Estimates of reproducibility by perceived crisis in field (n = 137)")
 
 # so, I like your sprintf wrapper for the title...we will need to rebuild this figure
@@ -178,8 +184,7 @@ qtext <- "What is your experience with open materials and/or code?"
 
 # here we use formatting to insert an integer number into the title text
 title = sprintf("Experience with open materials and/or code (n = %d)",nvalid_code)
-# Am i missing it? I don't see the integer number, and I don't see what the "n = %d" is
-  # doing....
+
                 
 # create the plot
 # use the 100*(..count..)/sum(..count..)) thing to create percentages

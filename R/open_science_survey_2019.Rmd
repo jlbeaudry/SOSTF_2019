@@ -31,36 +31,59 @@ library(here)
 library(tidyverse)
 library(skimr)
 library(ggbeeswarm)
-#library(plyr) #can I do everything without plyr? I hate the conflicts with dplyr
+library(plyr) 
 library(plotly)
 ```
 
 
 ```{r import data, include=FALSE}
-#import the data. Here I'm using my data from '1_read_data', rather than Jordy's revised one.
+#import the data. Here I'm using the original Qualtrics data, rather than Jordy's revised one.
 df <- read_csv (here::here("data", "3_data_to_use.csv"))
 ```
 
 
 
+
+```{r crisis_by_estimate, include = FALSE}
+
+# filter rows with valid response for REPESTIMATE & rename variable accordingly
+valid_rep_est <- filter(df, RepEstimate_1 != "NA")
+
+# calculate number of rows with a valid response 
+nvalid_rep_est <- nrow(valid_rep_est)
+
+# filter rows with valid responses for CRISIS & rename variable accordingly
+nvalid_crisis <- filter(df, crisis != "NA") %>% 
+  nrow()
+#no_crisis_perc <- filter(df, crisis == "No Crisis") %>% 
+ # (100* ())
+
+# messy code to give percentages, but it works & allows me to insert the percentages
+  # into the text! :) 
+
+c <- count(df$crisis) #frequencies per level
+nvalid_crisis #total number of valid cases
+p <- round(100*(c [,2] / nvalid_crisis),2) #gives percentages per level
+
+# function to get percentages
+perc <- function (x,y){  #x = variable; #y = nrows of valid cases from above
+  c <- count (x)         #frequencies per level
+  round (100*(c [,2] / y), 0) #forcing to 0 decimal places   
+}
+
+p <- perc(x = df$crisis, y = nvalid_crisis)  
+
+```
+
 ## Estimates of Reproducibility by Perceived Crisis  
 
 Participants were asked if they believed their field is experiencing a "reproducibility
-crisis". X% indicated that they didn't know if there was a crisis, X% indicated that 
-there was no crisis, X% indicated that there was a slight crisis, and X% indicated
-that there was a significant reproducibility crisis in their field. 
+crisis". Of the `r nvalid_crisis` respondents who answered this question, `r p[1]`% indicated that they didn't know if there was a crisis, `r p[2]`% indicated there was no crisis, `r p[3]`% indicated that there was a slight crisis, and `r p[4]`% that there was a significant reproducibility crisis in their field. 
+
 
 The black bar is the mean estimate of reproducibility according to the level of 
 perceived crisis. 
 
-```{r crisis_by_estimate, include = FALSE}
-
-# filter rows with valid response for this variable & rename variable accordingly
-valid_rep_est <- filter(df, RepEstimate_1 != "NA")
-
-# calculate number of rows with a valid response for this variable
-nvalid_rep_est <- nrow(valid_rep_est)
-```
 
 ```{r crisis_by_estimate_barchart, echo=FALSE, warning=TRUE}
 #estimates of reproducibility by levels of crisis as a stripchart 
@@ -108,7 +131,10 @@ valid_os_exp <- filter(df, OverallExperience != "NA")
 # calculate number of rows with a valid response for this variable
 nvalid_os_exp <- nrow(valid_os_exp)
 
-# it works! Thanks, Tom!
+# just an FYI that this does the same thing
+#nvalid_os_exp <- df %>% 
+  #filter (OverallExperience != "NA") %>% 
+  #nrow()
 ```
 
 This figure shows how many people have experience with any open science practices. A
@@ -118,6 +144,9 @@ total of `r nvalid_os_exp` answered this question.
 
 # here we use formatting to insert an integer number into the title text
 title = sprintf("Experience with open science practices (n = %d)",nvalid_os_exp)
+x_name = "What is your experience with open science practices?"
+x_labels = c("Unaware", "Aware, But Not Used", "Some Experience", "Extensive Experience")
+y_name = "Frequency"
 
 p <- ggplot(data = valid_os_exp, 
        aes(x = OverallExperience)) + 
@@ -176,8 +205,7 @@ valid_code <- filter(df,CodeExp != "NA")
 # calculate number of rows with a valid response for this variable
 nvalid_code <- nrow(valid_code)
 
-# That's hilarious. I could not get this to work for me to save my life....I'll
-  # try to use this above....
+
 ```
 
 <!-- I use the `r ` inline insertion in the following to insert number of valid rows -->

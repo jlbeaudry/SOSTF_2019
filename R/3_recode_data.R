@@ -44,7 +44,7 @@ df %>%
   count(CodeExp)
 
 # when done recoding, write the data to a new file
-write.csv(df, here::here("data", "3_data_to_use.csv"))
+write.csv(df, here::here("data", "3_data_to_use.csv"), row.names = FALSE)
 
 
 

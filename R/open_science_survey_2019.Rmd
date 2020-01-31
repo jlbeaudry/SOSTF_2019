@@ -31,14 +31,14 @@ library(here)
 library(tidyverse)
 library(skimr)
 library(ggbeeswarm)
-library(plyr) #this is really important for factors
+#library(plyr) #can I do everything without plyr? I hate the conflicts with dplyr
 library(plotly)
 ```
 
 
 ```{r import data, include=FALSE}
 #import the data. Here I'm using my data from '1_read_data', rather than Jordy's revised one.
-df <- read_csv (here::here("data", "clean_data.csv"))
+df <- read_csv (here::here("data", "3_data_to_use.csv"))
 ```
 
 
@@ -53,14 +53,25 @@ that there was a significant reproducibility crisis in their field.
 The black bar is the mean estimate of reproducibility according to the level of 
 perceived crisis. 
 
+```{r crisis_by_estimate, include = FALSE}
+
+# filter rows with valid response for this variable & rename variable accordingly
+valid_rep_est <- filter(df, RepEstimate_1 != "NA")
+
+# calculate number of rows with a valid response for this variable
+nvalid_rep_est <- nrow(valid_rep_est)
+```
+
 ```{r crisis_by_estimate_barchart, echo=FALSE, warning=TRUE}
 #estimates of reproducibility by levels of crisis as a stripchart 
-  #and the !is.na removes NA from the 'RepEstimate_1' variable). 
 # This works fine, but can tweak to increase font size & perhaps add boxplot & remove background grid.
 
-valid_rep_est <- filter(df,  != "NA")
+#Right...I really like the idea of pulling out this stuff from the figure itself....
 
-title = sprintf("Estimates of reproducibility by perceived crisis in field (n = %d)",nvalid_code)
+title = sprintf("Estimates of reproducibility by perceived crisis in field (n = %d)",nvalid_rep_est)
+x_name = "Do you think your field is experiencing a 'Reprodubility Crisis'?"
+x_labels = c("Don't Know", "No Crisis", "Slight Crisis", "Significant Crisis")
+y_name = "Estimated %age of reproducible studies"
 
 p <- ggplot(data = subset(df, !is.na(RepEstimate_1)), 
        aes(x=crisis, y=RepEstimate_1)) + 
@@ -74,16 +85,13 @@ p <- ggplot(data = subset(df, !is.na(RepEstimate_1)),
                fun.ymax=mean,
                geom='crossbar',
                width=0.5) +
-  scale_x_discrete(name = "Do you think your field is experiencing a 'Reprodubility Crisis'?", limits = (c("Don't Know", "No Crisis", "Slight Crisis", "Significant Crisis"))) +
-  scale_y_continuous(name = "Estimated %age of reproducible studies") +
+  scale_x_discrete(name = x_name, limits = x_labels) +
+  scale_y_continuous(name = y_name) +
   coord_cartesian(ylim = c(0,100)) +
-  theme (text = element_text(size = 12))
+  theme (text = element_text(size = 12)) +
+  ggtitle(title)
 
-p + ggtitle("Estimates of reproducibility by perceived crisis in field (n = 137)")
-
-# so, I like your sprintf wrapper for the title...we will need to rebuild this figure
-  # accordingly, mainly for consistency and so the n in the title is automatically 
-  # calculated rather than hand-computed.
+p
 
 # if we want a separate file of the figure, use this code & it will be saved in the
   # figs folder. This will be handy if we want to create slides.

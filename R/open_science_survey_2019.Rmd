@@ -178,8 +178,7 @@ qtext <- "What is your experience with open materials and/or code?"
 
 # here we use formatting to insert an integer number into the title text
 title = sprintf("Experience with open materials and/or code (n = %d)",nvalid_code)
-# Am i missing it? I don't see the integer number, and I don't see what the "n = %d" is
-  # doing....
+
                 
 # create the plot
 # use the 100*(..count..)/sum(..count..)) thing to create percentages

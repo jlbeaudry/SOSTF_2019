@@ -2,46 +2,31 @@
 
 library(tidyverse)
 library(here)
-#library(plyr) #needed to mapvalues for factors; but lets see without...
+library(plyr) #need to mapvalues for factors
 
 # import the data file produced by '2_clean_data.R'
 df <- readr::read_csv(here::here("data", "2_clean_data.csv"))
 
-# turn specific variables into factors (will rename levels later)
+# turn specific variables into factors & rename levels
 
-df$crisis <- factor(df$crisis)
-df$OverallExperience <- factor(df$OverallExperience)
-df$CodeExp <- factor(df$CodeExp)
+df$crisis <- factor(df$crisis) %>% 
+  mapvalues(
+    c("1", "2", "3", "4"), 
+    c("Significant Crisis", "Slight Crisis", "No Crisis", "Don't Know")
+  )
 
-# rename levels for the factors using mutate because the recoding is cleaner
+df$OverallExperience <- factor(df$OverallExperience) %>% 
+  mapvalues(
+    c("1", "2", "3", "4"), 
+    c("Unaware", "Aware, But Not Used", "Some Experience", "Extensive Experience")
+  )
 
-df %>% 
-  dplyr::mutate(crisis = fct_recode(crisis,
-                             "Significant Crisis" = "1", 
-                             "Slight Crisis" = "2", 
-                             "No Crisis" = "3", 
-                             "Don't Know" = "4"
-                               )) %>% 
-  count(crisis) #count, just to see numbers
+df$CodeExp <- factor(df$CodeExp) %>%
+  mapvalues(
+    c("1", "2", "3", "4"),
+    c("Unaware", "Aware, But Not Used", "Some Use", "Regular Use")
+  )
 
-df %>% 
-  dplyr::mutate(OverallExperience = fct_recode(OverallExperience,
-                                        "Unaware" = "1",
-                                        "Aware, But Not Used" = "2", 
-                                        "Some Experience" = "3", 
-                                        "Extensive Experience"= "4"
-                                        )) %>% 
-  count(OverallExperience)
-
-
-df %>% 
-  dplyr::mutate(CodeExp = fct_recode(CodeExp,
-                                               "Unaware" = "1",
-                                               "Aware, But Not Used" = "2", 
-                                               "Some Use" = "3", 
-                                               "Regular Use"= "4"
-  )) %>% 
-  count(CodeExp)
 
 # when done recoding, write the data to a new file
 write.csv(df, here::here("data", "3_data_to_use.csv"), row.names = FALSE)

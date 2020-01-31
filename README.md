@@ -12,6 +12,11 @@ file. This script will evolve as I continue to manipulate the data. You should r
 the updated script any time you work with the data. As I play with this, I will 
 update the code in the 'open_science_survey_2019.Rmd' file to ensure that everything runs on the new 'clean_data.csv' dataset. 
 
+2. Use '2_clean_data.R' to convert the '.csv' file from Step 1 into a clean data
+file. This file will then be used in step 3 to recode the variables. You should only need to do this once--I don't need to play with this code.
+
+3. Use '3_recode_data.R' to recode the variables from the '.csv' file from Step 2. This script will evolve as I continue to manipulate the data. YOU SHOULD RUN THIS UPDATED SCRIPT ANYTIME YOU WORK WITH THE DATA. 
+
 3. The RMarkdown file 'open_science_survey_2019.Rmd' is the working document with all figures. 
 
 ## Info of additional files

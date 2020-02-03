@@ -47,7 +47,7 @@ df <- read_csv (here::here("data", "3_data_to_use.csv"))
 ```{r crisis_by_estimate, include = FALSE}
 
 # filter rows with valid response for REPESTIMATE & rename variable accordingly
-valid_rep_est <- filter(df, RepEstimate_1 != "NA")
+valid_rep_est <- filter(df, RepEstimate != "NA")
 
 # calculate number of rows with a valid response 
 nvalid_rep_est <- nrow(valid_rep_est)
@@ -55,37 +55,32 @@ nvalid_rep_est <- nrow(valid_rep_est)
 # filter rows with valid responses for CRISIS & rename variable accordingly
 nvalid_crisis <- filter(df, crisis != "NA") %>% 
   nrow()
-#no_crisis_perc <- filter(df, crisis == "No Crisis") %>% 
- # (100* ())
-
-# messy code to give percentages, but it works & allows me to insert the percentages
-  # into the text! :) 
-
-c <- count(df$crisis) #frequencies per level
-nvalid_crisis #total number of valid cases
-p <- round(100*(c [,2] / nvalid_crisis),2) #gives percentages per level
 
 # function to get percentages
-perc <- function (x,y){  #x = variable; #y = nrows of valid cases from above
+perc <- function (x,y){  #x = variable; #y = n of valid cases from above
   c <- count (x)         #frequencies per level
-  round (100*(c [,2] / y), 0) #forcing to 0 decimal places   
+  round (100*(c [,2] / y), 0) #rounding to 0 decimal places   
 }
 
-p <- perc(x = df$crisis, y = nvalid_crisis)  
+per_crisis <- perc(x = df$crisis, y = nvalid_crisis)  #percentage per level divided by total
+  # number of valid cases for the crisis variable
 
+# output of `p` inserted in text below
 ```
 
 ## Estimates of Reproducibility by Perceived Crisis  
 
 Participants were asked if they believed their field is experiencing a "reproducibility
-crisis". Of the `r nvalid_crisis` respondents who answered this question, `r p[1]`% indicated that they didn't know if there was a crisis, `r p[2]`% indicated there was no crisis, `r p[3]`% indicated that there was a slight crisis, and `r p[4]`% that there was a significant reproducibility crisis in their field. 
+crisis". Of the `r nvalid_crisis` respondents who answered this question, `r per_crisis[1]`% indicated that they didn't know if there was a crisis, `r per_crisis[2]`% indicated there was no crisis, `r per_crisis[3]`% indicated that there was a slight crisis, and `r per_crisis[4]`% that there was a significant reproducibility crisis in their field.   
 
-
-The black bar is the mean estimate of reproducibility according to the level of 
+Participants were also asked to estimate the percentage of research publications in 
+their field that are reproducible. In the figure below, we plotted participants' 
+reproducibility estimates according to their responses to the perceived reproducibility 
+crisis in their field. The black bar is the mean estimate of reproducibility according to the 
 perceived crisis. 
 
 
-```{r crisis_by_estimate_barchart, echo=FALSE, warning=TRUE}
+```{r crisis_by_estimate_stripchart, echo=FALSE, warning=TRUE}
 #estimates of reproducibility by levels of crisis as a stripchart 
 # This works fine, but can tweak to increase font size & perhaps add boxplot & remove background grid.
 
@@ -96,8 +91,8 @@ x_name = "Do you think your field is experiencing a 'Reprodubility Crisis'?"
 x_labels = c("Don't Know", "No Crisis", "Slight Crisis", "Significant Crisis")
 y_name = "Estimated %age of reproducible studies"
 
-p <- ggplot(data = subset(df, !is.na(RepEstimate_1)), 
-       aes(x=crisis, y=RepEstimate_1)) + 
+p <- ggplot(data = subset(df, !is.na(RepEstimate)), 
+       aes(x=crisis, y=RepEstimate)) + 
   geom_jitter(position=position_jitter(height=0,width=.15),
               fill="blue",
               colour="blue",
@@ -131,18 +126,23 @@ valid_os_exp <- filter(df, OverallExperience != "NA")
 # calculate number of rows with a valid response for this variable
 nvalid_os_exp <- nrow(valid_os_exp)
 
-# just an FYI that this does the same thing
+per_os_exp <- perc(x = df$OverallExperience, y = nvalid_os_exp)
+
+#count outputs in case that's what we are going to report instead...
+c_os_exp <- count(valid_os_exp$OverallExperience)
+
+# just an FYI that this does the same thing as the code above
 #nvalid_os_exp <- df %>% 
   #filter (OverallExperience != "NA") %>% 
   #nrow()
 ```
 
-This figure shows how many people have experience with any open science practices. A
-total of `r nvalid_os_exp` answered this question.
+This figure shows how many people have experience with any open science practices. Before we asked participants about their experience with open science practices, we explained that the practices enveloped by the umbrella term of "open science" were study preregistration, open materials and/or code, open data, pre-publication archiving, and open access publishing. Of the `r nvalid_os_exp`participants who answered this question, `r per_os_exp[4]`% (or, `r c_os_exp[4,2]` reported that they were unaware of open science practices; `r per_os_exp[1]`% reported that they were aware of open science practices, but had not used them; `r per_os_exp[3]`% reported that they had some experience with open science practices; and only `r per_os_exp[2]`% reported that they had extensive experience with open science practices. 
 
-```{r os_experience_figure, echo=FALSE, warning=TRUE}
+```{r os_experience_bar, echo=FALSE, warning=TRUE}
 
-# here we use formatting to insert an integer number into the title text
+# TOM, THIS WILL NEED TO BE UPDATED WITH YOUR FUNCTION# 
+
 title = sprintf("Experience with open science practices (n = %d)",nvalid_os_exp)
 x_name = "What is your experience with open science practices?"
 x_labels = c("Unaware", "Aware, But Not Used", "Some Experience", "Extensive Experience")

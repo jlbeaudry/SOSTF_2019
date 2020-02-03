@@ -20,7 +20,7 @@ df <- df %>%
   # (e.g., V1, location, etc.).
 df <- df %>% 
   select (-c(X1, V1:V10, consent, Intro, LocationLatitude, LocationLongitude, 
-            LocationAccuracy)) 
+            LocationAccuracy, PreregDef)) 
 
 # when done cleaning, write the data to a new file
 write.csv(df, here::here("data", "2_clean_data.csv"),row.names = FALSE)

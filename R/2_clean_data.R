@@ -2,11 +2,11 @@
 
 library(tidyverse)
 library(here)
-library(plyr) #needed to mapvalues for factors
+#library(plyr) #needed to mapvalues for factors; but lets see without...
 
 
 # import the data file produced by '1_read_data.R'
-df <- read_csv(here::here("data", "data_to_clean.csv"))
+df <- read_csv(here::here("data", "1_data_to_clean.csv"))
 
 # start cleaning the data:
 
@@ -19,32 +19,14 @@ df <- df %>%
 # selects all columns except for the junk columns, which we don't need 
   # (e.g., V1, location, etc.).
 df <- df %>% 
-  select (-V1:-V10, -X1, -consent, -Intro, -LocationLatitude, -LocationLongitude, 
-          -LocationAccuracy)
-
-# turns specific variables into factors & includes the labels for the values.
-df$crisis <- factor(df$crisis) %>% 
-  mapvalues(
-    c("1", "2", "3", "4"), 
-    c("Significant Crisis", "Slight Crisis", "No Crisis", "Don't Know")
-  )
-
-df$OverallExperience <- factor(df$OverallExperience) %>% 
-  mapvalues(
-    c("1", "2", "3", "4"), 
-    c("Unaware", "Aware, But Not Used", "Some Experience", "Extensive Experience")
-  )
-  
-df$CodeExp <- factor(df$CodeExp) %>%
-  mapvalues(
-    c("1", "2", "3", "4"),
-    c("Unaware", "Aware, But Not Used", "Some Use", "Regular Use")
-  )
+  select (-c(X1, V1:V10, consent, Intro, LocationLatitude, LocationLongitude, 
+            LocationAccuracy, PreregDef)) 
 
 # when done cleaning, write the data to a new file
-write.csv(df, here::here("data", "clean_data.csv"))
+write.csv(df, here::here("data", "2_clean_data.csv"),row.names = FALSE)
+# row.names gets rid of the first column from the dataframe.
 
-
+# use this csv file in step 3, which recodes variables for use. See '3_recode_data.R'.
 
 
 

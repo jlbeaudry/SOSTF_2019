@@ -35,13 +35,70 @@ library(plyr)
 library(plotly)
 ```
 
+```{r function_defs, include=FALSE}
+# define functions here. Could be moved to a separate file I guess.
+
+simple_pie_chart <- function(the_data,label_var="",the_title="",colours){
+
+#tally the responses for each response option
+pie_data <- table(the_data[[label_var]])
+# calculate number of valid responses for this variable
+nvalid <- sum(pie_data)
+
+# here we use formatting to insert an integer number into the title text
+the_title = sprintf(the_title,nvalid)
+
+
+pie_dataframe <- as.data.frame(pie_data)
+# Create the pie chart
+p <- plot_ly(pie_dataframe, labels = ~Var1, values = ~Freq, type = 'pie',
+             textposition = "inside",
+             textinfo = 'label+percent',
+             marker = list(colors = colours, line=list(color="white", width=10)),
+             showlegend=FALSE,
+             sort=FALSE,
+             direction="clockwise",
+             rotation=0,
+             hole=0.3,
+             pull=0,
+             title=list(text=the_title,position="top center",font=list(size=20, color="black")))
+return(p)
+}
+
+
+simple_bar_graph <- function(the_data,label_var="",the_title="", yname="Percentage", xname="Response",bar_colour="blue",line_colour="",line_width=1){
+
+  #tally the responses for each response option
+  bar_data <- table(the_data[[label_var]])
+  # calculate number of valid responses for this variable
+  nvalid <- sum(bar_data)
+  # create percentage scores
+  bar_data <- bar_data*100/nvalid
+  
+  # here we use formatting to insert an integer number into the title text
+  the_title = sprintf(the_title,nvalid)
+  
+  bar_dataframe <- as.data.frame(bar_data)
+  
+  # create labels for the graph elements
+  qtext <- "What is your experience with open materials and/or code?"
+  
+  if (line_colour == "") line_width <- 0
+  # create the plot
+  p <- plot_ly(bar_dataframe, type="bar",
+    x = ~Var1, y = ~Freq,
+    marker = list(color = bar_colour,
+                           line = list(color = line_colour, width = line_width))) %>%
+    layout(title=the_title,yaxis = list(title=yname),xaxis = list(title=xname))
+  return(p)
+}
+
+```
 
 ```{r import data, include=FALSE}
 #import the data. Here I'm using the original Qualtrics data, rather than Jordy's revised one.
 df <- read_csv (here::here("data", "3_data_to_use.csv"))
 ```
-
-
 
 
 ```{r crisis_by_estimate, include = FALSE}
@@ -231,71 +288,26 @@ nvalid_code <- nrow(valid_code)
 ```
 
 <!-- I use the `r ` inline insertion in the following to insert number of valid rows -->
-This figure shows how many people have experience with open code and/or materials. A
+The following section shows how many people have experience with open code and/or materials. A
 total of `r nvalid_code` answered this question.
 
 ```{r code_figures, echo=FALSE, warning=TRUE}
-# Tom, can you get in the habit of naming your r chunks, please?
-
-# create labels for the graph elements
-qtext <- "What is your experience with open materials and/or code?"
-
-# here we use formatting to insert an integer number into the title text
-title = sprintf("Experience with open materials and/or code (n = %d)",nvalid_code)
-
-                
-# create the plot
-# use the 100*(..count..)/sum(..count..)) thing to create percentages
-
-p <- ggplot(data = valid_code, aes(x=CodeExp)) + 
-  geom_bar(aes(y=100*(..count..)/sum(..count..)),colour = "black" , fill = "blue" ) +
-  scale_x_discrete(name = qtext,
-                   limits=c("Unaware", "Aware, But Not Used", "Some Use", "Regular Use")) + 
-  theme (text = element_text(size = 12)) +
-  scale_y_continuous(name = "Percentage") + 
-  coord_cartesian(ylim = c(0,100)) + 
-  ggtitle(title)
-p
-
-# Now in pie chart form
-
-valid_code_summary <- dplyr::count(valid_code,CodeExp)  
-
-p <- pie(valid_code_summary$n,clockwise=TRUE,labels=valid_code_summary$CodeExp, init.angle=90, col=gray.colors(4,start=0.4,end=1.0))
-p
-
-# Now try the plotly pie chart
-
-piedata <- valid_code[,'CodeExp']
-
-p <- plot_ly(piedata, labels = ~CodeExp, type = 'pie',
-             textposition = "inside",
-             textinfo = 'label+percent',
-             marker = list(colors = c("red","yellow","palegreen","darkseagreen"), 
-                line=list(color="white", width=10)),
-             showlegend=FALSE,
-             sort=FALSE,
-             direction="clockwise",
-             rotation=0,
-             hole=0.3,
-             pull=0,
-             title=list(text=title,position="top center",font=list(size=20, color="black")))
-p
-
-```
-
-```{r code_tables, echo=FALSE}
 
 c2 <- valid_code %>% 
   dplyr::count(CodeExp)  
 
 knitr::kable(c2, caption = 'Experience with Open Materials & Code')
+
+
+p <- simple_bar_graph(df,"CodeExp",the_title=title,xname = "What is your experience with open materials and/or code?", yname="Proportion",bar_colour = "orange",line_colour = "black")
+p
+
+# colours = heat.colors(4)
+colours = rev(topo.colors(8))
+p <- simple_pie_chart(df,"CodeExp",the_title=title,colours)
+p
+
 ```
-
-### Concerns with practices....
-
-### Barriers...
-
 
 
 ```{r skim df, eval=FALSE, include=FALSE}

@@ -1,15 +1,9 @@
 .Rproj.user
 .Rhistory
 .Rdata
-.README.html
-data_to_clean.csv
-clean_data.csv
 *.html
-<<<<<<< HEAD
-open_science_survey_2019.html
 *.xlsx
 *.rds
-=======
 .RData
 data
->>>>>>> 40cc82d2037eb67c8832cbd3ff3054f3cfd346a8
+

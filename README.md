@@ -12,7 +12,7 @@ a .csv file to the main 'data' folder for use with the .Rmd script.
 WHILE WE ARE IN DEVELOPMENT MODE, YOU SHOULD RUN THIS PREPROCESSING SCRIPT EVERYTIME
 YOU WORK WITH THE DATA. 
 
-2.The RMarkdown file 'open_science_survey_2019.Rmd' is in the 'analysis' folder. 
+2. The RMarkdown file 'open_science_survey_2019.Rmd' is in the 'analysis' folder. 
 
 ## Info of additional files
 

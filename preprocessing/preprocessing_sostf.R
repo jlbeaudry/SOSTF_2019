@@ -84,6 +84,35 @@ df$CodeExp <- df$CodeExp %>%
   )
 
 
+# check how many options were selected in the AcLevel columns.
+
+  AcLevel <- select (df, AcLevel_1:AcLevel_13) 
+  df$Multi_AcLevel <- rowSums (AcLevel == "1", na.rm = TRUE) #create new column with 
+    # values across the Academic Level columns
+  # select(df, df$Multi_AcLevel = 2) 
+  # next step is to resolve the conflicts, but I've not figured that out yet. 
+
+
+
+
+# the coding of the academic levels are not exactly as in the pdf of the survey
+  # in the current version of the survey due to a coding error in Qualtrics. Check
+  # the second row of the 'AcLevel' columns to see the actual labels. Recoding those
+  # here into a single variable.
+
+df$AcLevel_1 <- recode (df$AcLevel_1, '1' = "Prof")
+df$AcLevel_2 <- recode (df$AcLevel_2, '1' = "Ass_Prof")
+df$AcLevel_3 <- recode (df$AcLevel_3, '1' ="Sen_Lec")
+df$AcLevel_4 <- recode (df$AcLevel_4, '1' = "Lec")
+df$AcLevel_5 <- recode (df$AcLevel_5, '1' = "Postdoc")
+df$AcLevel_6 <- recode (df$AcLevel_6, '1' = "PhD_student")
+df$AcLevel_7 <- recode (df$AcLevel_7, '1' = "Masters_student")
+df$AcLevel_9 <- recode (df$AcLevel_9, '1' = "RA")
+df$AcLevel_10<- recode (df$AcLevel_10, '1' = "Other")
+df$AcLevel_12<- recode (df$AcLevel_12, '1' = "Senior_Res_Fellow")
+df$AcLevel_13<- recode (df$AcLevel_13, '1' = "Res_Fellow")
+
+
 ################### WRITE DATA TO CSV #############
 
 # when done recoding, write the data to a new file

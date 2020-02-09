@@ -39,6 +39,8 @@ perc <- function (x,y){  #x = variable; #y = n of valid cases from above
   round (100*(c [,2] / y), 0) #rounding to 0 decimal places   
 }
 
+
+
 ## PIE CHART ##
 simple_pie_chart <- function (the_data, label_var="", the_title="", colours){
 

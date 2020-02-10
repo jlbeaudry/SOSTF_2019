@@ -84,6 +84,48 @@ df$CodeExp <- df$CodeExp %>%
   )
 
 
+# notes re: how I dealt with folks who selected more than one option from Academic Levels.
+  # Keeping for transparency and reproducibility, but no need to run everytime. 
+
+  #AcLevel <- select (df, AcLevel_1:AcLevel_13) 
+  #df$Multi_AcLevel <- rowSums (AcLevel == "1", na.rm = TRUE) #create new column with 
+    # values across the Academic Level columns
+  # filter(df, Multi_AcLevel >= 2) # shows which respondents (n = 11) gave more than 
+    # one response to question of Academic Level. Will resolve this in these 11 cases 
+    # by applying a data cleansing rule that follows this logic:
+    # Academic Position > Student Position > Research Assistantship
+    # For these 11 cases, we will just take the first response, because that 
+    # coding corresponds to the rule above. 
+  # if we need to see those with multiple responses again, use this code
+  # df2 <- filter(df, Multi_AcLevel >= 2) %>% 
+    #select (ParticipantNumber, AcLevel_1:AcLevel_13) 
+
+  
+  
+# Recoding Academic Levels. 
+  # the coding of the academic levels is not exactly as in the pdf of the survey
+  # due to a coding error in Qualtrics. The second row of the 'AcLevel' columns 
+  # has the correct  labels. Recoding the numerical responses into text responses here, 
+  # based on their first response within the survey to resolve the multiple responses.
+  
+  
+  df <- mutate (df, AcLevel_Label = ifelse (AcLevel_1 %in% '1', "Professor",
+                                    ifelse (AcLevel_2 %in% '1', "Associate Professor", 
+                                    ifelse (AcLevel_3 %in% '1', "Senior Lecturer",
+                                    ifelse (AcLevel_4 %in% '1', "Lecturer", 
+                                    ifelse (AcLevel_5 %in% '1', "Postdoc",
+                                    ifelse (AcLevel_6 %in% '1', "PhD Student", 
+                                    ifelse (AcLevel_7 %in% '1', "Masters Student",
+                                    ifelse (AcLevel_9 %in% '1', "Research Assistant", 
+                                    ifelse (AcLevel_10 %in% '1', "Other", 
+                                    ifelse (AcLevel_12 %in% '1', "Senior Research Fellow",
+                                    ifelse (AcLevel_13 %in% '1', "Research Fellow", "NA"))))))))))))
+
+  # transform into factor
+  df$AcLevel_Label <- factor(df$AcLevel_Label) 
+  
+ 
+
 ################### WRITE DATA TO CSV #############
 
 # when done recoding, write the data to a new file

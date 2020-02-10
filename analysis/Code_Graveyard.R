@@ -13,6 +13,45 @@ df$crisis <- factor(df$crisis) %>%
 #&prevents it from being truncated
 
 
+# figuring out the Academic Levels variables
+
+# recoding them into a different variable (could also recode into same variable)
+df$AcLevel_1_lab <- recode (df$AcLevel_1, '1' = "Prof")
+df$AcLevel_2_lab <- recode (df$AcLevel_2, '1' = "Ass_Prof")
+df$AcLevel_3_lab <- recode (df$AcLevel_3, '1' ="Sen_Lec")
+df$AcLevel_4_lab <- recode (df$AcLevel_4, '1' = "Lec")
+df$AcLevel_5_lab <- recode (df$AcLevel_5, '1' = "Postdoc")
+df$AcLevel_6_lab <- recode (df$AcLevel_6, '1' = "PhD_student")
+df$AcLevel_7_lab <- recode (df$AcLevel_7, '1' = "Masters_student")
+df$AcLevel_9_lab <- recode (df$AcLevel_9, '1' = "RA")
+df$AcLevel_10_lab <- recode (df$AcLevel_10, '1' = "Other")
+df$AcLevel_12_lab <- recode (df$AcLevel_12, '1' = "Senior_Res_Fellow")
+df$AcLevel_13_lab <- recode (df$AcLevel_13, '1' = "Res_Fellow")
+
+
+# just checking the numbers to make sure I captured everything (need to remove 11)
+x1 <- dplyr::count(df, AcLevel_1_lab)
+x2 <- dplyr::count(df, AcLevel_2_lab)
+x3 <- dplyr::count(df, AcLevel_3_lab)
+x4 <- dplyr::count(df, AcLevel_4_lab)
+x5 <- dplyr::count(df, AcLevel_5_lab)
+x6 <- dplyr::count(df, AcLevel_6_lab)
+x7 <- dplyr::count(df, AcLevel_7_lab)
+x9 <- dplyr::count(df, AcLevel_9_lab)
+x10 <- dplyr::count(df, AcLevel_10_lab)
+x12 <- dplyr::count(df, AcLevel_12_lab)
+x13 <- dplyr::count(df, AcLevel_13_lab)
+print (c(x1 [1,2], x2 [1,2], x3 [1,2], x4 [1,2], x5 [1,2], x6 [1,2], x7 [1,2], x9 [1,2],
+         x10 [1,2], x12[1,2], x13[1,2]))
+
+# I will use this data to compare to the counts within the renamed variable
+
+df2 <- filter(df, Multi_AcLevel >= 2) %>% 
+  select (ParticipantNumber, AcLevel_1:AcLevel_13) #shows which participants said yes to 
+# more than one AcLevel
+
+
+
 # FIGURE OUT COLUMN NAMES & TYPES
 
 #shows the column types for all variables &prevents it from being truncated

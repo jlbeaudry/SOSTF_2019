@@ -109,17 +109,17 @@ df$CodeExp <- df$CodeExp %>%
   # based on their first response within the survey to resolve the multiple responses.
   
   
-  df <- mutate (df, AcLevel_Label = ifelse (AcLevel_1 %in% '1', "Prof",
-                                    ifelse (AcLevel_2 %in% '1', "Ass_Prof", 
-                                    ifelse (AcLevel_3 %in% '1', "Sen_Lec",
-                                    ifelse (AcLevel_4 %in% '1', "Lec", 
+  df <- mutate (df, AcLevel_Label = ifelse (AcLevel_1 %in% '1', "Professor",
+                                    ifelse (AcLevel_2 %in% '1', "Associate Professor", 
+                                    ifelse (AcLevel_3 %in% '1', "Senior Lecturer",
+                                    ifelse (AcLevel_4 %in% '1', "Lecturer", 
                                     ifelse (AcLevel_5 %in% '1', "Postdoc",
-                                    ifelse (AcLevel_6 %in% '1', "PhD_student", 
-                                    ifelse (AcLevel_7 %in% '1', "Masters_student",
-                                    ifelse (AcLevel_9 %in% '1', "RA", 
+                                    ifelse (AcLevel_6 %in% '1', "PhD Student", 
+                                    ifelse (AcLevel_7 %in% '1', "Masters Student",
+                                    ifelse (AcLevel_9 %in% '1', "Research Assistant", 
                                     ifelse (AcLevel_10 %in% '1', "Other", 
-                                    ifelse (AcLevel_12 %in% '1', "Sen_Res_Fellow",
-                                    ifelse (AcLevel_13 %in% '1', "Res_Fellow", "NA"))))))))))))
+                                    ifelse (AcLevel_12 %in% '1', "Senior Research Fellow",
+                                    ifelse (AcLevel_13 %in% '1', "Research Fellow", "NA"))))))))))))
 
   # transform into factor
   df$AcLevel_Label <- factor(df$AcLevel_Label) 

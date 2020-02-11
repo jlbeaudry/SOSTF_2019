@@ -35,7 +35,7 @@ library(kableExtra)
 
 ## CALCULATE PERCENTAGES ##
 
-perc <- function (x,y){  #x = variable; #y = n of valid cases from above
+perc <- function (x,y){  #x = variable; #y = n of valid cases
   c <- plyr::count (x)         #frequencies per level
   round (100*(c [,2] / y), 0) #rounding to 0 decimal places   
 }
@@ -50,9 +50,11 @@ perc <- function (x,y){  #x = variable; #y = n of valid cases from above
  
 simple_pie_chart <- function (the_data, label_var="CodeExp", the_title="", colours, order = "ByRespNum"){
 
+the_data <- filter(the_data,CodeExp != "NA")
 # sort the data by response option order
 sort_var = paste(label_var,"_num",sep="")
 the_data <- the_data[order(the_data[[sort_var]]),]
+
 
 #tally the responses for each response option
 pie_data <- table (the_data[[label_var]])
@@ -66,12 +68,11 @@ pie_dataframe <- as.data.frame(pie_data)
 
 #rounded_pcts = round(100*pie_dataframe$freq/sum(pie_dataframe$freq))
 # Create the pie chart
-p <- plot_ly(the_data, labels = the_data[[label_var]], values = the_data[[sort_var]], type = 'pie',
+p <- plot_ly(the_data, labels = the_data[[label_var]], type = 'pie',
              textposition = "inside",
              textinfo = 'label+percent',
              #text = ~paste(rounded_pcts),
              #textinfo='text',
-
              marker = list(colors = colours, line=list(color="white", width=10)),
              showlegend = FALSE,
              sort = FALSE,
@@ -83,6 +84,9 @@ p <- plot_ly(the_data, labels = the_data[[label_var]], values = the_data[[sort_v
                 (text = the_title, position = "top center",font = list (size=20, color="black")))
 return(p)
 }
+
+# this is the old attempt, which multiplied the values... 
+# values = the_data[[sort_var]],
 
 ## BAR CHART HISTOGRAM ##
 
@@ -127,12 +131,6 @@ simple_bar_graph <- function (the_data, label_var = "", the_title = "",
   return(p)
 }
 
-  # Tom's to-do list
-    # open-ended data to Lisa...
-    # Tom to try to round to integer
-    # change y-axis & include parameter, which will change the data
-    # add in ability to order according to different criteria (labels or coded number)
-
 ```
 
 ```{r import data, include=FALSE}
@@ -146,8 +144,6 @@ n <- nrow(df$ParticipantNumber)
 valid_ac_level <- filter(df, AcLevel_Label != "NA")
 nvalid_ac_level <- nrow(valid_ac_level)
 per_ac_level <- perc(x = df$AcLevel_Label, y = nvalid_ac_level) 
-
-
 
 ```
 
@@ -436,8 +432,13 @@ p
 ```{r code_pie, echo = FALSE, warning = TRUE}
 title = "What is your experience with open materials and/or code (n = %d)"
 #pie chart
+
+# Tom, I haven't figured out the issue yet, but I'm flagging for you that the 
+  # numbers on this figure aren't correct. Print the object 'c2' above to see
+  # the correct values. I have to run to a meeting, so I can't investigate now.
+
 colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(df,label_var="CodeExp",the_title = title, colours)
+p <- simple_pie_chart(df,label_var="CodeExp",the_title = title, colours = colours)
 p
 ```
 

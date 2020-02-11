@@ -41,7 +41,18 @@ perc <- function (x,y){  #x = variable; #y = n of valid cases from above
 }
 
 ## PIE CHART ##
-simple_pie_chart <- function (the_data, label_var="", the_title="", colours){
+
+# Tom's to-do list
+    # open-ended data to Lisa...
+    # Tom to try to round to integer
+    # change y-axis & include parameter, which will change the data: done
+    # add in ability to order according to different criteria (labels or coded number): added order by response order. Still to add order by number of responses.
+ 
+simple_pie_chart <- function (the_data, label_var="CodeExp", the_title="", colours, order = "ByRespNum"){
+
+# sort the data by response option order
+sort_var = paste(label_var,"_num",sep="")
+the_data <- the_data[order(the_data[[sort_var]]),]
 
 #tally the responses for each response option
 pie_data <- table (the_data[[label_var]])
@@ -53,10 +64,14 @@ the_title = sprintf(the_title,nvalid)
 
 pie_dataframe <- as.data.frame(pie_data)
 
-## PIE CHART ##
-p <- plot_ly(pie_dataframe, labels = ~Var1, values = ~Freq, type = 'pie',
+#rounded_pcts = round(100*pie_dataframe$freq/sum(pie_dataframe$freq))
+# Create the pie chart
+p <- plot_ly(the_data, labels = the_data[[label_var]], values = the_data[[sort_var]], type = 'pie',
              textposition = "inside",
-            textinfo = 'label+percent',
+             textinfo = 'label+percent',
+             #text = ~paste(rounded_pcts),
+             #textinfo='text',
+
              marker = list(colors = colours, line=list(color="white", width=10)),
              showlegend = FALSE,
              sort = FALSE,
@@ -69,34 +84,46 @@ p <- plot_ly(pie_dataframe, labels = ~Var1, values = ~Freq, type = 'pie',
 return(p)
 }
 
-## BAR GRAPH ##
+## BAR CHART HISTOGRAM ##
+
 
 simple_bar_graph <- function (the_data, label_var = "", the_title = "", 
-                              yname = "Percentage", xname = "Response",
+                              yname = "Count", xname = "Response",
                               bar_colour = "blue",line_colour = "",line_width = 1){
+
+  
+  # sort the data by response option order
+  sort_var = paste(label_var,"_num",sep="")
+  the_data <- the_data[order(the_data[[sort_var]]),]
 
   #tally the responses for each response option
   bar_data <- table (the_data[[label_var]])
   # calculate number of valid responses for this variable
   nvalid <- sum (bar_data)
-  # create percentage scores
-  bar_data <- bar_data*100/nvalid
+  
+  # plot the Count, unless y-axis has been specified as "Percentage"
+  ynorm = ""
+  if (yname=="Percentage") ynorm = "percentage"
   
   # here we use formatting to insert an integer number into the title text
   the_title = sprintf (the_title,nvalid)
-  
-  bar_dataframe <- as.data.frame(bar_data)
   
   # create labels for the graph elements
   qtext <- "What is your experience with open materials and/or code?"
   
   if (line_colour == "") line_width <- 0
   # create the plot
-  p <- plot_ly(bar_dataframe, type="bar",
-    x = ~Var1, y = ~Freq,
+  p <- plot_ly(
+    x = the_data[[label_var]],
+    histfunc="count",
+    histnorm=ynorm,
+    orientation="v",
+    type = "histogram",
     marker = list(color = bar_colour,
                            line = list(color = line_colour, width = line_width))) %>%
-    layout (title = the_title, yaxis = list (title=yname), xaxis = list (title=xname))
+    layout (title = the_title, 
+            yaxis = list (title=yname), 
+            xaxis = list (title=xname,type="category",categoryorder="trace"))
   return(p)
 }
 
@@ -378,9 +405,8 @@ p
 
 #pie chart
 colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(df,"CodeExp",the_title = title, colours)
+p <- simple_pie_chart(df,label_var="CodeExp",the_title = title, colours)
 p
-
 ```
 
 

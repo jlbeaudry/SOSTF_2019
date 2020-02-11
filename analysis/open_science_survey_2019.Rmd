@@ -186,6 +186,20 @@ knitr::kable(col.names = c("Academic Levels", "Frequency", "Percentage"), captio
 #                       bar_colour = "blue",
 #                       line_colour = "black") %>% 
 #  layout(xaxis = list(categoryorder='trace'))
+
+# will need to figure out how to reorder data....
+
+ap <- ggplot(data = valid_ac_level, aes (AcLevel_Label)) + 
+  geom_bar() +
+  labs (x = "Frequency", 
+        y = "Academic Levels", 
+        title = sprintf("Reported Academic Levels (n = %d)",nvalid_ac_level)) +
+  coord_flip() + 
+  theme_classic(base_size = 12)
+ap
+
+ggsave(here::here("figs", "aclevels_bar.png"))
+
 ```
 
 <!--NEED TO RECODE THE FOR CODES. FOR NOW, I COULD PULL IN THIS DATA FROM JORDY'S, BUT THAT'S LESS THAN IDEAL. EITHER WAY INSERT THESE DETAILS HERE-->
@@ -253,7 +267,7 @@ p
 
 # if we want a separate file of the figure, use this code & it will be saved in 
   # the figs folder. This will be handy if we want to create slides.
-#ggsave(here::here("figs", "reprod_estimates_by_crisis.png"))
+# ggsave(here::here("figs", "reprod_estimates_by_crisis.png"))
 ```
   
    
@@ -303,20 +317,24 @@ p <- ggplot(data = valid_os_exp,
   fill = "blue") +
   scale_x_discrete(name = "What is your experience with open science practices?",
                    limits=c("Unaware", "Aware, But Not Used", "Some Experience", "Extensive Experience")) + 
-  theme (text = element_text(size = 12)) +
+  theme_classic(base_size = 12) +
   scale_y_continuous(name = "Frequency") +
   coord_cartesian(ylim = c(0,100)) +
   ggtitle(title)
-
 p
+
+# ggsave(here::here("figs", "os_overallexp_bar.png"))
+
+
+
 ```
 
 
 ```{r os_experience_pie, echo = FALSE}
 
-# TOM, THIS WILL NEED TO BE UPDATED WITH YOUR PIE CHART FUNCTION# 
-
 title = "What is your experience with open science practices? (n = %d)"
+
+# this works, but it doesn't look great because of the "extensive experience" value
 
 #pie chart
 colours <- brewer.pal(4, "Blues")
@@ -331,7 +349,7 @@ p
   
 ```
 
-```{r tables_os_experience, echo = FALSE}
+```{r tables_os_experience, echo = FALSE, eval = FALSE}
 
 # keeping this for now, but we likely won't use the table, right?
   # but, this is a good reminder that it's possible to change the order of the rows in the tables (arranged by descending frequency)
@@ -369,8 +387,13 @@ Of the `r nvalid_prereg_exp` participants who answered this question, `r per_pre
 
 ```{r prereg_table, echo=FALSE, warning=TRUE}
 
-dplyr::arrange(c_prereg_exp, desc(freq)) %>% 
-knitr::kable (col.names = c("Preregistration Experience", "Frequency"), caption = "Experience with Study Preregistration")
+p2 <- valid_prereg_exp %>% 
+  dplyr::count(PreregExp1) %>% 
+  mutate(Percentage = round (n/nvalid_prereg_exp*100))
+
+dplyr::arrange(p2, desc(n)) %>% 
+knitr::kable (col.names = c("Preregistration Experience", "Frequency", "Percentage"), caption = sprintf("Experience with Study Preregistration (n = %d)", nvalid_prereg_exp)) %>% 
+    kable_styling(bootstrap_options = "striped", full_width = F, position = 'center')
 
 ```
 
@@ -391,18 +414,27 @@ nvalid_code <- nrow(valid_code)
 The following section shows how many people have experience with open code and/or materials. A
 total of `r nvalid_code` answered this question.
 
-```{r code_figures, echo=FALSE, warning=TRUE}
+```{r code_table, echo=FALSE, warning=TRUE}
 
 c2 <- valid_code %>% 
-  dplyr::count(CodeExp)  
+  dplyr::count(CodeExp) %>%  
+    mutate(Percentage = round (n/nvalid_code*100))
 
-knitr::kable(c2, caption = 'Experience with Open Materials & Code')
+dplyr::arrange(c2, desc(n)) %>% 
+knitr::kable (col.names = c("Experience with Open Materials & Code", "Frequency", "Percentage"), caption = sprintf("Experience with Open Materials & Code (n = %d)", nvalid_code)) %>% 
+    kable_styling(bootstrap_options = "striped", full_width = F, position = 'center')
 
+```
+
+```{r code_bar, echo = FALSE, warning = TRUE, eval = FALSE}
 title = "What is your experience with open materials and/or code (n = %d)"
 
 p <- simple_bar_graph(df, label_var = "CodeExp", the_title = title, xname = "What is your experience with open materials and/or code?", bar_colour = "orange",line_colour = "black")
 p
+```
 
+```{r code_pie, echo = FALSE, warning = TRUE}
+title = "What is your experience with open materials and/or code (n = %d)"
 #pie chart
 colours <- brewer.pal(4, "Blues")
 p <- simple_pie_chart(df,label_var="CodeExp",the_title = title, colours)

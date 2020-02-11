@@ -27,6 +27,7 @@ library(ggbeeswarm)
 library(plyr) 
 library(plotly)
 library(RColorBrewer)
+library(kableExtra)
 ```
 
 ```{r function_defs, include=FALSE}
@@ -62,6 +63,7 @@ nvalid <- sum (pie_data)
 the_title = sprintf(the_title,nvalid)
 
 pie_dataframe <- as.data.frame(pie_data)
+
 #rounded_pcts = round(100*pie_dataframe$freq/sum(pie_dataframe$freq))
 # Create the pie chart
 p <- plot_ly(the_data, labels = the_data[[label_var]], values = the_data[[sort_var]], type = 'pie',
@@ -69,6 +71,7 @@ p <- plot_ly(the_data, labels = the_data[[label_var]], values = the_data[[sort_v
              textinfo = 'label+percent',
              #text = ~paste(rounded_pcts),
              #textinfo='text',
+
              marker = list(colors = colours, line=list(color="white", width=10)),
              showlegend = FALSE,
              sort = FALSE,
@@ -83,9 +86,11 @@ return(p)
 
 ## BAR CHART HISTOGRAM ##
 
+
 simple_bar_graph <- function (the_data, label_var = "", the_title = "", 
                               yname = "Count", xname = "Response",
                               bar_colour = "blue",line_colour = "",line_width = 1){
+
   
   # sort the data by response option order
   sort_var = paste(label_var,"_num",sep="")
@@ -122,6 +127,12 @@ simple_bar_graph <- function (the_data, label_var = "", the_title = "",
   return(p)
 }
 
+  # Tom's to-do list
+    # open-ended data to Lisa...
+    # Tom to try to round to integer
+    # change y-axis & include parameter, which will change the data
+    # add in ability to order according to different criteria (labels or coded number)
+
 ```
 
 ```{r import data, include=FALSE}
@@ -132,6 +143,11 @@ df <- read_csv (here::here("data", "data_sostf.csv"))
 ```{r demographics, include=FALSE}
 
 n <- nrow(df$ParticipantNumber)
+valid_ac_level <- filter(df, AcLevel_Label != "NA")
+nvalid_ac_level <- nrow(valid_ac_level)
+per_ac_level <- perc(x = df$AcLevel_Label, y = nvalid_ac_level) 
+
+
 
 ```
 
@@ -141,18 +157,41 @@ We conducted a survey in September 2019 to examine people's current use of open
 science practices, to examine their perceptions of these practices, and to examine
 their perceived barriers to using these practices. Across the university, `r n` 
 started the survey, although not all respondents completed all questions; thus, 
-we report the sample size for each question.
+we report the sample size for each question. This document presents an overview of their responses. 
 
 In terms of their demographics, we did not obtain information about gender or age
-to provide more anonymity to our respondents. We did ask about their Academic 
-Level or Type and their Discpline (based on 2-digit and 4-digit Field of Research [FOR] codes). 
+to provide more anonymity to our respondents. We did, however, ask about their Academic 
+Level/Type and their Discpline (based on 2-digit and 4-digit Field of Research [FOR] codes). Of the `r nrow(valid_ac_level)` respondents who provided details about their Academic Level, `r per_ac_level [5]`% were PhD students, `r per_ac_level [7]`% were Professors, and 
+`r per_ac_level [10]`% were Senior Lecturers. The breakdown of the rest of the academic
+levels for the rest of the respondents are in the table below. 
 
-<!--NEED TO RECODE THESE the AcLevel Variable & the FOR CODES. FOR NOW, I COULD
-PULL IN THIS DATA FROM JORDY'S, BUT THAT'S LESS THAN IDEAL. EITHER WAY INSERT THESE
-DETAILS HERE-->
+```{r ac_level_table, echo=FALSE, warning=TRUE}
 
-This document presents an overview of their responses. 
+a2 <- valid_ac_level %>% 
+  dplyr::count(AcLevel_Label) %>% 
+   mutate (Percentage = round (n/nvalid_ac_level*100))
 
+
+dplyr::arrange(a2, desc(n)) %>% 
+knitr::kable(col.names = c("Academic Levels", "Frequency", "Percentage"), caption = sprintf("Academic Levels of Respondents (n = %d)",nvalid_ac_level)) %>% 
+  kable_styling(bootstrap_options = "striped", full_width = F, position = 'center')
+
+# title = "Academic Level of Respondents (n = %d)"
+
+# Tom, I can't figure out how to arrange this by frequency. It looks super messy 
+  # otherwise...
+#p <-  simple_bar_graph(df, label_var = "AcLevel_Label", 
+#                       the_title = title, 
+#                       xname = "What is your academic level/type?", 
+#                       bar_colour = "blue",
+#                       line_colour = "black") %>% 
+#  layout(xaxis = list(categoryorder='trace'))
+```
+
+<!--NEED TO RECODE THE FOR CODES. FOR NOW, I COULD PULL IN THIS DATA FROM JORDY'S, BUT THAT'S LESS THAN IDEAL. EITHER WAY INSERT THESE DETAILS HERE-->
+  
+  
+  
 ```{r crisis_by_estimate, include = FALSE}
 
 # filter rows with valid responses 
@@ -181,7 +220,8 @@ their field that are reproducible. In the figure below, we plotted participants'
 reproducibility estimates according to their responses to the perceived 
 crisis in their field. The black bar is the mean estimate of reproducibility 
 perceived crisis. 
-
+  
+  
 
 ```{r crisis_by_estimate_stripchart, echo = FALSE, include = TRUE}
 #estimates of reproducibility by levels of crisis as a stripchart 
@@ -215,10 +255,11 @@ p
   # the figs folder. This will be handy if we want to create slides.
 #ggsave(here::here("figs", "reprod_estimates_by_crisis.png"))
 ```
-
+  
    
 ## Experience with Open Science Practices
 
+  
 ### Overall Experience with Open Science Practices
 
 ```{r os_experience, include = FALSE, warning=TRUE}
@@ -275,7 +316,16 @@ p
 
 # TOM, THIS WILL NEED TO BE UPDATED WITH YOUR PIE CHART FUNCTION# 
 
-pie(c_os_exp$freq, labels=c_os_exp$x)
+title = "What is your experience with open science practices? (n = %d)"
+
+#pie chart
+colours <- brewer.pal(4, "Blues")
+p <- simple_pie_chart(df, "OverallExp", 
+                      the_title = title, 
+                      colours)
+p
+
+# pie(c_os_exp$freq, labels=c_os_exp$x)
 # I can play with the pie more to make it look different, but lets decide on one 
   # consistent style & then go from there....
   

@@ -68,7 +68,7 @@ df$crisis <- df$crisis %>%
 df$OverallExp <- df$OverallExperience %>% 
   mapvalues(
     c("1", "2", "3", "4"), 
-    c("Unaware", "Aware, But Not Used", "Some Experience", "Extensive Experience")
+    c("Unaware", "Aware, But Not Used", "Some", "Extensive")
   )
 
 df$PreregExp1 <- df$PreregExp1 %>% 

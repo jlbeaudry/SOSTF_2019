@@ -74,7 +74,7 @@ df$OverallExp <- df$OverallExperience %>%
 df$PreregExp1 <- df$PreregExp1 %>% 
   mapvalues(
     c("1", "2", "3", "4"), 
-    c("Unaware", "Aware, But Not Used", "Some Experience", "Regularly Preregister")
+    c("Unaware", "Aware, But Not Used", "Some Experience", "Reg Use")
   )
 
 df$CodeExp <- df$CodeExp %>%

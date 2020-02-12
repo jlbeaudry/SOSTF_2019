@@ -48,31 +48,41 @@ perc <- function (x,y){  #x = variable; #y = n of valid cases
     # change y-axis & include parameter, which will change the data: done
     # add in ability to order according to different criteria (labels or coded number): added order by response order. Still to add order by number of responses.
  
-simple_pie_chart <- function (the_data, label_var="CodeExp", the_title="", colours, order = "ByRespNum"){
+simple_pie_chart <- function (the_data, label_var="", the_title="", colours, order = "ByRespNum", the_quantity = ""){
 
-the_data <- filter(the_data,CodeExp != "NA")
-# sort the data by response option order
-sort_var = paste(label_var,"_num",sep="")
-the_data <- the_data[order(the_data[[sort_var]]),]
+# the column with the response item numbers
+item_var = paste(label_var,"_num",sep="")
 
+# filter out non-responses
+the_data <- the_data[ !is.na(the_data[[label_var]]),]
 
-#tally the responses for each response option
-pie_data <- table (the_data[[label_var]])
-# calculate number of valid responses for this variable
-nvalid <- sum (pie_data)
+# calculate number of rows with a valid response 
+nvalid <- nrow(the_data)
 
-# here we use formatting to insert an integer number into the title text
+# tally the responses for each response option
+pie_data <- count(the_data,vars=c(label_var,item_var))
+
+# sort the data by response option order (needs other sort orders added)
+if (order == "ByRespNum") pie_data <- pie_data[order(pie_data[[item_var]]),]
+
+# by default display counts
+the_textinfo <- 'label+value'
+the_text = ""
+# display percentages if specified
+if (the_quantity == "percent") {
+  pie_data$perc <- paste(as.character(round(100*pie_data$freq/nvalid)),"%",sep="")
+  the_textinfo <- 'label+text'
+  the_text <- pie_data$perc
+}  
+
+# insert total number of responses into the title text
 the_title = sprintf(the_title,nvalid)
 
-pie_dataframe <- as.data.frame(pie_data)
-
-#rounded_pcts = round(100*pie_dataframe$freq/sum(pie_dataframe$freq))
 # Create the pie chart
-p <- plot_ly(the_data, labels = the_data[[label_var]], type = 'pie',
+p <- plot_ly(pie_data, labels = pie_data[[label_var]], values = pie_data$freq, type = 'pie',
              textposition = "inside",
-             textinfo = 'label+percent',
-             #text = ~paste(rounded_pcts),
-             #textinfo='text',
+             textinfo = the_textinfo,
+             text = the_text,
              marker = list(colors = colours, line=list(color="white", width=10)),
              showlegend = FALSE,
              sort = FALSE,
@@ -85,11 +95,8 @@ p <- plot_ly(the_data, labels = the_data[[label_var]], type = 'pie',
 return(p)
 }
 
-# this is the old attempt, which multiplied the values... 
-# values = the_data[[sort_var]],
 
 ## BAR CHART HISTOGRAM ##
-
 
 simple_bar_graph <- function (the_data, label_var = "", the_title = "", 
                               yname = "Count", xname = "Response",
@@ -332,11 +339,11 @@ title = "What is your experience with open science practices? (n = %d)"
 
 # this works, but it doesn't look great because of the "extensive experience" value
 
-#pie chart
+# pie chart
 colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(df, "OverallExp", 
+p <- simple_pie_chart(the_data = df, label_var = "OverallExp", 
                       the_title = title, 
-                      colours)
+                      colours,the_quantity = "percent")
 p
 
 # pie(c_os_exp$freq, labels=c_os_exp$x)
@@ -438,7 +445,7 @@ title = "What is your experience with open materials and/or code (n = %d)"
   # the correct values. I have to run to a meeting, so I can't investigate now.
 
 colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(df,label_var="CodeExp",the_title = title, colours = colours)
+p <- simple_pie_chart(df,label_var="CodeExp",the_title = title, colours = colours, the_quantity="percent")
 p
 ```
 

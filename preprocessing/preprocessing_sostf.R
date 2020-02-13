@@ -27,6 +27,10 @@ df <- here::here("survey", "data", "OS_Data_ID_Legacy.csv") %>%
 df <- df %>% 
   filter(ParticipantNumber != "1062")
 
+# delete respondent who indicated that they were 'professional staff-manager' as academic level
+df <- df %>% 
+  filter(ParticipantNumber != "1103")
+
 # select all columns except for the junk columns, which we don't need 
   # (e.g., V1, location, etc.).
 
@@ -83,6 +87,7 @@ df$CodeExp <- df$CodeExp %>%
     c("Unaware", "Aware, But Not Used", "Some Use", "Regular Use")
   )
 
+## RECODE ACADEMIC LEVELS ##
 
 # notes re: how I dealt with folks who selected more than one option from Academic Levels.
   # Keeping for transparency and reproducibility, but no need to run everytime. 
@@ -100,12 +105,17 @@ df$CodeExp <- df$CodeExp %>%
   # df2 <- filter(df, Multi_AcLevel >= 2) %>% 
     #select (ParticipantNumber, AcLevel_1:AcLevel_13) 
 
-  
-  
+# deal with the 'other' responses that align with the actual response options.
+
+df <- df %>% 
+  mutate(AcLevel_5 = replace(AcLevel_5, ParticipantNumber == "1065", 1)) %>%  #1065 said 'post doc'
+  mutate(AcLevel_1 = replace(AcLevel_1, ParticipantNumber == "1028", 1)) #1028 said 'emeritus professor'
+
 # Recoding Academic Levels. 
   # the coding of the academic levels is not exactly as in the pdf of the survey
-  # due to a coding error in Qualtrics. The second row of the 'AcLevel' columns 
-  # has the correct  labels. Recoding the numerical responses into text responses here, 
+  # due to a coding error in Qualtrics. The second row of the 'AcLevel' columns in the 
+  # 'OS_Data_ID_Legacy.csv' filehas the correct  labels. R
+  # Recoding the numerical responses into text responses here, 
   # based on their first response within the survey to resolve the multiple responses.
   
   
@@ -121,10 +131,10 @@ df$CodeExp <- df$CodeExp %>%
                                     ifelse (AcLevel_12 %in% '1', "Senior Research Fellow",
                                     ifelse (AcLevel_13 %in% '1', "Research Fellow", "NA"))))))))))))
 
+  
   # transform into factor
   df$AcLevel_Label <- factor(df$AcLevel_Label) 
   
- 
 
 ################### WRITE DATA TO CSV #############
 

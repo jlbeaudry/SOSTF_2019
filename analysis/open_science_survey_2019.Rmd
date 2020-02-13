@@ -48,51 +48,60 @@ perc <- function (x,y){  #x = variable; #y = n of valid cases
     # change y-axis & include parameter, which will change the data: done
     # add in ability to order according to different criteria (labels or coded number): added order by response order. Still to add order by number of responses.
  
-simple_pie_chart <- function (the_data, label_var="", the_title="", colours, order = "ByRespNum", the_quantity = ""){
+simple_pie_chart <- function (the_data, label_var="", the_title="", colours, order = "ByRespNum", the_quantity = "", include_NA = "NO"){
 
-# the column with the response item numbers
-item_var = paste(label_var,"_num",sep="")
-
-# filter out non-responses
-the_data <- the_data[ !is.na(the_data[[label_var]]),]
-
-# calculate number of rows with a valid response 
-nvalid <- nrow(the_data)
-
-# tally the responses for each response option
-pie_data <- count(the_data,vars=c(label_var,item_var))
-
-# sort the data by response option order (needs other sort orders added)
-if (order == "ByRespNum") pie_data <- pie_data[order(pie_data[[item_var]]),]
-
-# by default display counts
-the_textinfo <- 'label+value'
-the_text = ""
-# display percentages if specified
-if (the_quantity == "percent") {
-  pie_data$perc <- paste(as.character(round(100*pie_data$freq/nvalid)),"%",sep="")
-  the_textinfo <- 'label+text'
-  the_text <- pie_data$perc
-}  
-
-# insert total number of responses into the title text
-the_title = sprintf(the_title,nvalid)
-
-# Create the pie chart
-p <- plot_ly(pie_data, labels = pie_data[[label_var]], values = pie_data$freq, type = 'pie',
-             textposition = "inside",
-             textinfo = the_textinfo,
-             text = the_text,
-             marker = list(colors = colours, line=list(color="white", width=10)),
-             showlegend = FALSE,
-             sort = FALSE,
-             direction = "clockwise",
-             rotation = 0,
-             hole = 0.3,
-             pull = 0,
-             title = list 
-                (text = the_title, position = "top center",font = list (size=20, color="black")))
-return(p)
+  # the column with the response item numbers
+  item_var = paste(label_var,"_num",sep="")
+  
+  # if including NAs, replace with "no response"
+  # and set position of "no response" on graph
+  if (include_NA != "NO") {
+    the_data[[label_var]][is.na(the_data[[label_var]])] <- "No response"
+    the_data[[item_var]][is.na(the_data[[item_var]])] <- switch(include_NA,
+                                                                FIRST = 0,
+                                                                LAST = max(the_data[[item_var]])+1)
+  }  
+ 
+  # filter out non-responses
+  the_data <- the_data[ !is.na(the_data[[label_var]]),]
+  
+  # calculate number of rows with a valid response 
+  nvalid <- nrow(the_data)
+  
+  # tally the responses for each response option
+  pie_data <- count(the_data,vars=c(label_var,item_var))
+  
+  # sort the data by response option order (needs other sort orders added)
+  if (order == "ByRespNum") pie_data <- pie_data[order(pie_data[[item_var]]),]
+  
+  # by default display counts
+  the_textinfo <- 'label+value'
+  the_text = ""
+  # display percentages if specified
+  if (the_quantity == "percent") {
+    pie_data$perc <- paste(as.character(round(100*pie_data$freq/nvalid)),"%",sep="")
+    the_textinfo <- 'label+text'
+    the_text <- pie_data$perc
+  }  
+  
+  # insert total number of responses into the title text
+  the_title = sprintf(the_title,nvalid)
+  
+  # Create the pie chart
+  p <- plot_ly(pie_data, labels = pie_data[[label_var]], values = pie_data$freq, type = 'pie',
+               textposition = "inside",
+               textinfo = the_textinfo,
+               text = the_text,
+               marker = list(colors = colours, line=list(color="white", width=10)),
+               showlegend = FALSE,
+               sort = FALSE,
+               direction = "clockwise",
+               rotation = 0,
+               hole = 0.3,
+               pull = 0,
+               title = list 
+                  (text = the_title, position = "top center",font = list (size=20, color="black")))
+  return(p)
 }
 
 
@@ -100,24 +109,44 @@ return(p)
 
 simple_bar_graph <- function (the_data, label_var = "", the_title = "", 
                               yname = "Count", xname = "Response",
-                              bar_colour = "blue",line_colour = "",line_width = 1){
+                              bar_colour = "blue",line_colour = "",line_width = 1, include_NA = "NO", order = "ByRespNum", the_quantity = ""){
 
+  # the column with the response item numbers
+  item_var = paste(label_var,"_num",sep="")
   
-  # sort the data by response option order
-  sort_var = paste(label_var,"_num",sep="")
-  the_data <- the_data[order(the_data[[sort_var]]),]
-
-  #tally the responses for each response option
-  bar_data <- table (the_data[[label_var]])
-  # calculate number of valid responses for this variable
-  nvalid <- sum (bar_data)
+  # if including NAs, replace with "no response"
+  # and set position of "no response" on graph
+  if (include_NA != "NO") {
+    the_data[[label_var]][is.na(the_data[[label_var]])] <- "No response"
+    the_data[[item_var]][is.na(the_data[[item_var]])] <- switch(include_NA,
+                                                                FIRST = 0,
+                                                                LAST = max(the_data[[item_var]])+1)
+  }  
   
-  # plot the Count, unless y-axis has been specified as "Percentage"
-  ynorm = ""
-  if (yname=="Percentage") ynorm = "percentage"
+  # filter out NAs
+  the_data <- the_data[ !is.na(the_data[[label_var]]),]
   
-  # here we use formatting to insert an integer number into the title text
-  the_title = sprintf (the_title,nvalid)
+  # calculate number of rows with a valid response 
+  nvalid <- nrow(the_data)
+  
+  # tally the responses for each response option
+  bar_data <- count(the_data,vars=c(label_var,item_var))
+  
+  # sort the data by response option order (needs other sort orders added)
+  if (order == "ByRespNum") bar_data <- bar_data[order(bar_data[[item_var]]),]
+  
+  # by default display counts
+  the_column <- "freq"
+  yname <- "number of responses"
+  # display percentages if specified
+  if (the_quantity == "percent") {
+    bar_data$perc <- 100*bar_data$freq/nvalid
+    the_column <- "perc"
+    yname <- "percent of responses"
+  }  
+  
+  # insert total number of responses into the title text
+  the_title = sprintf(the_title,nvalid)
   
   # create labels for the graph elements
   qtext <- "What is your experience with open materials and/or code?"
@@ -125,11 +154,10 @@ simple_bar_graph <- function (the_data, label_var = "", the_title = "",
   if (line_colour == "") line_width <- 0
   # create the plot
   p <- plot_ly(
-    x = the_data[[label_var]],
-    histfunc="count",
-    histnorm=ynorm,
+    x = bar_data[[label_var]],
+    y = bar_data[[the_column]],
+    type = "bar",
     orientation="v",
-    type = "histogram",
     marker = list(color = bar_colour,
                            line = list(color = line_colour, width = line_width))) %>%
     layout (title = the_title, 
@@ -436,10 +464,10 @@ knitr::kable (col.names = c("Experience with Open Materials & Code", "Frequency"
 
 ```
 
-```{r code_bar, echo = FALSE, warning = TRUE, eval = FALSE}
+```{r code_bar, echo = FALSE, warning = TRUE, eval = TRUE}
 title = "What is your experience with open materials and/or code (n = %d)"
 
-p <- simple_bar_graph(df, label_var = "CodeExp", the_title = title, xname = "What is your experience with open materials and/or code?", bar_colour = "orange",line_colour = "black")
+p <- simple_bar_graph(df, label_var = "CodeExp", the_title = title, xname = "Response given", bar_colour = "orange",line_colour = "black",the_quantity="count",include_NA="LAST")
 p
 ```
 
@@ -448,7 +476,7 @@ title = "What is your experience with open materials and/or code (n = %d)"
 #pie chart
 
 colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(df,label_var="CodeExp",the_title = title, colours = colours, the_quantity="percent")
+p <- simple_pie_chart(df,label_var="CodeExp",the_title = title, colours = colours, the_quantity="percent",include_NA="FIRST")
 p
 ```
 

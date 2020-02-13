@@ -54,7 +54,7 @@ simple_pie_chart <- function (the_data, label_var="", the_title="", colours, ord
   item_var = paste(label_var,"_num",sep="")
   
   # if including NAs, replace with "no response"
-  # and set position of "no response" on graph
+  # and set position of "no response" on graph (e.g., "FIRST" or "LAST")
   if (include_NA != "NO") {
     the_data[[label_var]][is.na(the_data[[label_var]])] <- "No response"
     the_data[[item_var]][is.na(the_data[[item_var]])] <- switch(include_NA,
@@ -347,7 +347,7 @@ p <- ggplot(data = valid_os_exp,
   colour = "black" , 
   fill = "blue") +
   scale_x_discrete(name = "What is your experience with open science practices?",
-                   limits=c("Unaware", "Aware, But Not Used", "Some Experience", "Extensive Experience")) + 
+                   limits=c("Unaware", "Aware, But Not Used", "Some", "Extensive")) + 
   theme_classic(base_size = 12) +
   scale_y_continuous(name = "Frequency") +
   coord_cartesian(ylim = c(0,100)) +
@@ -367,20 +367,24 @@ title = "What is your experience with open science practices? (n = %d)"
 
 # pie chart
 colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(the_data = df, label_var = "OverallExp", 
+p <- simple_pie_chart(the_data = df, label_var = "OverallExp",
                       the_title = title, 
                       colours,the_quantity = "percent")
 p
   
 ```
 
-```{r tables_os_experience, echo = FALSE, eval = FALSE}
+```{r tables_os_experience, echo = FALSE, eval = TRUE}
 
-# keeping this for now, but we likely won't use the table, right?
-  # but, this is a good reminder that it's possible to change the order of the rows in the tables (arranged by descending frequency)
+# keeping this for now because it's useful to double check values.
 
-dplyr::arrange(c_os_exp, desc(freq)) %>% 
-knitr::kable(col.names = c("Overall Experience", "Frequency"), caption = "Overall Experience with Open Science Practices")
+os2 <- valid_os_exp %>% 
+    dplyr::count(OverallExp) %>% 
+  mutate(Percentage = round (n/nvalid_os_exp*100))
+
+dplyr::arrange(os2, desc(n)) %>% 
+knitr::kable(col.names = c("Overall Experience", "Frequency", "Percentage"), caption = sprintf("Overall Experience with Open Science Practices (n = %d)", nvalid_os_exp))  %>% 
+    kable_styling(bootstrap_options = "striped", full_width = F, position = 'center')
 
 ```
 
@@ -464,10 +468,10 @@ knitr::kable (col.names = c("Experience with Open Materials & Code", "Frequency"
 
 ```
 
-```{r code_bar, echo = FALSE, warning = TRUE, eval = TRUE}
+```{r code_bar, echo = FALSE, warning = TRUE, eval = FALSE}
 title = "What is your experience with open materials and/or code (n = %d)"
 
-p <- simple_bar_graph(df, label_var = "CodeExp", the_title = title, xname = "Response given", bar_colour = "orange",line_colour = "black",the_quantity="count",include_NA="LAST")
+p <- simple_bar_graph(df, label_var = "CodeExp", the_title = title, xname = "Response given", bar_colour = "orange",line_colour = "black",the_quantity="count")
 p
 ```
 
@@ -476,7 +480,7 @@ title = "What is your experience with open materials and/or code (n = %d)"
 #pie chart
 
 colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(df,label_var="CodeExp",the_title = title, colours = colours, the_quantity="percent",include_NA="FIRST")
+p <- simple_pie_chart(df,label_var="CodeExp",the_title = title, colours = colours, the_quantity="percent")
 p
 ```
 

@@ -173,7 +173,7 @@ simple_bar_graph <- function (the_data, label_var = "", the_title = "",
 df <- read_csv (here::here("data", "data_sostf.csv"))
 ```
 
-```{r demographics, include=FALSE}
+```{r demographics_ac_level, include=FALSE}
 
 n <- nrow(df$ParticipantNumber)
 valid_ac_level <- filter(df, AcLevel_Label != "NA")
@@ -220,23 +220,71 @@ knitr::kable(col.names = c("Academic Levels", "Frequency", "Percentage"), captio
 
 # will need to figure out how to reorder data....
 
-ap <- ggplot(data = valid_ac_level, aes (AcLevel_Label)) + 
-  geom_bar() +
-  labs (x = "Frequency", 
-        y = "Academic Levels", 
-        title = sprintf("Reported Academic Levels (n = %d)",nvalid_ac_level)) +
-  coord_flip() + 
-  theme_classic(base_size = 12)
-ap
+#ap <- ggplot(data = valid_ac_level, aes (AcLevel_Label)) + 
+#  geom_bar() +
+#  labs (x = "Frequency", 
+#        y = "Academic Levels", 
+#        title = sprintf("Reported Academic Levels (n = %d)",nvalid_ac_level)) +
+#  coord_flip() + 
+#  theme_classic(base_size = 12)
+#ap
 
 # code to save figure. If using it for slides, increase the 'base_size' from 12 to 18. 
 #ggsave(here::here("figs", "aclevels_bar.png"))
 
 ```
 
-<!--NEED TO RECODE THE 'FOR' CODES. FOR NOW, I COULD PULL IN THIS DATA FROM JORDY'S, 
-BUT THAT'S LESS THAN IDEAL. EITHER WAY INSERT THESE DETAILS HERE-->
+
+```{r demographics_discipline, include=FALSE}
+
+valid_disc <- filter(df, discipline != "Not Specified")
+nvalid_disc <- nrow(valid_disc)
+valid_per_disc <- perc(x = valid_disc$discipline, y = nvalid_disc) 
+FOR_freq <- count(df$FORcode_2_label)
+```
+
+In terms of Field of Research Codes, we had at least one response from respondents who classified themselves as belonging to the two-digit FOR codes from 01 to 20, one person indicated "Other", and `r FOR_freq[20,2]` respondents did not specify their FOR code. We did not have any responses from researchers in History and Archeology (21) and Philosophy and Religious Studies (22). For ease of interpretation and to reduce the identifiability of the respondents, we classified similar FOR codes with a small number of respondents (less than 10) into disciplinary groups. Specifically, the new discipline grouping of Arts, Social Sciences, and Humanities (ASSH) included Education (13, <em>n</em> = `r FOR_freq[6,2]`), Studies in Human Society (16, <em>n</em> = `r FOR_freq[18,2]`), Studies in Creative Arts and Writing (19, <em>n</em> = `r FOR_freq[17,2]`), and Language, Communication and Culture (20, <em>n</em> = `r FOR_freq[10,2]`). The new discipline grouping of Business & Law included Economics (14, <em>n</em> = `r FOR_freq[5,2]`), Commerce, Management, Tourism, and Services (15, <em>n</em> = `r FOR_freq[4,2]`), and Law and Legal Studies (18, <em>n</em> = `r FOR_freq[11,2]`). The new discipline grouping of Technology & Computer Sciences included Information and Computing Sciences (08, <em>n</em> = `r FOR_freq[9,2]`), and Technology (10, <em>n</em> = `r FOR_freq[19,2]`). We retained the FOR codes of Engineering (09, <em>n</em> = `r FOR_freq[7,2]`), Medical & Health Sciences (11, <em>n</em> = `r FOR_freq[13,2]`), Physical Sciences (02, <em>n</em> = `r FOR_freq[15,2]`), and Psychology & Cognitive Sciences (17, <em>n</em> = `r FOR_freq[16,2]`) as their own discipline groupings. The breakdown for the number of respondents according to discpline groupings is displayed in the next table.
+
   
+```{r discipline_table, echo=FALSE, warning=TRUE}
+
+d2 <- df %>% 
+  dplyr::count(discipline) %>% 
+   mutate (Percentage = round (n/nrow(df)*100))
+
+
+dplyr::arrange(d2, desc(n)) %>% 
+knitr::kable(col.names = c("Disciplines", "Frequency", "Percentage"), caption = sprintf("Discipline Groupings of Respondents (n = %d)",nrow(df))) %>% 
+  kable_styling(bootstrap_options = "striped", full_width = F, position = 'center')
+
+# still need to figure out the order...
+
+# title = "Academic Level of Respondents (n = %d)"
+
+# Tom, I can't figure out how to arrange this by frequency. It looks super messy 
+  # otherwise...
+#p <-  simple_bar_graph(df, label_var = "AcLevel_Label", 
+#                       the_title = title, 
+#                       xname = "What is your academic level/type?", 
+#                       bar_colour = "blue",
+#                       line_colour = "black") %>% 
+#  layout(xaxis = list(categoryorder='trace'))
+
+# will need to figure out how to reorder data....
+
+#ap <- ggplot(data = valid_ac_level, aes (AcLevel_Label)) + 
+#  geom_bar() +
+#  labs (x = "Frequency", 
+#        y = "Academic Levels", 
+#        title = sprintf("Reported Academic Levels (n = %d)",nvalid_ac_level)) +
+#  coord_flip() + 
+#  theme_classic(base_size = 12)
+#ap
+
+# code to save figure. If using it for slides, increase the 'base_size' from 12 to 18. 
+#ggsave(here::here("figs", "aclevels_bar.png"))
+
+```
   
 ```{r crisis_by_estimate, include = FALSE}
 

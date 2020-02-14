@@ -15,10 +15,22 @@ read_qualtrics <- function(file, legacy = TRUE) {
   a %>% readr::type_convert(trim_ws = TRUE)
 }
 
-# pipe my data through the 'read_qualtrics' function
+# laod data with the 'read_qualtrics' function
 
+# df is the main dataset, but it doesn't have the FOR code variables in a usable format
 df <- here::here("survey", "data", "OS_Data_ID_Legacy.csv") %>% 
-  read_qualtrics()
+  read_qualtrics() %>% 
+  select (-FORcode_1, -FORcode_2) #remove the columns that don't make sense for FOR code
+
+# need df_for from the 'not legacy' dataset for FOR codes
+df_for <- here::here("survey", "data", "OS_Data_ID_Not_Legacy.csv") %>% 
+  read_qualtrics (legacy = FALSE) %>% 
+  select (ParticipantNumber, FORcode_1, FORcode_2) #keep only variables we need
+
+# join the two sets by ParticipantNumber
+
+df <- df %>% left_join(df_for, by = "ParticipantNumber")
+
 
 ############# CLEANING THE DATA #####################
 
@@ -38,15 +50,71 @@ df <- df %>%
   select (-c(V1:V10, consent, Intro, LocationLatitude, LocationLongitude, 
              LocationAccuracy, PreregDef)) 
 
-# rename wonky variable name
-
-df <- df %>% 
-  dplyr::rename(RepEstimate = RepEstimate_1)
 
 
 ################# RECODING VARIABLES ##################
 
-# convert variables into factors
+# rename wonky variable names & change FOR code columns to reflect number of digits. 
+
+df <- df %>% 
+  dplyr::rename(RepEstimate = RepEstimate_1, FORcode_4 = FORcode_2, FORcode_2 = FORcode_1) 
+
+
+
+
+# separate FOR code columns into numbers and labels 
+
+df <- df %>% 
+  separate (FORcode_2, into = c("FORcode_2_num", "FORcode_2_label"), sep = "-", convert = TRUE) %>% 
+  separate (FORcode_4, into = c("FORcode_4_num", "FORcode_4_label"), sep = "-", convert = TRUE)
+
+# one participant (1165) selected 'other' for the FOR code. 'Other' recoded in 
+  # 'num' columns, but not in 'label' columns. We need 'num' column to be numerical, 
+  # so recode that "Other" as 99 in the '_num' columns and as 'other' in the '_label' columns.
+
+df <- df %>% 
+  mutate(FORcode_2_num = replace(FORcode_2_num, ParticipantNumber == "1165", "99")) %>% 
+  mutate(FORcode_2_label = replace(FORcode_2_label, ParticipantNumber == "1165", "Other")) %>% 
+  mutate(FORcode_4_num = replace(FORcode_4_num, ParticipantNumber == "1165", "99")) %>% 
+  mutate(FORcode_4_label = replace(FORcode_4_label, ParticipantNumber == "1165", "Other")) 
+
+# recode FOR codes into grouped disciplines
+
+  # first, convert from character to number
+df$FORcode_2_num <- as.numeric(df$FORcode_2_num)
+df$FORcode_4_num <- as.numeric(df$FORcode_4_num)
+
+  # then recode according to discipline 
+df <- df %>% 
+  mutate (discipline = ifelse (FORcode_2_num %in% c('14','15','18'), "Business & Law",
+                       ifelse (FORcode_2_num %in% c('13','16','19','20'), "ASSH",
+                       ifelse (FORcode_2_num %in% '2', "Physical Sciences", 
+                       ifelse (FORcode_2_num %in% c('1', '3','5','6'), "Math, Chem, Enviro, & Bio Sciences", 
+                       ifelse (FORcode_2_num %in% c('8','10'), "Tech & Comp Sciences", 
+                       ifelse (FORcode_2_num %in% '9', "Engineering", 
+                       ifelse (FORcode_2_num %in% '11', "Medical & Health Sciences", 
+                       ifelse (FORcode_2_num %in% '17', "Psyc & Cog Sciences",
+                       ifelse (FORcode_2_num %in% c('12', '99'), "Other", "Not Specified"))))))))))
+
+# if we want to see the mapping from FOR to discipline, use this code
+a <- df %>% 
+  select(FORcode_2_num, FORcode_2_label, discipline) 
+  count(df$FORcode_2_label)
+
+summarise(n = n(FORcode_2_num))
+
+unique(a) %>% arrange(-desc(FORcode_2_num)) # by FOR code num
+a2 <- unique(a) %>% arrange(discipline, -desc(FORcode_2_num)) # by discipline & desc FOR code num
+
+
+
+# MAKE A DECISION AS TO HOW TO PROCEED WITH RELABELLING THE WONKY VALUES...(e.g., 
+  # recode AcLevel_x to have the numbers that match the pdf of the survey.
+  # If we re-run the survey, we should not have to do this again, so keep the code
+  # separate from the rest of it so it's obvious. Why won't we need it? Because 
+  # the data should match what we actually programmed.
+
+## CONVERT VARIABLES INTO FACTORS ###
 
 # the original variables will need to be factors too to use them in the figures.
 # because our scripts run the scripts with the labels, I'm going to create new
@@ -66,26 +134,22 @@ df$CodeExp_num <- factor(df$CodeExp)
 df$crisis <- df$crisis %>% 
   mapvalues(
     c("1", "2", "3", "4"), 
-    c("Significant Crisis", "Slight Crisis", "No Crisis", "Don't Know")
-  )
+    c("Significant Crisis", "Slight Crisis", "No Crisis", "Don't Know"))
 
 df$OverallExp <- df$OverallExperience %>% 
   mapvalues(
     c("1", "2", "3", "4"), 
-    c("Unaware", "Aware, But Not Used", "Some", "Extensive")
-  )
+    c("Unaware", "Aware, But Not Used", "Some", "Extensive"))
 
 df$PreregExp1 <- df$PreregExp1 %>% 
   mapvalues(
     c("1", "2", "3", "4"), 
-    c("Unaware", "Aware, But Not Used", "Some Experience", "Reg Use")
-  )
+    c("Unaware", "Aware, But Not Used", "Some Experience", "Reg Use"))
 
 df$CodeExp <- df$CodeExp %>%
   mapvalues(
     c("1", "2", "3", "4"),
-    c("Unaware", "Aware, But Not Used", "Some Use", "Regular Use")
-  )
+    c("Unaware", "Aware, But Not Used", "Some Use", "Regular Use"))
 
 ## RECODE ACADEMIC LEVELS ##
 

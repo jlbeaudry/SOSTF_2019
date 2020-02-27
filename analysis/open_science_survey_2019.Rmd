@@ -260,7 +260,7 @@ d2 <- df %>%
 f2 <-d2 [c(12,16,3,8,1,9,7,20,13,2,6,5,4,19,17,11,18,10,15,14),]
 f2$FORcode_2_label <- str_to_title(f2$FORcode_2_label) #change capilatlisation
 
-dplyr::arrange(f2) %>% 
+dplyr::arrange(f2,-desc(FORcode_2_num)) %>% 
 knitr::kable(col.names = c("FOR Code", "Field of Research", "Frequency", "Percentage"), caption = sprintf("Reported Two-Digit Field of Research Codes for Respondents (n = %d)",nrow(df))) %>% 
   kable_styling(bootstrap_options = "striped", full_width = F, position = 'center')
 

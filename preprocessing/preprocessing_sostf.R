@@ -62,7 +62,7 @@ df <- df %>%
 
 
 
-# separate FOR code columns into numbers and labels 
+# separate FOR code columns into numbers and labels & change case
 
 df <- df %>% 
   separate (FORcode_2, into = c("FORcode_2_num", "FORcode_2_label"), sep = "-", convert = TRUE) %>% 
@@ -78,6 +78,16 @@ df <- df %>%
   mutate(FORcode_4_num = replace(FORcode_4_num, ParticipantNumber == "1165", "99")) %>% 
   mutate(FORcode_4_label = replace(FORcode_4_label, ParticipantNumber == "1165", "Other")) 
 
+# relabel "NA" to "Not Specified"
+df <- df %>% 
+  mutate(FORcode_2_label = replace(FORcode_2_label, is.na(FORcode_2_label), "Not Specified"))
+
+# WWHEN I GET BACK TO WIFI, CHECK HOW TO TURN ALL OF THE LABELS INTO LOWER CASE.
+
+df2 <- df %>% 
+  mutate(str_to_sentence(FORcode_2_label))               
+
+df3 <- str_to_sentence(df$FORcode_2_label)                      
 # recode FOR codes into grouped disciplines
 
   # first, convert from character to number
@@ -85,27 +95,25 @@ df$FORcode_2_num <- as.numeric(df$FORcode_2_num)
 df$FORcode_4_num <- as.numeric(df$FORcode_4_num)
 
   # then recode according to discipline 
+
 df <- df %>% 
   mutate (discipline = ifelse (FORcode_2_num %in% c('14','15','18'), "Business & Law",
                        ifelse (FORcode_2_num %in% c('13','16','19','20'), "ASSH",
                        ifelse (FORcode_2_num %in% '2', "Physical Sciences", 
-                       ifelse (FORcode_2_num %in% c('1', '3','5','6'), "Math, Chem, Enviro, & Bio Sciences", 
+                       ifelse (FORcode_2_num %in% c('1','3','5','6'), "Math, Chem, Enviro, & Bio Sciences", 
                        ifelse (FORcode_2_num %in% c('8','10'), "Tech & Comp Sciences", 
                        ifelse (FORcode_2_num %in% '9', "Engineering", 
                        ifelse (FORcode_2_num %in% '11', "Medical & Health Sciences", 
                        ifelse (FORcode_2_num %in% '17', "Psyc & Cog Sciences",
                        ifelse (FORcode_2_num %in% c('12', '99'), "Other", "Not Specified"))))))))))
 
-# if we want to see the mapping from FOR to discipline, use this code
-a <- df %>% 
-  select(FORcode_2_num, FORcode_2_label, discipline) 
-  count(df$FORcode_2_label)
+# View the mapping from FOR to discipline & see the number of folks in each FOR 
+  # code group (and then ungroup again)
 
-summarise(n = n(FORcode_2_num))
-
-unique(a) %>% arrange(-desc(FORcode_2_num)) # by FOR code num
-a2 <- unique(a) %>% arrange(discipline, -desc(FORcode_2_num)) # by discipline & desc FOR code num
-
+df %>% 
+  group_by(FORcode_2_num,FORcode_2_label,discipline) %>% 
+  dplyr::summarise(n = n()) %>% 
+  ungroup(FORcode_2_num)
 
 
 # MAKE A DECISION AS TO HOW TO PROCEED WITH RELABELLING THE WONKY VALUES...(e.g., 

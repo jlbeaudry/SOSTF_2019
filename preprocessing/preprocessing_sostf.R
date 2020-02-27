@@ -81,13 +81,7 @@ df <- df %>%
 # relabel "NA" to "Not Specified"
 df <- df %>% 
   mutate(FORcode_2_label = replace(FORcode_2_label, is.na(FORcode_2_label), "Not Specified"))
-
-# WWHEN I GET BACK TO WIFI, CHECK HOW TO TURN ALL OF THE LABELS INTO LOWER CASE.
-
-df2 <- df %>% 
-  mutate(str_to_sentence(FORcode_2_label))               
-
-df3 <- str_to_sentence(df$FORcode_2_label)                      
+                 
 # recode FOR codes into grouped disciplines
 
   # first, convert from character to number

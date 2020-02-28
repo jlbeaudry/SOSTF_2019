@@ -1,6 +1,7 @@
 library(tidyverse)
 library(here)
 library(plyr) 
+library(tools)
 
 ####### READ IN DATA FILE ############
   
@@ -81,7 +82,13 @@ df <- df %>%
 # relabel "NA" to "Not Specified"
 df <- df %>% 
   mutate(FORcode_2_label = replace(FORcode_2_label, is.na(FORcode_2_label), "Not Specified"))
-                 
+
+#change capitalisation of FOR labels
+df$FORcode_2_label <- toTitleCase(tolower(df$FORcode_2_label)) 
+# using 'to lower' to make the all caps lower case, and then using title case to 
+  # capitalise the words
+# I'm using this rather than 'str_to_title' because it doesn't capitalise "and"
+              
 # recode FOR codes into grouped disciplines
 
   # first, convert from character to number

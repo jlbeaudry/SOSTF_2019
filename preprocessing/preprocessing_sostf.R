@@ -1,6 +1,7 @@
-library(tidyverse)
 library(here)
 library(plyr) 
+library(tidyverse)
+library(tools)
 
 ####### READ IN DATA FILE ############
   
@@ -51,7 +52,6 @@ df <- df %>%
              LocationAccuracy, PreregDef)) 
 
 
-
 ################# RECODING VARIABLES ##################
 
 # rename wonky variable names & change FOR code columns to reflect number of digits. 
@@ -60,9 +60,7 @@ df <- df %>%
   dplyr::rename(RepEstimate = RepEstimate_1, FORcode_4 = FORcode_2, FORcode_2 = FORcode_1) 
 
 
-
-
-# separate FOR code columns into numbers and labels 
+# separate FOR code columns into numbers and labels & change case
 
 df <- df %>% 
   separate (FORcode_2, into = c("FORcode_2_num", "FORcode_2_label"), sep = "-", convert = TRUE) %>% 
@@ -78,6 +76,16 @@ df <- df %>%
   mutate(FORcode_4_num = replace(FORcode_4_num, ParticipantNumber == "1165", "99")) %>% 
   mutate(FORcode_4_label = replace(FORcode_4_label, ParticipantNumber == "1165", "Other")) 
 
+# relabel "NA" to "Not Specified"
+df <- df %>% 
+  mutate(FORcode_2_label = replace(FORcode_2_label, is.na(FORcode_2_label), "Not Specified"))
+
+#change capitalisation of FOR labels
+df$FORcode_2_label <- toTitleCase(tolower(df$FORcode_2_label)) 
+# using 'to lower' to make the all caps lower case, and then using title case to 
+  # capitalise the words
+# I'm using this rather than 'str_to_title' because it doesn't capitalise "and"
+              
 # recode FOR codes into grouped disciplines
 
   # first, convert from character to number
@@ -85,27 +93,25 @@ df$FORcode_2_num <- as.numeric(df$FORcode_2_num)
 df$FORcode_4_num <- as.numeric(df$FORcode_4_num)
 
   # then recode according to discipline 
+
 df <- df %>% 
   mutate (discipline = ifelse (FORcode_2_num %in% c('14','15','18'), "Business & Law",
                        ifelse (FORcode_2_num %in% c('13','16','19','20'), "ASSH",
                        ifelse (FORcode_2_num %in% '2', "Physical Sciences", 
-                       ifelse (FORcode_2_num %in% c('1', '3','5','6'), "Math, Chem, Enviro, & Bio Sciences", 
+                       ifelse (FORcode_2_num %in% c('1','3','5','6'), "Math, Chem, Enviro, & Bio Sciences", 
                        ifelse (FORcode_2_num %in% c('8','10'), "Tech & Comp Sciences", 
                        ifelse (FORcode_2_num %in% '9', "Engineering", 
                        ifelse (FORcode_2_num %in% '11', "Medical & Health Sciences", 
                        ifelse (FORcode_2_num %in% '17', "Psyc & Cog Sciences",
                        ifelse (FORcode_2_num %in% c('12', '99'), "Other", "Not Specified"))))))))))
 
-# if we want to see the mapping from FOR to discipline, use this code
-a <- df %>% 
-  select(FORcode_2_num, FORcode_2_label, discipline) 
-  count(df$FORcode_2_label)
+# View the mapping from FOR to discipline & see the number of folks in each FOR 
+  # code group (and then ungroup again)
 
-summarise(n = n(FORcode_2_num))
-
-unique(a) %>% arrange(-desc(FORcode_2_num)) # by FOR code num
-a2 <- unique(a) %>% arrange(discipline, -desc(FORcode_2_num)) # by discipline & desc FOR code num
-
+df %>% 
+  group_by(FORcode_2_num,FORcode_2_label,discipline) %>% 
+  dplyr::summarise(n = n()) %>% 
+  ungroup(FORcode_2_num)
 
 
 # MAKE A DECISION AS TO HOW TO PROCEED WITH RELABELLING THE WONKY VALUES...(e.g., 
@@ -129,6 +135,30 @@ df$PreregExp1_num <- factor(df$PreregExp1)
 
 df$CodeExp_num <- factor(df$CodeExp) 
 
+df$PreRegImp_num <- factor(df$PreRegImp)
+
+# recode preregistration concerns
+df$PreRegCon_delay <- factor(df$PreregConcern_4)
+df$PreRegCon_look <- factor(df$PreregConcern_5)
+df$PreRegCon_prevent_exp <- factor(df$PreregConcern_6)
+df$PreRegCon_stifle_creativity <- factor(df$PreregConcern_7)
+df$PreRegCon_scooping <- factor(df$PreregConcern_8)
+df$PreRegCon_prevent_sig <- factor(df$PreregConcern_10)
+df$PreRegCon_diff_pub <- factor(df$PreregConcern_11)
+df$PreRegCon_no_con <- factor(df$PreregConcern_12)
+
+# recode open code concerns
+
+df$CodeCon_criticise <- factor(df$CodeConcern_4)
+df$CodeCon_diff_understand <- factor(df$CodeConcern_5)
+df$CodeCon_assistance <- factor(df$CodeConcern_6)
+df$CodeCon_lose_control <- factor(df$CodeConcern_7)
+df$CodeCon_errors <- factor(df$CodeConcern_8)
+df$CodeCon_credit <- factor(df$CodeConcern_9)
+df$CodeCon_no_con <- factor(df$CodeConcern_12)
+df$CodeCon_violate <- factor(df$CodeConcern_13)
+df$CodeCon_ip <- factor(df$CodeConcern_14)
+
 # create new variables with text labels for levels
 
 df$crisis <- df$crisis %>% 
@@ -150,6 +180,13 @@ df$CodeExp <- df$CodeExp %>%
   mapvalues(
     c("1", "2", "3", "4"),
     c("Unaware", "Aware, But Not Used", "Some Use", "Regular Use"))
+
+df$PreRegImp <- df$PreRegImp %>% 
+  mapvalues(
+    c ("0", "1", "2", "3", "4"),
+    c ("Researchers in my discipline do not conduct research studies", "Extremely", "Somewhat important", "Somewhat unimportant", "Not at all")
+  )
+
 
 ## RECODE ACADEMIC LEVELS ##
 

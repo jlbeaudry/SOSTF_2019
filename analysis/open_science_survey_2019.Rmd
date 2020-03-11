@@ -175,7 +175,7 @@ df <- read_csv (here::here("data", "data_sostf.csv"))
 
 ```{r demographics_ac_level, include=FALSE}
 
-n <- nrow(df$ParticipantNumber)
+n <- length(df$ParticipantNumber)
 valid_ac_level <- filter(df, AcLevel_Label != "NA")
 nvalid_ac_level <- nrow(valid_ac_level)
 per_ac_level <- perc(x = df$AcLevel_Label, y = nvalid_ac_level) 
@@ -186,8 +186,7 @@ per_ac_level <- perc(x = df$AcLevel_Label, y = nvalid_ac_level)
 
 We conducted a survey in September 2019 to examine people's current use of open 
 science practices, to examine their perceptions of these practices, and to examine
-their perceived barriers to using these practices. Across the university, `r n` 
-started the survey, although not all respondents completed all questions; thus, 
+their perceived barriers to using these practices. Across the university, `r n` started the survey, although not all respondents completed all questions; thus, 
 we report the sample size for each question. This document presents an overview of their responses. 
 
 In terms of their demographics, we did not obtain information about gender or age
@@ -238,49 +237,124 @@ knitr::kable(a3, col.names = c("Academic Levels", "Frequency", "Percentage"), ca
 valid_disc <- filter(df, discipline != "Not Specified")
 nvalid_disc <- nrow(valid_disc)
 valid_per_disc <- perc(x = valid_disc$discipline, y = nvalid_disc) 
-FOR_freq <- count(df$FORcode_2_label)
+FOR_freq <- df %>% 
+  select (FORcode_2_num, FORcode_2_label) %>% 
+  dplyr::count(FORcode_2_num, FORcode_2_label) %>% 
+  arrange(-desc(FORcode_2_num))
 ```
 
-In terms of Field of Research Codes, we had at least one response from respondents who classified themselves as belonging to the two-digit FOR codes from 01 to 20, one person indicated "Other", and `r FOR_freq[20,2]` respondents did not specify their FOR code. We did not have any responses from researchers in History and Archeology (21) and Philosophy and Religious Studies (22). For ease of interpretation and to reduce the identifiability of the respondents, we classified similar FOR codes with a small number of respondents (less than 10) into disciplinary groups. Specifically, the new discipline grouping of Arts, Social Sciences, and Humanities (ASSH) included Education (13, <em>n</em> = `r FOR_freq[6,2]`), Studies in Human Society (16, <em>n</em> = `r FOR_freq[18,2]`), Studies in Creative Arts and Writing (19, <em>n</em> = `r FOR_freq[17,2]`), and Language, Communication and Culture (20, <em>n</em> = `r FOR_freq[10,2]`). The new discipline grouping of Business & Law included Economics (14, <em>n</em> = `r FOR_freq[5,2]`), Commerce, Management, Tourism, and Services (15, <em>n</em> = `r FOR_freq[4,2]`), and Law and Legal Studies (18, <em>n</em> = `r FOR_freq[11,2]`). The new discipline grouping of Technology & Computer Sciences included Information and Computing Sciences (08, <em>n</em> = `r FOR_freq[9,2]`), and Technology (10, <em>n</em> = `r FOR_freq[19,2]`). We retained the FOR codes of Engineering (09, <em>n</em> = `r FOR_freq[7,2]`), Medical & Health Sciences (11, <em>n</em> = `r FOR_freq[13,2]`), Physical Sciences (02, <em>n</em> = `r FOR_freq[15,2]`), and Psychology & Cognitive Sciences (17, <em>n</em> = `r FOR_freq[16,2]`) as their own discipline groupings. The breakdown for the number of respondents according to discpline groupings is displayed in the next table.
 
+In terms of Field of Research Codes, we had at least one response from respondents 
+who classified themselves as belonging to the two-digit FOR codes from 01 to 20, one 
+person indicated "Other", and `r FOR_freq[20,3]` respondents did not specify their 
+FOR code. We did not have any responses from researchers in Earth Sciences (04), 
+Agricultural and Veterinary Sciences (07), History and Archeology (21),
+and Philosophy and Religious Studies (22). 
+
+```{r FOR_table, echo=FALSE, warning=TRUE}
+
+d2 <- df %>% 
+  select (c(FORcode_2_num, FORcode_2_label)) %>% 
+  dplyr::count(FORcode_2_num,FORcode_2_label) %>% 
+  mutate (Percentage = round (n/nrow(df)*100))
+
+# specify the exact order of the columns based on d2 (select them according to the order
+  # of the rows in the tibble)
+f2 <-d2 [c(12,16,3,8,1,9,7,20,13,2,6,5,4,19,17,11,18,10,15,14),]
+
+dplyr::arrange(f2,-desc(FORcode_2_num)) %>% 
+knitr::kable(col.names = c("FOR Code", "Field of Research Division", "Frequency", "Percentage"), caption = sprintf("Reported Two-Digit Field of Research Codes for Respondents (n = %d)",nrow(df))) %>% 
+  kable_styling(bootstrap_options = "striped", full_width = F, position = 'center')
+
+```
+
+
+```{r FOR_table_by_role, echo=FALSE, warning=TRUE, eval = FALSE}
+
+# Now look at how the data changes according to their academic level (student or not)
+#  very few unspecified with students! Out of the 54 students, only 1 'other' and 1 'unspecified'
+
+student <- dplyr::filter(df, AcLevel_Label == "PhD Student" | AcLevel_Label == "Masters Student" | AcLevel_Label == "Research Assistant") %>% 
+  dplyr::count(FORcode_2_num, FORcode_2_label)
+
+dplyr::arrange(student,-desc(FORcode_2_num)) %>% 
+knitr::kable(col.names = c("FOR Code", "Field of Research Division", "Frequency"), caption = sprintf("Reported Two-Digit Field of Research Codes for Student Respondents (n = %d)",(sum(student$n)))) %>% 
+  kable_styling(bootstrap_options = "striped", full_width = F, position = 'center')
+
+# now showing the staff breakdown
+
+staff <- dplyr::filter(df, AcLevel_Label == "Professor" | AcLevel_Label == "Associate Professor" | AcLevel_Label == "Senior Lecturer" | AcLevel_Label == "Senior Research Fellow" | AcLevel_Label == "Lecturer" | AcLevel_Label == "Research Fellow" | AcLevel_Label == "Postdoc") %>% 
+  dplyr::count(FORcode_2_num, FORcode_2_label)
+
+dplyr::arrange(staff,-desc(FORcode_2_num)) %>% 
+knitr::kable(col.names = c("FOR Code", "Field of Research Division", "Frequency"), caption = sprintf("Reported Two-Digit Field of Research Codes for Staff Respondents (n = %d)",(sum(staff$n)))) %>% 
+  kable_styling(bootstrap_options = "striped", full_width = F, position = 'center')
+
+# now showing for respondents who did not specify their academic levels (NA or 'other')
+
+unknown <- dplyr::filter(df, is.na(AcLevel_Label) | AcLevel_Label == "Other") %>% 
+  dplyr::count(FORcode_2_num, FORcode_2_label)
+
+dplyr::arrange(unknown,-desc(FORcode_2_num)) %>% 
+knitr::kable(col.names = c("FOR Code", "Field of Research Division", "Frequency"), caption = sprintf("Reported Two-Digit Field of Research Codes for Unknown Academic Levels (n = %d)",(sum(unknown$n)))) %>% 
+  kable_styling(bootstrap_options = "striped", full_width = F, position = 'center')
+
+```
+
+For ease of interpretation and to reduce the identifiability of the respondents, 
+for the FOR divisions with a small number of respondents (less than 10), we combined 
+similar divisions into disciplinary groups. Specifically, the new discipline grouping of Arts, 
+Social Sciences, and Humanities (ASSH) included Education (FOR = `r FOR_freq[11,1]`, 
+<em>n</em> = `r FOR_freq[11,3]`); Studies in Human Society (FOR = `r FOR_freq[14,1]`, 
+<em>n</em> = `r FOR_freq[14,3]`); Studies in Creative Arts and Writing 
+(FOR = `r FOR_freq[17,1]`, <em>n</em> = `r FOR_freq[17,3]`); and Language, Communication
+and Culture (FOR = `r FOR_freq[18,1]`, <em>n</em> = `r FOR_freq[18,3]`). 
+The new discipline grouping of Business & Law included Economics (FOR = 
+`r FOR_freq[12,1]`, <em>n</em> = `r FOR_freq[12,3]`); Commerce, Management, Tourism
+and Services (FOR = `r FOR_freq[13,1]`, <em>n</em> = `r FOR_freq[13,3]`), and Law
+and Legal Studies (FOR = `r FOR_freq[16,1]`, <em>n</em> = `r FOR_freq[16,3]`), 
+The new discipline grouping of Technology & Computer Sciences included Information 
+and Computing Sciences (FOR = `r FOR_freq[6,1]`, <em>n</em> = `r FOR_freq[6,3]`),
+and Technology (FOR = `r FOR_freq[8,1]`, <em>n</em> = `r FOR_freq[8,3]`). We 
+allocated Built Environment and Design (FOR = `r FOR_freq[10,1]`, <em>n</em> = 
+`r FOR_freq[10,3]`) to the "Other" category. 
   
+We retained the FOR divisions of Engineering (FOR = `r FOR_freq[7,1]`, <em>n</em> = 
+`r FOR_freq[7,3]`); Medical and Health Sciences (FOR = `r FOR_freq[9,1]`, <em>n</em> = 
+`r FOR_freq[9,3]`); Physical Sciences (FOR = `r FOR_freq[2,1]`, <em>n</em> = 
+`r FOR_freq[2,3]`); and Psychology and Cognitive Sciences (FOR = `r FOR_freq[15,1]`, 
+<em>n</em> = `r FOR_freq[15,3]`) as their own discipline groupings. The breakdown 
+for the number of respondents according to discpline groupings is displayed in the next table.
+  
+<em>I AM SURE YOU WILL ALL AGREE THAT WE DON'T NEED THESE TWO PARAGRAPHS IN THE 
+MAIN TEXT, BUT LEAVING IT FOR NOW TO MAKE SURE WE UNDERSTAND HOW EVERYTHING WAS 
+GROUPED TOGETHER.</em> :)
+
 ```{r discipline_table, echo=FALSE, warning=TRUE}
 
 d2 <- df %>% 
   dplyr::count(discipline) %>% 
    mutate (Percentage = round (n/nrow(df)*100))
 
+# specify the exact order of the columns based on d3 (select them according to the order
+  # of the rows in the tibble)
+d3 <-d2 [c(4,8,10,3,5,1,2,9,7,6),]
 
-dplyr::arrange(d2, desc(n)) %>% 
+dplyr::arrange(d3) %>% 
 knitr::kable(col.names = c("Disciplines", "Frequency", "Percentage"), caption = sprintf("Discipline Groupings of Respondents (n = %d)",nrow(df))) %>% 
   kable_styling(bootstrap_options = "striped", full_width = F, position = 'center')
 
-# still need to figure out the order...
+# grouping the stem & non-stem disciples together
+df <- df %>% 
+  mutate (assh = ifelse (discipline %in% c ("Business & Law", "ASSH"), "ASSH", "STEM"))
+                  
+#d4 <- assh %>% 
+#  dplyr::count(assh) %>% 
+#   mutate (Percentage = round (n/nrow(df)*100))
 
-# title = "Academic Level of Respondents (n = %d)"
-
-# Tom, I can't figure out how to arrange this by frequency. It looks super messy 
-  # otherwise...
-#p <-  simple_bar_graph(df, label_var = "AcLevel_Label", 
-#                       the_title = title, 
-#                       xname = "What is your academic level/type?", 
-#                       bar_colour = "blue",
-#                       line_colour = "black") %>% 
-#  layout(xaxis = list(categoryorder='trace'))
-
-# will need to figure out how to reorder data....
-
-#ap <- ggplot(data = valid_ac_level, aes (AcLevel_Label)) + 
-#  geom_bar() +
-#  labs (x = "Frequency", 
-#        y = "Academic Levels", 
-#        title = sprintf("Reported Academic Levels (n = %d)",nvalid_ac_level)) +
-#  coord_flip() + 
-#  theme_classic(base_size = 12)
-#ap
-
-# code to save figure. If using it for slides, increase the 'base_size' from 12 to 18. 
-#ggsave(here::here("figs", "aclevels_bar.png"))
+#dplyr::arrange(d4) %>% 
+#knitr::kable(col.names = c("Disciplines", "Frequency", "Percentage"), caption = #sprintf("Discipline Groupings of Respondents (n = %d)",nrow(df))) %>% 
+#  kable_styling(bootstrap_options = "striped", full_width = F, position = 'center')
 
 ```
   
@@ -321,7 +395,7 @@ perceived crisis.
 title = sprintf("Estimates of reproducibility by perceived crisis in field (n = %d)",nvalid_rep_est)
 x_name = "Do you think your field is experiencing a 'Reprodubility Crisis'?"
 x_labels = c("Don't Know", "No Crisis", "Slight Crisis", "Significant Crisis")
-y_name = "Estimated %age of reproducible studies"
+y_name = "Estimated % of reproducible studies"
 
 p <- ggplot(data = valid_rep_est, 
        aes(x=crisis, y=RepEstimate)) + 
@@ -417,7 +491,31 @@ p <- simple_pie_chart(the_data = df, label_var = "OverallExp",
                       the_title = title, 
                       colours,the_quantity = "percent")
 p
-  
+```
+
+```{r os_experience_pie_assh, echo = FALSE}
+
+# data for just ASSH respondents
+title = "What is your experience with open science practices? HAS respondents (n = %d)"
+d_assh <- df %>% filter(assh == "ASSH")
+
+# pie chart
+colours <- brewer.pal(4, "Blues")
+p <- simple_pie_chart(the_data = d_assh, label_var = "OverallExp",
+                      the_title = title, 
+                      colours,the_quantity = "percent")
+p
+
+# data for just STEM respondents
+title = "What is your experience with open science practices? STEM respondents (n = %d)"
+d_stem <- df %>% filter(assh == "STEM")
+
+# pie chart
+colours <- brewer.pal(4, "Blues")
+p <- simple_pie_chart(the_data = d_stem, label_var = "OverallExp",
+                      the_title = title, 
+                      colours,the_quantity = "percent")
+p
 ```
 
 ```{r tables_os_experience, echo = FALSE, eval = TRUE}
@@ -440,8 +538,7 @@ Next, we break down the results according to their experience with specific type
 
 #### Experience with Study Preregistration
 
-```{r prereg_count, echo = FALSE, warning=TRUE}
-
+```{r prereg_exp_count, echo = FALSE, warning=TRUE}
 # filter rows with valid responses for this variable
 valid_prereg_exp <- filter(df, PreregExp1 != "NA")
 
@@ -459,8 +556,7 @@ per_prereg_exp <- perc(x = df$PreregExp1, y = nvalid_prereg_exp)
 
 Of the `r nvalid_prereg_exp` participants who answered this question, `r per_prereg_exp[4]`% were unaware of study preregistration; `r per_prereg_exp[1]`% were aware of study preregistration, but had not used it; `r per_prereg_exp[3]`% had some experience with it, but did not regularly preregister their studies; and `r per_prereg_exp[2]`% regularly preregistered their studies. 
 
-```{r prereg_pie_chart, echo = FALSE, warning = TRUE}
-
+```{r prereg_exp_pie_chart, echo = FALSE, warning = TRUE}
 
 title = "What is your experience with preregistration? (n = %d)"
 
@@ -473,7 +569,21 @@ p
 ```
 
 
-```{r prereg_table, echo=FALSE, warning=TRUE}
+```{r prereg_exp_pie_chart_assh, echo = FALSE, warning = TRUE, eval=FALSE}
+
+d_assh <- df %>% filter(assh == "ASSH") 
+title = "What is your experience with preregistration? HAS respondents (n = %d)"
+
+# pie chart
+colours <- brewer.pal(4, "Blues")
+p <- simple_pie_chart(the_data = d_assh, label_var = "PreregExp1", 
+                      the_title = title, 
+                      colours,the_quantity = "percent")
+p
+
+```
+
+```{r prereg_exp_table, echo=FALSE, warning=TRUE}
 
 p2 <- valid_prereg_exp %>% 
   dplyr::count(PreregExp1) %>% 
@@ -484,6 +594,126 @@ knitr::kable (col.names = c("Preregistration Experience", "Frequency", "Percenta
     kable_styling(bootstrap_options = "striped", full_width = F, position = 'center')
 
 ```
+
+#### Perceived Importance about Preregistration 
+
+
+```{r prereg_imp_count, echo = FALSE, warning=TRUE}
+
+# filter rows with valid responses for this variable
+valid_prereg_imp <- filter(df, PreRegImp != "NA")
+
+# create object with the counts for each valid response for this variable
+c_prereg_imp <- count(valid_prereg_imp$PreRegImp)
+
+# calculate number of rows with a valid response for this variable
+nvalid_prereg_imp <- nrow(valid_prereg_imp)
+
+# calculate the percentage for each response
+per_prereg_imp <- perc(x = df$PreRegImp, y = nvalid_prereg_exp)
+
+```
+
+
+Of the `r nvalid_prereg_imp` participants who answered this question, `r per_prereg_imp[1]`% indicated that preregistration was extremely important for their field; `r per_prereg_imp[4]`% indicated that it was somewhat important; `r per_prereg_exp[5]`% indicated that preregistration was somewhat unimportant; and `r per_prereg_exp[2]`% indicated that it was not at all important for their field. A small number (`r per_prereg_exp[3]`%) indicated that researchers in their 
+discipline do not conduct research studies. 
+
+```{r prereg_imp_pie_chart, echo = FALSE, warning = TRUE}
+
+title = "In your opinion, how important for your field is it that researchers preregister their studies (n = %d)"
+
+# pie chart
+colours <- brewer.pal(4, "Blues")
+p <- simple_pie_chart(the_data = df, label_var = "PreRegImp", 
+                      the_title = title, 
+                      colours,the_quantity = "percent")
+p
+```
+
+```{r prereg_imp_pie_chart_assh, echo = FALSE, warning = TRUE, eval=FALSE}
+
+title = "How important is it that researchers preregister their studies? HAS respondents (n = %d)"
+
+d_assh <- df %>% 
+  filter(assh == "ASSH") %>% 
+  filter(PreRegImp != "Researchers in my discipline do not conduct research studies")
+
+# pie chart
+colours <- brewer.pal(4, "Blues")
+p <- simple_pie_chart(the_data = d_assh, label_var = "PreRegImp", 
+                      the_title = title, 
+                      colours,the_quantity = "percent")
+p
+```
+
+
+```{r prereg_imp_table, echo=FALSE, warning=TRUE}
+
+p2 <- valid_prereg_imp %>% 
+  dplyr::count(PreRegImp) %>% 
+  mutate(Percentage = round (n/nvalid_prereg_imp*100))
+
+dplyr::arrange(p2, desc(n)) %>% 
+knitr::kable (col.names = c("Perceived Importance of Preregistration", "Frequency", "Percentage"), caption = sprintf("Perceived Importance of Preregistration (n = %d)", nvalid_prereg_imp)) %>% 
+    kable_styling(bootstrap_options = "striped", full_width = F, position = 'center')
+
+```
+
+```{r prereg_concerns_data, echo=FALSE, warning=TRUE}
+# wrangle this data so it's in long form & only includes endorsements.
+
+PreRegCon_long <- df %>% 
+     select(c("ParticipantNumber", "PreRegCon_delay", "PreRegCon_look", "PreRegCon_prevent_exp", "PreRegCon_stifle_creativity", "PreRegCon_scooping", "PreRegCon_prevent_sig", "PreRegCon_diff_pub", "PreRegCon_no_con")) %>%  
+     pivot_longer(c("PreRegCon_delay", "PreRegCon_look", "PreRegCon_prevent_exp", "PreRegCon_stifle_creativity", "PreRegCon_scooping", "PreRegCon_prevent_sig", "PreRegCon_diff_pub", "PreRegCon_no_con"), 
+     names_to = "PreRegConcern", values_to = "PreReg_Endorsement") %>% 
+  filter(PreReg_Endorsement == "1")  
+
+# recode the data so the response options have proper labels
+  # create a character vector with proper labels
+prereg_con_key <- c (PreRegCon_delay = "Delays data collection", 
+                     PreRegCon_look = "Need to look at data to analyse it",
+                     PreRegCon_prevent_exp = "Prevents exploratory research",
+                     PreRegCon_stifle_creativity = "Stifles creativity", 
+                     PreRegCon_scooping = "Risk of scooping", 
+                     PreRegCon_prevent_sig = "More difficult to find significant results",
+                     PreRegCon_diff_pub = "More difficult to publish in certain journals", 
+                     PreRegCon_no_con = "No concerns")
+  # recode the values with this character vector
+PreRegCon_long$PreRegConcern <- recode(PreRegCon_long$PreRegConcern, !!!prereg_con_key)
+
+# getting a tibble for the counts
+con <- count(PreRegCon_long$PreRegConcern)
+
+# need the data to figure out how many respondents shared concerns
+  # figure out unique number of participants
+n_con <- unique(PreRegCon_long$ParticipantNumber)
+  # count the number of unique values (can do that in the title itself in next chunk)
+# length(n_con)
+```
+
+We also asked respondents if they have any concerns about preregistering their studies. 
+After asking respondents to share their concerns in a free text format, we provided a 
+list of possible concerns that researchers could have about preregistering their studies. 
+They were able to select as many concerns as they liked. A total of `r length(n_con)`
+respondents answered this question. Of those who respondended to this question, 
+`r con[5,2]` reported that they do not share any of the listed concerns. 
+
+```{r prereg_concerns_bar, echo=FALSE, warning=TRUE}
+# build the bar chart
+
+title = sprintf("Concerns about preregistering studies (n = %d)", length(n_con))
+
+p <- ggplot(PreRegCon_long, aes (x = PreRegConcern)) +
+         geom_bar(fill = "lightskyblue3", colour = "black")  +
+    labs (x = element_blank(),
+      y = "Frequency", 
+        title = title) +
+  coord_flip() +
+  theme_classic(base_size = 12) 
+p
+
+```
+
 
 ### Experience with Open Materials and/or Code
 
@@ -501,6 +731,15 @@ nvalid_code <- nrow(valid_code)
 
 The following section shows how many people have experience with open code and/or materials. A
 total of `r nvalid_code` answered this question.
+
+```{r code_pie, echo = FALSE, warning = TRUE}
+title = "What is your experience with open materials and/or code (n = %d)"
+#pie chart
+
+colours <- brewer.pal(4, "Blues")
+p <- simple_pie_chart(df,label_var="CodeExp",the_title = title, colours = colours, the_quantity="percent")
+p
+```
 
 ```{r code_table, echo=FALSE, warning=TRUE}
 
@@ -521,15 +760,59 @@ p <- simple_bar_graph(df, label_var = "CodeExp", the_title = title, xname = "Res
 p
 ```
 
-```{r code_pie, echo = FALSE, warning = TRUE}
-title = "What is your experience with open materials and/or code (n = %d)"
-#pie chart
 
-colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(df,label_var="CodeExp",the_title = title, colours = colours, the_quantity="percent")
-p
+```{r code_concerns_data, echo=FALSE, warning=TRUE}
+# wrangle this data so it's in long form & only includes endorsements.
+
+CodeCon_long <- df %>% 
+  select (c("ParticipantNumber", "CodeCon_criticise", "CodeCon_diff_understand", "CodeCon_assistance", "CodeCon_lose_control", "CodeCon_errors", "CodeCon_credit", "CodeCon_no_con", "CodeCon_violate", "CodeCon_ip")) %>%  
+  pivot_longer(c("CodeCon_criticise", "CodeCon_diff_understand", "CodeCon_assistance", "CodeCon_lose_control", "CodeCon_errors", "CodeCon_credit", "CodeCon_no_con", "CodeCon_violate", "CodeCon_ip"), names_to = "CodeConcern", values_to = "CodeCon_Endorsement") %>% 
+  filter(CodeCon_Endorsement == "1")
+
+# recode the data so the response options have proper labels
+  # create a character vector with proper labels
+code_con_key <- c (CodeCon_criticise = "Others might criticise my materials/code", 
+                     CodeCon_diff_understand = "Others might find it difficult to understand my materials/code",
+                     CodeCon_assistance = "Others might ask for my assistance with their research",
+                     CodeCon_lose_control = "I might lose control over how they are used", 
+                     CodeCon_errors = "Others might find errors in my published work", 
+                     CodeCon_credit = "I might not receive appropriate credit",
+                     CodeCon_violate = "Reuse could violate epistemological framework", 
+                     CodeCon_ip = "Issues related to intellectual property", 
+                     CodeCon_no_con = "No concerns")
+  # recode the values with this character vector
+CodeCon_long$CodeConcern <- recode(CodeCon_long$CodeConcern, !!!code_con_key)
+
+# getting a tibble for the counts
+code_con <- count(CodeCon_long$CodeConcern)
+
+# need the data to figure out how many respondents shared concerns
+  # figure out unique number of participants
+n_code_con <- unique(CodeCon_long$ParticipantNumber)
+  # count the number of unique values (can do that in the title itself in next chunk)
+# length(n_con)
 ```
 
+We also asked respondents if they have any concerns about making their research materials
+and/or code open. After asking respondents to share their concerns in a free text format, we provided a list of possible concerns that researchers could have about sharing their materials
+and/or code. Respondents were able to select as many concerns as they liked. A total of `r length(n_con)` respondents answered this question. Of those who respondended to this question, 
+`r con[4,2]` reported that they do not share any of the listed concerns. 
+
+```{r code_concerns_bar, echo=FALSE, warning=TRUE}
+# build the bar chart
+
+title = sprintf("Open materials and/or code\n concerns (n = %d)", length(n_code_con))
+
+p <- ggplot(CodeCon_long, aes (x = CodeConcern)) +
+         geom_bar(fill = "lightskyblue3", colour = "black")  +
+    labs (x = element_blank(),
+      y = "Frequency", 
+        title = title) +
+  coord_flip() +
+  theme_classic(base_size = 12) 
+p
+
+```
 
 ```{r skim df, eval=FALSE, include=FALSE}
 #These are chunks from the course I took, that I'm keeping now just for reference

@@ -1,6 +1,6 @@
-library(tidyverse)
 library(here)
 library(plyr) 
+library(tidyverse)
 library(tools)
 
 ####### READ IN DATA FILE ############
@@ -52,15 +52,12 @@ df <- df %>%
              LocationAccuracy, PreregDef)) 
 
 
-
 ################# RECODING VARIABLES ##################
 
 # rename wonky variable names & change FOR code columns to reflect number of digits. 
 
 df <- df %>% 
   dplyr::rename(RepEstimate = RepEstimate_1, FORcode_4 = FORcode_2, FORcode_2 = FORcode_1) 
-
-
 
 
 # separate FOR code columns into numbers and labels & change case
@@ -138,6 +135,30 @@ df$PreregExp1_num <- factor(df$PreregExp1)
 
 df$CodeExp_num <- factor(df$CodeExp) 
 
+df$PreRegImp_num <- factor(df$PreRegImp)
+
+# recode preregistration concerns
+df$PreRegCon_delay <- factor(df$PreregConcern_4)
+df$PreRegCon_look <- factor(df$PreregConcern_5)
+df$PreRegCon_prevent_exp <- factor(df$PreregConcern_6)
+df$PreRegCon_stifle_creativity <- factor(df$PreregConcern_7)
+df$PreRegCon_scooping <- factor(df$PreregConcern_8)
+df$PreRegCon_prevent_sig <- factor(df$PreregConcern_10)
+df$PreRegCon_diff_pub <- factor(df$PreregConcern_11)
+df$PreRegCon_no_con <- factor(df$PreregConcern_12)
+
+# recode open code concerns
+
+df$CodeCon_criticise <- factor(df$CodeConcern_4)
+df$CodeCon_diff_understand <- factor(df$CodeConcern_5)
+df$CodeCon_assistance <- factor(df$CodeConcern_6)
+df$CodeCon_lose_control <- factor(df$CodeConcern_7)
+df$CodeCon_errors <- factor(df$CodeConcern_8)
+df$CodeCon_credit <- factor(df$CodeConcern_9)
+df$CodeCon_no_con <- factor(df$CodeConcern_12)
+df$CodeCon_violate <- factor(df$CodeConcern_13)
+df$CodeCon_ip <- factor(df$CodeConcern_14)
+
 # create new variables with text labels for levels
 
 df$crisis <- df$crisis %>% 
@@ -159,6 +180,13 @@ df$CodeExp <- df$CodeExp %>%
   mapvalues(
     c("1", "2", "3", "4"),
     c("Unaware", "Aware, But Not Used", "Some Use", "Regular Use"))
+
+df$PreRegImp <- df$PreRegImp %>% 
+  mapvalues(
+    c ("0", "1", "2", "3", "4"),
+    c ("Researchers in my discipline do not conduct research studies", "Extremely", "Somewhat important", "Somewhat unimportant", "Not at all")
+  )
+
 
 ## RECODE ACADEMIC LEVELS ##
 

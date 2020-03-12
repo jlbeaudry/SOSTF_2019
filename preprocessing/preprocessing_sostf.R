@@ -248,3 +248,5 @@ write.csv(df, here::here("data", "data_sostf.csv"), row.names = FALSE)
 
 
 
+
+  

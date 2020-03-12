@@ -21,10 +21,10 @@ options(scipen = 999)
 library(tinytex)
 library(knitr)
 library(here)
+library(plyr)
 library(tidyverse)
 library(skimr)
 library(ggbeeswarm)
-library(plyr) 
 library(plotly)
 library(RColorBrewer)
 library(kableExtra)
@@ -69,7 +69,7 @@ simple_pie_chart <- function (the_data, label_var="", the_title="", colours, ord
   nvalid <- nrow(the_data)
   
   # tally the responses for each response option
-  pie_data <- count(the_data,vars=c(label_var,item_var))
+  pie_data <- plyr::count(the_data,vars=c(label_var,item_var))
   
   # sort the data by response option order (needs other sort orders added)
   if (order == "ByRespNum") pie_data <- pie_data[order(pie_data[[item_var]]),]
@@ -130,7 +130,7 @@ simple_bar_graph <- function (the_data, label_var = "", the_title = "",
   nvalid <- nrow(the_data)
   
   # tally the responses for each response option
-  bar_data <- count(the_data,vars=c(label_var,item_var))
+  bar_data <- plyr::count(the_data,vars=c(label_var,item_var))
   
   # sort the data by response option order (needs other sort orders added)
   if (order == "ByRespNum") bar_data <- bar_data[order(bar_data[[item_var]]),]
@@ -442,7 +442,7 @@ per_os_exp <- perc(x = valid_os_exp$OverallExp, y = nvalid_os_exp)
 
 
 #count outputs in case that's what we are going to report instead...
-c_os_exp <- count(valid_os_exp$OverallExp)
+c_os_exp <- plyr::count(valid_os_exp$OverallExp)
 
 # just an FYI that this does the same thing as the code above
 #nvalid_os_exp <- df %>% 
@@ -543,7 +543,7 @@ Next, we break down the results according to their experience with specific type
 valid_prereg_exp <- filter(df, PreregExp1 != "NA")
 
 # create object with the counts for each valid response for this variable
-c_prereg_exp <- count(valid_prereg_exp$PreregExp1)
+c_prereg_exp <- plyr::count(valid_prereg_exp$PreregExp1)
 
 # calculate number of rows with a valid response for this variable
 nvalid_prereg_exp <- nrow(valid_prereg_exp)
@@ -604,7 +604,7 @@ knitr::kable (col.names = c("Preregistration Experience", "Frequency", "Percenta
 valid_prereg_imp <- filter(df, PreRegImp != "NA")
 
 # create object with the counts for each valid response for this variable
-c_prereg_imp <- count(valid_prereg_imp$PreRegImp)
+c_prereg_imp <- plyr::count(valid_prereg_imp$PreRegImp)
 
 # calculate number of rows with a valid response for this variable
 nvalid_prereg_imp <- nrow(valid_prereg_imp)
@@ -646,6 +646,7 @@ p <- simple_pie_chart(the_data = d_assh, label_var = "PreRegImp",
 p
 ```
 
+<emp> I still need to remove the "my field does not use studies". </emp>
 
 ```{r prereg_imp_table, echo=FALSE, warning=TRUE}
 
@@ -682,7 +683,7 @@ prereg_con_key <- c (PreRegCon_delay = "Delays data collection",
 PreRegCon_long$PreRegConcern <- recode(PreRegCon_long$PreRegConcern, !!!prereg_con_key)
 
 # getting a tibble for the counts
-con <- count(PreRegCon_long$PreRegConcern)
+con <- plyr::count(PreRegCon_long$PreRegConcern)
 
 # need the data to figure out how many respondents shared concerns
   # figure out unique number of participants
@@ -700,7 +701,6 @@ respondents answered this question. Of those who respondended to this question,
 
 ```{r prereg_concerns_bar, echo=FALSE, warning=TRUE}
 # build the bar chart
-
 title = sprintf("Concerns about preregistering studies (n = %d)", length(n_con))
 
 p <- ggplot(PreRegCon_long, aes (x = PreRegConcern)) +
@@ -714,6 +714,7 @@ p
 
 ```
 
+<emp> %age of those who responded to this question & also make "no concerns" a different colour</emp> 
 
 ### Experience with Open Materials and/or Code
 
@@ -755,17 +756,16 @@ knitr::kable (col.names = c("Experience with Open Materials & Code", "Frequency"
 
 ```{r code_bar, echo = FALSE, warning = TRUE, eval = FALSE}
 title = "What is your experience with open materials and/or code (n = %d)"
-
 p <- simple_bar_graph(df, label_var = "CodeExp", the_title = title, xname = "Response given", bar_colour = "orange",line_colour = "black",the_quantity="count")
 p
 ```
 
+<emp> %age of those who responded to this question & also make "no concerns" a different colour</emp> 
 
 ```{r code_concerns_data, echo=FALSE, warning=TRUE}
 # wrangle this data so it's in long form & only includes endorsements.
-
 CodeCon_long <- df %>% 
-  select (c("ParticipantNumber", "CodeCon_criticise", "CodeCon_diff_understand", "CodeCon_assistance", "CodeCon_lose_control", "CodeCon_errors", "CodeCon_credit", "CodeCon_no_con", "CodeCon_violate", "CodeCon_ip")) %>%  
+  select (c("ParticipantNumber", "CodeCon_criticise", "CodeCon_diff_understand", "CodeCon_assistance", "CodeCon_lose_control", "CodeCon_errors", "CodeCon_credit", "CodeCon_no_con", "CodeCon_violate", "CodeCon_ip", "FORcode_2_label")) %>%  
   pivot_longer(c("CodeCon_criticise", "CodeCon_diff_understand", "CodeCon_assistance", "CodeCon_lose_control", "CodeCon_errors", "CodeCon_credit", "CodeCon_no_con", "CodeCon_violate", "CodeCon_ip"), names_to = "CodeConcern", values_to = "CodeCon_Endorsement") %>% 
   filter(CodeCon_Endorsement == "1")
 
@@ -784,13 +784,17 @@ code_con_key <- c (CodeCon_criticise = "Others might criticise my materials/code
 CodeCon_long$CodeConcern <- recode(CodeCon_long$CodeConcern, !!!code_con_key)
 
 # getting a tibble for the counts
-code_con <- count(CodeCon_long$CodeConcern)
+code_con <- plyr::count(CodeCon_long$CodeConcern)
 
 # need the data to figure out how many respondents shared concerns
   # figure out unique number of participants
 n_code_con <- unique(CodeCon_long$ParticipantNumber)
   # count the number of unique values (can do that in the title itself in next chunk)
 # length(n_con)
+
+c2 <- CodeCon_long %>% 
+  filter(CodeCon_long$CodeConcern == "Reuse could violate epistemological framework")
+
 ```
 
 We also asked respondents if they have any concerns about making their research materials

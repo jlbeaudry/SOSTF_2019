@@ -186,10 +186,11 @@ per_ac_level <- perc(x = df$AcLevel_Label, y = nvalid_ac_level)
 
 We conducted a survey in September 2019 to examine people's current use of open 
 science practices, to examine their perceptions of these practices, and to examine
-their perceived barriers to using these practices. Across the university, `r n` started the survey, although not all respondents completed all questions; thus, 
+their perceived barriers to adopting these practices. Across the university, `r n` 
+started the survey, although not all respondents completed all questions; thus, 
 we report the sample size for each question. This document presents an overview of their responses. 
 
-In terms of their demographics, we did not obtain information about gender or age
+In terms of respondents' demographic information, we did not collect information about gender or age
 to provide more anonymity to our respondents. We did, however, ask about their Academic 
 Level/Type and their Discpline (based on 2-digit and 4-digit Field of Research [FOR] codes). Of the `r nrow(valid_ac_level)` respondents who provided details about their Academic Level, `r per_ac_level [5]`% were PhD students, `r per_ac_level [7]`% were Professors, and 
 `r per_ac_level [10]`% were Senior Lecturers. The breakdown of the rest of the academic
@@ -493,7 +494,7 @@ p <- simple_pie_chart(the_data = df, label_var = "OverallExp",
 p
 ```
 
-```{r os_experience_pie_assh, echo = FALSE}
+```{r os_experience_pie_assh, echo = FALSE, eval = FALSE}
 
 # data for just ASSH respondents
 title = "What is your experience with open science practices? HAS respondents (n = %d)"
@@ -549,10 +550,9 @@ c_prereg_exp <- plyr::count(valid_prereg_exp$PreregExp1)
 nvalid_prereg_exp <- nrow(valid_prereg_exp)
 
 # calculate the percentage for each response
-per_prereg_exp <- perc(x = df$PreregExp1, y = nvalid_prereg_exp)
+per_prereg_exp <- perc(x = valid_prereg_exp$PreregExp1, y = nvalid_prereg_exp)
 
 ```
-
 
 Of the `r nvalid_prereg_exp` participants who answered this question, `r per_prereg_exp[4]`% were unaware of study preregistration; `r per_prereg_exp[1]`% were aware of study preregistration, but had not used it; `r per_prereg_exp[3]`% had some experience with it, but did not regularly preregister their studies; and `r per_prereg_exp[2]`% regularly preregistered their studies. 
 
@@ -566,6 +566,7 @@ p <- simple_pie_chart(the_data = df, label_var = "PreregExp1",
                       the_title = title, 
                       colours,the_quantity = "percent")
 p
+rm(title)
 ```
 
 
@@ -581,6 +582,7 @@ p <- simple_pie_chart(the_data = d_assh, label_var = "PreregExp1",
                       colours,the_quantity = "percent")
 p
 
+rm(title)
 ```
 
 ```{r prereg_exp_table, echo=FALSE, warning=TRUE}
@@ -589,48 +591,71 @@ p2 <- valid_prereg_exp %>%
   dplyr::count(PreregExp1) %>% 
   mutate(Percentage = round (n/nvalid_prereg_exp*100))
 
+df$PreregExp1 <- df$PreregExp1 %>% 
+  mapvalues(
+    c("1", "2", "3", "4"), 
+    c("Unaware", "Aware, But Not Used", "Some Experience", "Reg Use"))
+
+p2$PreregExp1 <- p2$PreregExp1 %>% 
+  mapvalues(
+    c("Unaware", "Aware, But Not Used", "Some Experience", "Reg Use"), 
+    c("Unaware", "Aware, But Not Used", "Some Experience","Regular Use"))
+
 dplyr::arrange(p2, desc(n)) %>% 
 knitr::kable (col.names = c("Preregistration Experience", "Frequency", "Percentage"), caption = sprintf("Experience with Study Preregistration (n = %d)", nvalid_prereg_exp)) %>% 
     kable_styling(bootstrap_options = "striped", full_width = F, position = 'center')
 
 ```
 
+<em> CAN I CHANGE THE TITLE OF THE 'REG USE' VARIABLE TO 'REGULAR USE' WITHIN KABLE?
 #### Perceived Importance about Preregistration 
 
 
 ```{r prereg_imp_count, echo = FALSE, warning=TRUE}
 
-# filter rows with valid responses for this variable
+# filter rows with valid responses for this variable; first df contains all valid responses
+  # the second df contains all valid responses, except "Researchers...do not conduct research
+  # studies"
 valid_prereg_imp <- filter(df, PreRegImp != "NA")
+valid_prereg_imp_ex <- filter(valid_prereg_imp, PreRegImp != "Researchers in my discipline do not conduct research studies")
 
-# create object with the counts for each valid response for this variable
+# create objects with the counts for each valid response for the variable
 c_prereg_imp <- plyr::count(valid_prereg_imp$PreRegImp)
+c_prereg_imp_ex <- plyr::count(valid_prereg_imp_ex$PreRegImp)
 
 # calculate number of rows with a valid response for this variable
 nvalid_prereg_imp <- nrow(valid_prereg_imp)
+nvalid_prereg_imp_ex <- nrow(valid_prereg_imp_ex)
 
 # calculate the percentage for each response
-per_prereg_imp <- perc(x = df$PreRegImp, y = nvalid_prereg_exp)
+per_prereg_imp <- perc(x = valid_prereg_imp$PreRegImp, y = nvalid_prereg_imp)
+per_prereg_imp_ex <- perc(x = valid_prereg_imp_ex$PreRegImp, y = nvalid_prereg_imp_ex)
 
 ```
 
 
-Of the `r nvalid_prereg_imp` participants who answered this question, `r per_prereg_imp[1]`% indicated that preregistration was extremely important for their field; `r per_prereg_imp[4]`% indicated that it was somewhat important; `r per_prereg_exp[5]`% indicated that preregistration was somewhat unimportant; and `r per_prereg_exp[2]`% indicated that it was not at all important for their field. A small number (`r per_prereg_exp[3]`%) indicated that researchers in their 
-discipline do not conduct research studies. 
+Of the `r nvalid_prereg_imp` participants who answered this question, a small percentage 
+(`r per_prereg_imp[3]`%) indicated that researchers in their discipline do not conduct 
+research studies. As such, we excluded them from this analysis. Of the remaining 
+`r nvalid_prereg_imp_ex` respondents, `r per_prereg_imp_ex[1]`% indicated that 
+preregistration was extremely important for their field; `r per_prereg_imp_ex[3]`% 
+indicated that it was somewhat important; `r per_prereg_imp_ex[4]`% indicated that 
+preregistration was somewhat unimportant; and `r per_prereg_imp_ex[2]`% indicated 
+that it was not at all important for their field. 
 
-```{r prereg_imp_pie_chart, echo = FALSE, warning = TRUE}
+```{r prereg_imp_ex_pie_chart, echo = FALSE, warning = TRUE}
 
 title = "In your opinion, how important for your field is it that researchers preregister their studies (n = %d)"
 
 # pie chart
 colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(the_data = df, label_var = "PreRegImp", 
+p <- simple_pie_chart(the_data = valid_prereg_imp_ex, label_var = "PreRegImp", 
                       the_title = title, 
                       colours,the_quantity = "percent")
 p
 ```
 
-```{r prereg_imp_pie_chart_assh, echo = FALSE, warning = TRUE, eval=FALSE}
+```{r prereg_imp_ex_pie_chart_assh, echo = FALSE, warning = TRUE, eval = FALSE}
 
 title = "How important is it that researchers preregister their studies? HAS respondents (n = %d)"
 
@@ -646,19 +671,20 @@ p <- simple_pie_chart(the_data = d_assh, label_var = "PreRegImp",
 p
 ```
 
-<emp> I still need to remove the "my field does not use studies". </emp>
 
-```{r prereg_imp_table, echo=FALSE, warning=TRUE}
+```{r prereg_imp_ex_table, echo=FALSE, warning=TRUE}
 
-p2 <- valid_prereg_imp %>% 
+p2 <- valid_prereg_imp_ex %>% 
   dplyr::count(PreRegImp) %>% 
-  mutate(Percentage = round (n/nvalid_prereg_imp*100))
+  mutate(Percentage = round (n/nvalid_prereg_imp_ex*100))
 
 dplyr::arrange(p2, desc(n)) %>% 
-knitr::kable (col.names = c("Perceived Importance of Preregistration", "Frequency", "Percentage"), caption = sprintf("Perceived Importance of Preregistration (n = %d)", nvalid_prereg_imp)) %>% 
+knitr::kable (col.names = c("Perceived Importance of Preregistration", "Frequency", "Percentage"), caption = sprintf("Perceived Importance of Preregistration (n = %d)", nvalid_prereg_imp_ex)) %>% 
     kable_styling(bootstrap_options = "striped", full_width = F, position = 'center')
 
 ```
+
+<em> I DON'T WANT THE NUMBERS TO DESCEND. PUT THEM IN LOGICAL ORDER. </em>
 
 ```{r prereg_concerns_data, echo=FALSE, warning=TRUE}
 # wrangle this data so it's in long form & only includes endorsements.
@@ -798,7 +824,8 @@ c2 <- CodeCon_long %>%
 ```
 
 We also asked respondents if they have any concerns about making their research materials
-and/or code open. After asking respondents to share their concerns in a free text format, we provided a list of possible concerns that researchers could have about sharing their materials
+and/or code open. After asking respondents to share their concerns in a free text format, 
+we provided a list of possible concerns that researchers could have about sharing their materials
 and/or code. Respondents were able to select as many concerns as they liked. A total of `r length(n_con)` respondents answered this question. Of those who respondended to this question, 
 `r con[4,2]` reported that they do not share any of the listed concerns. 
 
@@ -889,3 +916,23 @@ average_response_small <- average_response_small %>%
 average_response_small
 
 ```
+
+```{r clean environment, echo = FALSE}
+rm(a2)
+rm(a3)
+rm(c_os_exp)
+rm(d_assh)
+rm(d_stem)
+rm(d2)
+rm(d3)
+rm(df)
+rm(f2)
+rm(FOR_freq)
+rm(n)
+rm(nvalid_ac_level)
+rm(nvalid_crisis)
+rm(nvalid_disc)
+rm(nvalid_os_exp)
+rm(nvalid_rep_est)
+```
+

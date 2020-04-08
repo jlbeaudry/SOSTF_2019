@@ -184,7 +184,7 @@ df$CodeExp <- df$CodeExp %>%
 df$PreRegImp <- df$PreRegImp %>% 
   mapvalues(
     c ("0", "1", "2", "3", "4"),
-    c ("Researchers in my discipline do not conduct research studies", "Extremely", "Somewhat important", "Somewhat unimportant", "Not at all")
+    c ("Researchers in my discipline do not conduct research studies", "Extremely important", "Somewhat important", "Somewhat unimportant", "Not at all")
   )
 
 
@@ -245,7 +245,10 @@ df <- df %>%
 write.csv(df, here::here("data", "data_sostf.csv"), row.names = FALSE)
 
 
-
+# Clean Environment
+rm(df)
+rm(df_for)
+rm(read_qualtrics)
 
 
 

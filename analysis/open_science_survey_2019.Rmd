@@ -591,11 +591,6 @@ p2 <- valid_prereg_exp %>%
   dplyr::count(PreregExp1) %>% 
   mutate(Percentage = round (n/nvalid_prereg_exp*100))
 
-df$PreregExp1 <- df$PreregExp1 %>% 
-  mapvalues(
-    c("1", "2", "3", "4"), 
-    c("Unaware", "Aware, But Not Used", "Some Experience", "Reg Use"))
-
 p2$PreregExp1 <- p2$PreregExp1 %>% 
   mapvalues(
     c("Unaware", "Aware, But Not Used", "Some Experience", "Reg Use"), 
@@ -607,7 +602,6 @@ knitr::kable (col.names = c("Preregistration Experience", "Frequency", "Percenta
 
 ```
 
-<em> CAN I CHANGE THE TITLE OF THE 'REG USE' VARIABLE TO 'REGULAR USE' WITHIN KABLE?
 #### Perceived Importance about Preregistration 
 
 
@@ -678,7 +672,9 @@ p2 <- valid_prereg_imp_ex %>%
   dplyr::count(PreRegImp) %>% 
   mutate(Percentage = round (n/nvalid_prereg_imp_ex*100))
 
-dplyr::arrange(p2, desc(n)) %>% 
+p3 <-p2 [c(2,4,3,1),]
+
+p3 %>% 
 knitr::kable (col.names = c("Perceived Importance of Preregistration", "Frequency", "Percentage"), caption = sprintf("Perceived Importance of Preregistration (n = %d)", nvalid_prereg_imp_ex)) %>% 
     kable_styling(bootstrap_options = "striped", full_width = F, position = 'center')
 
@@ -740,7 +736,7 @@ p
 
 ```
 
-<emp> %age of those who responded to this question & also make "no concerns" a different colour</emp> 
+<em> %age of those who responded to this question & also make "no concerns" a different colour</em> 
 
 ### Experience with Open Materials and/or Code
 

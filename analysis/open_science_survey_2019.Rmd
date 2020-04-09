@@ -594,7 +594,7 @@ p2 <- valid_prereg_exp %>%
 p2$PreregExp1 <- p2$PreregExp1 %>% 
   mapvalues(
     c("Unaware", "Aware, But Not Used", "Some Experience", "Reg Use"), 
-    c("Unaware", "Aware, But Not Used", "Some Experience","Regular Use"))
+    c("Unaware", "Aware, But Not Used", "Some Experience", "Regular Use"))
 
 dplyr::arrange(p2, desc(n)) %>% 
 knitr::kable (col.names = c("Preregistration Experience", "Frequency", "Percentage"), caption = sprintf("Experience with Study Preregistration (n = %d)", nvalid_prereg_exp)) %>% 
@@ -680,7 +680,6 @@ knitr::kable (col.names = c("Perceived Importance of Preregistration", "Frequenc
 
 ```
 
-<em> I DON'T WANT THE NUMBERS TO DESCEND. PUT THEM IN LOGICAL ORDER. </em>
 
 ```{r prereg_concerns_data, echo=FALSE, warning=TRUE}
 # wrangle this data so it's in long form & only includes endorsements.
@@ -701,29 +700,39 @@ prereg_con_key <- c (PreRegCon_delay = "Delays data collection",
                      PreRegCon_prevent_sig = "More difficult to find significant results",
                      PreRegCon_diff_pub = "More difficult to publish in certain journals", 
                      PreRegCon_no_con = "No concerns")
+
   # recode the values with this character vector
 PreRegCon_long$PreRegConcern <- recode(PreRegCon_long$PreRegConcern, !!!prereg_con_key)
 
 # getting a tibble for the counts
-con <- plyr::count(PreRegCon_long$PreRegConcern)
+c_prereg_con <- plyr::count(PreRegCon_long$PreRegConcern)
 
-# need the data to figure out how many respondents shared concerns
-  # figure out unique number of participants
-n_con <- unique(PreRegCon_long$ParticipantNumber)
-  # count the number of unique values (can do that in the title itself in next chunk)
-# length(n_con)
+# to figure out how many respondents shared concerns calculate unique number of participants
+n_prereg_con <- length(unique(PreRegCon_long$ParticipantNumber))
+
+# calculate the percentage for each response (of the percentage who answered the question)
+per_prereg_con <- perc(x = PreRegCon_long$PreRegConcern, y = n_prereg_con)
+
+# df <- c(c_prereg_con, per_prereg_con)
+
 ```
 
 We also asked respondents if they have any concerns about preregistering their studies. 
-After asking respondents to share their concerns in a free text format, we provided a 
+After asking respondents to share their concerns in a free text format, we then provided a 
 list of possible concerns that researchers could have about preregistering their studies. 
-They were able to select as many concerns as they liked. A total of `r length(n_con)`
-respondents answered this question. Of those who respondended to this question, 
-`r con[5,2]` reported that they do not share any of the listed concerns. 
+Respondents were able to select as many concerns as they liked. Of the `r n_prereg_con`
+respondents who answered this question, `r c_prereg_con[5,2]` (`r per_prereg_con [5]`) 
+reported that they do not share any of the listed concerns. 
 
 ```{r prereg_concerns_bar, echo=FALSE, warning=TRUE}
 # build the bar chart
-title = sprintf("Concerns about preregistering studies (n = %d)", length(n_con))
+title = sprintf("Concerns about preregistering studies (n = %d)", n_prereg_con)
+
+# creating a tibble with the percentage
+df <- PreRegCon_long$PreRegConcern 
+df2 <- df %>% 
+  count()
+  
 
 p <- ggplot(PreRegCon_long, aes (x = PreRegConcern)) +
          geom_bar(fill = "lightskyblue3", colour = "black")  +
@@ -808,11 +817,13 @@ CodeCon_long$CodeConcern <- recode(CodeCon_long$CodeConcern, !!!code_con_key)
 # getting a tibble for the counts
 code_con <- plyr::count(CodeCon_long$CodeConcern)
 
-# need the data to figure out how many respondents shared concerns
+# need this data to figure out how many respondents shared concerns
   # figure out unique number of participants
-n_code_con <- unique(CodeCon_long$ParticipantNumber)
+
+n_code_con <- length(unique(CodeCon_long$ParticipantNumber))
   # count the number of unique values (can do that in the title itself in next chunk)
 # length(n_con)
+
 
 c2 <- CodeCon_long %>% 
   filter(CodeCon_long$CodeConcern == "Reuse could violate epistemological framework")

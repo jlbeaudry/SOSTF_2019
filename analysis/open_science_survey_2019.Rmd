@@ -710,8 +710,15 @@ c_prereg_con <- plyr::count(PreRegCon_long$PreRegConcern)
 # to figure out how many respondents shared concerns calculate unique number of participants
 n_prereg_con <- length(unique(PreRegCon_long$ParticipantNumber))
 
+# create a tibble with count & percentages (of respondents who answered this question) & 
+  # then reorder them by descending percentages
+b <- PreRegCon_long %>% 
+  dplyr::count(PreRegConcern) %>% 
+  mutate(Percentage = round (n/n_prereg_con*100)) %>% 
+  dplyr::arrange(desc(n))
+
 # calculate the percentage for each response (of the percentage who answered the question)
-per_prereg_con <- perc(x = PreRegCon_long$PreRegConcern, y = n_prereg_con)
+#per_prereg_con <- perc(x = PreRegCon_long$PreRegConcern, y = n_prereg_con)
 
 # df <- c(c_prereg_con, per_prereg_con)
 
@@ -721,23 +728,31 @@ We also asked respondents if they have any concerns about preregistering their s
 After asking respondents to share their concerns in a free text format, we then provided a 
 list of possible concerns that researchers could have about preregistering their studies. 
 Respondents were able to select as many concerns as they liked. Of the `r n_prereg_con`
-respondents who answered this question, `r c_prereg_con[5,2]` (`r per_prereg_con [5]`) 
-reported that they do not share any of the listed concerns. 
+respondents who answered this question, `r b [7,2]` (`r b [7,3]`) 
+reported that they do not share any of the listed concerns. The following table presents
+the percentage of respondents who selected each of the concerns provided. 
 
 ```{r prereg_concerns_bar, echo=FALSE, warning=TRUE}
+
+# need to reorder the response options...
+b2 <- b %>% 
+  dplyr::mutate(PreRegConcern = factor (PreRegConcern, 
+                                levels = c("More difficult to find significant results", "More difficult to publish in certain journals", "Delays data collection", "Stifles creativity",  "Prevents exploratory research", "Need to look at data to analyse it", "Risk of scooping", "No concerns")))
+
+# create a character vector for the colours for each bar
+cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", "grey50")
+
 # build the bar chart
 title = sprintf("Concerns about preregistering studies (n = %d)", n_prereg_con)
 
-# creating a tibble with the percentage
-df <- PreRegCon_long$PreRegConcern 
-df2 <- df %>% 
-  count()
-  
-
-p <- ggplot(PreRegCon_long, aes (x = PreRegConcern)) +
-         geom_bar(fill = "lightskyblue3", colour = "black")  +
+# plot the reordered data and colours. Because the data is in a tibble rather than a dataframe with
+  # counts, I could use 'geom_col' rather than 'geom_bar'(or I could use stat = "identity" with
+  # 'geom_bar')
+p <- ggplot(b2) + 
+  aes(x = PreRegConcern, y = Percentage) +
+   geom_bar(stat = "identity", colour = "black", fill = cols) +
     labs (x = element_blank(),
-      y = "Frequency", 
+      y = "Percentage", 
         title = title) +
   coord_flip() +
   theme_classic(base_size = 12) 
@@ -833,8 +848,8 @@ c2 <- CodeCon_long %>%
 We also asked respondents if they have any concerns about making their research materials
 and/or code open. After asking respondents to share their concerns in a free text format, 
 we provided a list of possible concerns that researchers could have about sharing their materials
-and/or code. Respondents were able to select as many concerns as they liked. A total of `r length(n_con)` respondents answered this question. Of those who respondended to this question, 
-`r con[4,2]` reported that they do not share any of the listed concerns. 
+and/or code. Respondents were able to select as many concerns as they liked. A total of `r length(n_code_con)` respondents answered this question. Of those who respondended to this question,
+`r code_con[4,2]` reported that they do not share any of the listed concerns. 
 
 ```{r code_concerns_bar, echo=FALSE, warning=TRUE}
 # build the bar chart
@@ -928,8 +943,8 @@ average_response_small
 rm(a2)
 rm(a3)
 rm(c_os_exp)
-rm(d_assh)
-rm(d_stem)
+#rm(d_assh)
+#rm(d_stem)
 rm(d2)
 rm(d3)
 rm(df)

@@ -777,7 +777,7 @@ p <- ggplot(b2) +
     labs (x = element_blank(),
       y = "Percentage", 
         title = title) +
-  coord_flip() +
+  coord_flip(ylim = c(0,60)) +
   theme_classic(base_size = 12) 
 p
 
@@ -861,8 +861,7 @@ CodeCon_long <- df %>%
 # recode the data so the response options have proper labels
   # create a character vector with proper labels
 code_con_key <- c (CodeCon_criticise = "Others might criticise my materials/code", 
-                     CodeCon_diff_understand = "Others might find it difficult to understand my 
-                   materials/code",
+                     CodeCon_diff_understand = "Others might find it difficult to understand my materials/code",
                      CodeCon_assistance = "Others might ask for my assistance with their research",
                      CodeCon_lose_control = "I might lose control over how they are used", 
                      CodeCon_errors = "Others might find errors in my published work", 
@@ -917,7 +916,8 @@ tb2 <- tb %>%
   # when they are graphed..
 
 # create a character vector for the colours for each bar
-cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", "grey50")
+cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
+          "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", "grey50")
 
 # build the bar chart
 title = sprintf("Concerns about open materials\n and/or code (n = %d)", n_code_con)
@@ -932,7 +932,8 @@ p <- ggplot(tb2) +
   labs (x = element_blank(),
         y = "Percentage", 
         title = title) +
-  coord_flip() +
+  coord_flip(ylim = c(0,60)) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 50)) + #wrap the labels
   theme_classic(base_size = 12) 
 p
 

@@ -186,10 +186,11 @@ per_ac_level <- perc(x = df$AcLevel_Label, y = nvalid_ac_level)
 
 We conducted a survey in September 2019 to examine people's current use of open 
 science practices, to examine their perceptions of these practices, and to examine
-their perceived barriers to using these practices. Across the university, `r n` started the survey, although not all respondents completed all questions; thus, 
+their perceived barriers to adopting these practices. Across the university, `r n` 
+started the survey, although not all respondents completed all questions; thus, 
 we report the sample size for each question. This document presents an overview of their responses. 
 
-In terms of their demographics, we did not obtain information about gender or age
+In terms of respondents' demographic information, we did not collect information about gender or age
 to provide more anonymity to our respondents. We did, however, ask about their Academic 
 Level/Type and their Discpline (based on 2-digit and 4-digit Field of Research [FOR] codes). Of the `r nrow(valid_ac_level)` respondents who provided details about their Academic Level, `r per_ac_level [5]`% were PhD students, `r per_ac_level [7]`% were Professors, and 
 `r per_ac_level [10]`% were Senior Lecturers. The breakdown of the rest of the academic
@@ -493,7 +494,7 @@ p <- simple_pie_chart(the_data = df, label_var = "OverallExp",
 p
 ```
 
-```{r os_experience_pie_assh, echo = FALSE}
+```{r os_experience_pie_assh, echo = FALSE, eval = FALSE}
 
 # data for just ASSH respondents
 title = "What is your experience with open science practices? HAS respondents (n = %d)"
@@ -501,10 +502,10 @@ d_assh <- df %>% filter(assh == "ASSH")
 
 # pie chart
 colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(the_data = d_assh, label_var = "OverallExp",
+p_assh <- simple_pie_chart(the_data = d_assh, label_var = "OverallExp",
                       the_title = title, 
                       colours,the_quantity = "percent")
-p
+p_assh
 
 # data for just STEM respondents
 title = "What is your experience with open science practices? STEM respondents (n = %d)"
@@ -512,15 +513,16 @@ d_stem <- df %>% filter(assh == "STEM")
 
 # pie chart
 colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(the_data = d_stem, label_var = "OverallExp",
+p_stem <- simple_pie_chart(the_data = d_stem, label_var = "OverallExp",
                       the_title = title, 
                       colours,the_quantity = "percent")
-p
+p_stem
 ```
 
 ```{r tables_os_experience, echo = FALSE, eval = TRUE}
 
-# keeping this for now because it's useful to double check values.
+# keeping this for now because it's useful to double check values, but will remove 
+  # once we are happy with everything..
 
 os2 <- valid_os_exp %>% 
     dplyr::count(OverallExp) %>% 
@@ -549,10 +551,9 @@ c_prereg_exp <- plyr::count(valid_prereg_exp$PreregExp1)
 nvalid_prereg_exp <- nrow(valid_prereg_exp)
 
 # calculate the percentage for each response
-per_prereg_exp <- perc(x = df$PreregExp1, y = nvalid_prereg_exp)
+per_prereg_exp <- perc(x = valid_prereg_exp$PreregExp1, y = nvalid_prereg_exp)
 
 ```
-
 
 Of the `r nvalid_prereg_exp` participants who answered this question, `r per_prereg_exp[4]`% were unaware of study preregistration; `r per_prereg_exp[1]`% were aware of study preregistration, but had not used it; `r per_prereg_exp[3]`% had some experience with it, but did not regularly preregister their studies; and `r per_prereg_exp[2]`% regularly preregistered their studies. 
 
@@ -566,6 +567,7 @@ p <- simple_pie_chart(the_data = df, label_var = "PreregExp1",
                       the_title = title, 
                       colours,the_quantity = "percent")
 p
+rm(title)
 ```
 
 
@@ -576,11 +578,12 @@ title = "What is your experience with preregistration? HAS respondents (n = %d)"
 
 # pie chart
 colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(the_data = d_assh, label_var = "PreregExp1", 
+p_assh <- simple_pie_chart(the_data = d_assh, label_var = "PreregExp1", 
                       the_title = title, 
                       colours,the_quantity = "percent")
-p
+p_assh
 
+rm(title)
 ```
 
 ```{r prereg_exp_table, echo=FALSE, warning=TRUE}
@@ -588,6 +591,11 @@ p
 p2 <- valid_prereg_exp %>% 
   dplyr::count(PreregExp1) %>% 
   mutate(Percentage = round (n/nvalid_prereg_exp*100))
+
+p2$PreregExp1 <- p2$PreregExp1 %>% 
+  mapvalues(
+    c("Unaware", "Aware, But Not Used", "Some Experience", "Reg Use"), 
+    c("Unaware", "Aware, But Not Used", "Some Experience", "Regular Use"))
 
 dplyr::arrange(p2, desc(n)) %>% 
 knitr::kable (col.names = c("Preregistration Experience", "Frequency", "Percentage"), caption = sprintf("Experience with Study Preregistration (n = %d)", nvalid_prereg_exp)) %>% 
@@ -600,37 +608,49 @@ knitr::kable (col.names = c("Preregistration Experience", "Frequency", "Percenta
 
 ```{r prereg_imp_count, echo = FALSE, warning=TRUE}
 
-# filter rows with valid responses for this variable
+# filter rows with valid responses for this variable; first df contains all valid responses
+  # the second df contains all valid responses, except "Researchers...do not conduct research
+  # studies"
 valid_prereg_imp <- filter(df, PreRegImp != "NA")
+valid_prereg_imp_ex <- filter(valid_prereg_imp, PreRegImp != "Researchers in my discipline do not conduct research studies")
 
-# create object with the counts for each valid response for this variable
+# create objects with the counts for each valid response for the variable
 c_prereg_imp <- plyr::count(valid_prereg_imp$PreRegImp)
+c_prereg_imp_ex <- plyr::count(valid_prereg_imp_ex$PreRegImp)
 
 # calculate number of rows with a valid response for this variable
 nvalid_prereg_imp <- nrow(valid_prereg_imp)
+nvalid_prereg_imp_ex <- nrow(valid_prereg_imp_ex)
 
 # calculate the percentage for each response
-per_prereg_imp <- perc(x = df$PreRegImp, y = nvalid_prereg_exp)
+per_prereg_imp <- perc(x = valid_prereg_imp$PreRegImp, y = nvalid_prereg_imp)
+per_prereg_imp_ex <- perc(x = valid_prereg_imp_ex$PreRegImp, y = nvalid_prereg_imp_ex)
 
 ```
 
 
-Of the `r nvalid_prereg_imp` participants who answered this question, `r per_prereg_imp[1]`% indicated that preregistration was extremely important for their field; `r per_prereg_imp[4]`% indicated that it was somewhat important; `r per_prereg_exp[5]`% indicated that preregistration was somewhat unimportant; and `r per_prereg_exp[2]`% indicated that it was not at all important for their field. A small number (`r per_prereg_exp[3]`%) indicated that researchers in their 
-discipline do not conduct research studies. 
+Of the `r nvalid_prereg_imp` participants who answered this question, a small percentage 
+(`r per_prereg_imp[3]`%) indicated that researchers in their discipline do not conduct 
+research studies. As such, we excluded them from this analysis. Of the remaining 
+`r nvalid_prereg_imp_ex` respondents, `r per_prereg_imp_ex[1]`% indicated that 
+preregistration was extremely important for their field; `r per_prereg_imp_ex[3]`% 
+indicated that it was somewhat important; `r per_prereg_imp_ex[4]`% indicated that 
+preregistration was somewhat unimportant; and `r per_prereg_imp_ex[2]`% indicated 
+that it was not at all important for their field. 
 
-```{r prereg_imp_pie_chart, echo = FALSE, warning = TRUE}
+```{r prereg_imp_ex_pie_chart, echo = FALSE, warning = TRUE}
 
 title = "In your opinion, how important for your field is it that researchers preregister their studies (n = %d)"
 
 # pie chart
 colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(the_data = df, label_var = "PreRegImp", 
+p <- simple_pie_chart(the_data = valid_prereg_imp_ex, label_var = "PreRegImp", 
                       the_title = title, 
                       colours,the_quantity = "percent")
 p
 ```
 
-```{r prereg_imp_pie_chart_assh, echo = FALSE, warning = TRUE, eval=FALSE}
+```{r prereg_imp_ex_pie_chart_assh, echo = FALSE, warning = TRUE, eval = FALSE}
 
 title = "How important is it that researchers preregister their studies? HAS respondents (n = %d)"
 
@@ -640,33 +660,52 @@ d_assh <- df %>%
 
 # pie chart
 colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(the_data = d_assh, label_var = "PreRegImp", 
+p_assh <- simple_pie_chart(the_data = d_assh, label_var = "PreRegImp", 
                       the_title = title, 
                       colours,the_quantity = "percent")
-p
+p_assh
 ```
 
-<emp> I still need to remove the "my field does not use studies". </emp>
 
-```{r prereg_imp_table, echo=FALSE, warning=TRUE}
+```{r prereg_imp_ex_table, echo=FALSE, warning=TRUE}
 
-p2 <- valid_prereg_imp %>% 
+df2 <- valid_prereg_imp_ex %>% 
   dplyr::count(PreRegImp) %>% 
-  mutate(Percentage = round (n/nvalid_prereg_imp*100))
+  mutate(Percentage = round (n/nvalid_prereg_imp_ex*100))
 
-dplyr::arrange(p2, desc(n)) %>% 
-knitr::kable (col.names = c("Perceived Importance of Preregistration", "Frequency", "Percentage"), caption = sprintf("Perceived Importance of Preregistration (n = %d)", nvalid_prereg_imp)) %>% 
+df3 <-df2 [c(2,4,3,1),] # rearrange the responses
+
+df3 %>% 
+knitr::kable (col.names = c("Perceived Importance of Preregistration", "Frequency", "Percentage"), caption = sprintf("Perceived Importance of Preregistration (n = %d)", nvalid_prereg_imp_ex)) %>% 
     kable_styling(bootstrap_options = "striped", full_width = F, position = 'center')
 
 ```
 
+
 ```{r prereg_concerns_data, echo=FALSE, warning=TRUE}
+
 # wrangle this data so it's in long form & only includes endorsements.
 
 PreRegCon_long <- df %>% 
-     select(c("ParticipantNumber", "PreRegCon_delay", "PreRegCon_look", "PreRegCon_prevent_exp", "PreRegCon_stifle_creativity", "PreRegCon_scooping", "PreRegCon_prevent_sig", "PreRegCon_diff_pub", "PreRegCon_no_con")) %>%  
-     pivot_longer(c("PreRegCon_delay", "PreRegCon_look", "PreRegCon_prevent_exp", "PreRegCon_stifle_creativity", "PreRegCon_scooping", "PreRegCon_prevent_sig", "PreRegCon_diff_pub", "PreRegCon_no_con"), 
-     names_to = "PreRegConcern", values_to = "PreReg_Endorsement") %>% 
+     select(c("ParticipantNumber", 
+              "PreRegCon_delay", 
+              "PreRegCon_look", 
+              "PreRegCon_prevent_exp", 
+              "PreRegCon_stifle_creativity", 
+              "PreRegCon_scooping", 
+              "PreRegCon_prevent_sig", 
+              "PreRegCon_diff_pub", 
+              "PreRegCon_no_con")) %>%  
+     pivot_longer(c("PreRegCon_delay", 
+                    "PreRegCon_look", 
+                    "PreRegCon_prevent_exp", 
+                    "PreRegCon_stifle_creativity", 
+                    "PreRegCon_scooping", 
+                    "PreRegCon_prevent_sig", 
+                    "PreRegCon_diff_pub", 
+                    "PreRegCon_no_con"), 
+     names_to = "PreRegConcern", 
+     values_to = "PreReg_Endorsement") %>% 
   filter(PreReg_Endorsement == "1")  
 
 # recode the data so the response options have proper labels
@@ -679,42 +718,70 @@ prereg_con_key <- c (PreRegCon_delay = "Delays data collection",
                      PreRegCon_prevent_sig = "More difficult to find significant results",
                      PreRegCon_diff_pub = "More difficult to publish in certain journals", 
                      PreRegCon_no_con = "No concerns")
-  # recode the values with this character vector
+
+  # recode the values with this character vector 
 PreRegCon_long$PreRegConcern <- recode(PreRegCon_long$PreRegConcern, !!!prereg_con_key)
 
 # getting a tibble for the counts
-con <- plyr::count(PreRegCon_long$PreRegConcern)
+c_prereg_con <- plyr::count(PreRegCon_long$PreRegConcern)
 
-# need the data to figure out how many respondents shared concerns
-  # figure out unique number of participants
-n_con <- unique(PreRegCon_long$ParticipantNumber)
-  # count the number of unique values (can do that in the title itself in next chunk)
-# length(n_con)
+# to figure out how many respondents shared concerns calculate unique number of participants
+n_prereg_con <- length(unique(PreRegCon_long$ParticipantNumber))
+
+# create a tibble with percentages (of respondents who answered this question) & 
+  # then reorder them by descending percentages
+b <- PreRegCon_long %>% 
+  dplyr::count(PreRegConcern) %>% 
+  mutate(Percentage = round (n/n_prereg_con*100)) %>% 
+  dplyr::arrange(desc(n))
+
 ```
 
 We also asked respondents if they have any concerns about preregistering their studies. 
-After asking respondents to share their concerns in a free text format, we provided a 
+After asking respondents to share their concerns in a free text format, we then provided a 
 list of possible concerns that researchers could have about preregistering their studies. 
-They were able to select as many concerns as they liked. A total of `r length(n_con)`
-respondents answered this question. Of those who respondended to this question, 
-`r con[5,2]` reported that they do not share any of the listed concerns. 
+Respondents were able to select as many concerns as they liked. Of the `r n_prereg_con`
+respondents who answered this question, `r b [7,2]` (`r b [7,3]`) 
+reported that they do not share any of the listed concerns. The
+following figure presents, of those who answered this question, the percentage
+who selected each of the concerns.  
 
 ```{r prereg_concerns_bar, echo=FALSE, warning=TRUE}
-# build the bar chart
-title = sprintf("Concerns about preregistering studies (n = %d)", length(n_con))
 
-p <- ggplot(PreRegCon_long, aes (x = PreRegConcern)) +
-         geom_bar(fill = "lightskyblue3", colour = "black")  +
+# reorder the response options from lowest to highest, with concerns last
+b2 <- b %>% 
+  dplyr::mutate(PreRegConcern = factor (PreRegConcern, 
+                                levels = c("More difficult to find significant results", 
+                                           "More difficult to publish in certain journals", 
+                                           "Delays data collection", 
+                                           "Stifles creativity",  
+                                           "Prevents exploratory research", 
+                                           "Need to look at data to analyse it", 
+                                           "Risk of scooping", 
+                                           "No concerns")))
+
+# create a character vector for the colours for each bar
+cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
+          "lightskyblue3", "lightskyblue3", "lightskyblue3", "grey50")
+
+# build the bar chart
+title = sprintf("Concerns about preregistering studies (n = %d)", n_prereg_con)
+
+# plot the reordered data and colours. Because the data is in a tibble rather than a dataframe with
+  # counts, I could use 'geom_col' rather than 'geom_bar'(or I could use stat = "identity" with
+  # 'geom_bar')
+
+p <- ggplot(b2) + 
+  aes(x = PreRegConcern, y = Percentage) +
+   geom_bar(stat = "identity", colour = "black", fill = cols) +
     labs (x = element_blank(),
-      y = "Frequency", 
+      y = "Percentage", 
         title = title) +
-  coord_flip() +
+  coord_flip(ylim = c(0,60)) +
   theme_classic(base_size = 12) 
 p
 
 ```
-
-<emp> %age of those who responded to this question & also make "no concerns" a different colour</emp> 
 
 ### Experience with Open Materials and/or Code
 
@@ -763,10 +830,32 @@ p
 <emp> %age of those who responded to this question & also make "no concerns" a different colour</emp> 
 
 ```{r code_concerns_data, echo=FALSE, warning=TRUE}
+
 # wrangle this data so it's in long form & only includes endorsements.
+
 CodeCon_long <- df %>% 
-  select (c("ParticipantNumber", "CodeCon_criticise", "CodeCon_diff_understand", "CodeCon_assistance", "CodeCon_lose_control", "CodeCon_errors", "CodeCon_credit", "CodeCon_no_con", "CodeCon_violate", "CodeCon_ip", "FORcode_2_label")) %>%  
-  pivot_longer(c("CodeCon_criticise", "CodeCon_diff_understand", "CodeCon_assistance", "CodeCon_lose_control", "CodeCon_errors", "CodeCon_credit", "CodeCon_no_con", "CodeCon_violate", "CodeCon_ip"), names_to = "CodeConcern", values_to = "CodeCon_Endorsement") %>% 
+  select (c("ParticipantNumber", 
+            "CodeCon_criticise", 
+            "CodeCon_diff_understand", 
+            "CodeCon_assistance", 
+            "CodeCon_lose_control", 
+            "CodeCon_errors", 
+            "CodeCon_credit", 
+            "CodeCon_no_con", 
+            "CodeCon_violate", 
+            "CodeCon_ip", 
+            "FORcode_2_label")) %>%  
+  pivot_longer(c("CodeCon_criticise", 
+                 "CodeCon_diff_understand", 
+                 "CodeCon_assistance", 
+                 "CodeCon_lose_control", 
+                 "CodeCon_errors", 
+                 "CodeCon_credit", 
+                 "CodeCon_no_con", 
+                 "CodeCon_violate", 
+                 "CodeCon_ip"), 
+               names_to = "CodeConcern", 
+               values_to = "CodeCon_Endorsement") %>% 
   filter(CodeCon_Endorsement == "1")
 
 # recode the data so the response options have proper labels
@@ -780,39 +869,71 @@ code_con_key <- c (CodeCon_criticise = "Others might criticise my materials/code
                      CodeCon_violate = "Reuse could violate epistemological framework", 
                      CodeCon_ip = "Issues related to intellectual property", 
                      CodeCon_no_con = "No concerns")
-  # recode the values with this character vector
+ 
+ # recode the values with this character vector
 CodeCon_long$CodeConcern <- recode(CodeCon_long$CodeConcern, !!!code_con_key)
 
 # getting a tibble for the counts
-code_con <- plyr::count(CodeCon_long$CodeConcern)
+c_code_con <- plyr::count(CodeCon_long$CodeConcern)
 
-# need the data to figure out how many respondents shared concerns
-  # figure out unique number of participants
-n_code_con <- unique(CodeCon_long$ParticipantNumber)
-  # count the number of unique values (can do that in the title itself in next chunk)
-# length(n_con)
+# to figure out how many respondents shared concerns calculate unique number of participants
+n_code_con <- length(unique(CodeCon_long$ParticipantNumber))
 
-c2 <- CodeCon_long %>% 
-  filter(CodeCon_long$CodeConcern == "Reuse could violate epistemological framework")
+# create a tibble with percentages (of respondents who answered this question) & 
+# then reorder them by descending percentages
+tb <- CodeCon_long %>% 
+  dplyr::count(CodeConcern) %>% 
+  mutate(Percentage = round (n/n_code_con*100)) %>% 
+  dplyr::arrange(desc(n))
 
 ```
 
 We also asked respondents if they have any concerns about making their research materials
-and/or code open. After asking respondents to share their concerns in a free text format, we provided a list of possible concerns that researchers could have about sharing their materials
-and/or code. Respondents were able to select as many concerns as they liked. A total of `r length(n_con)` respondents answered this question. Of those who respondended to this question, 
-`r con[4,2]` reported that they do not share any of the listed concerns. 
+and/or code open. After asking respondents to share their concerns in a free text format, 
+we provided a list of possible concerns that researchers could have about sharing their materials
+and/or code. Respondents were able to select as many concerns as they liked. A total of 
+`r n_code_con` respondents answered this question. Of those who respondended to this question,
+`r tb [4,2]` (`r tb [4,3]`) reported that they do not share any of the listed concerns. The
+following figure presents, of those who answered this question, the percentage
+who selected each of the concerns.  
 
 ```{r code_concerns_bar, echo=FALSE, warning=TRUE}
 # build the bar chart
 
-title = sprintf("Open materials and/or code\n concerns (n = %d)", length(n_code_con))
+# reorder the response options from lowest to highest, with concerns last
+tb2 <- tb %>% 
+  dplyr::mutate(CodeConcern = factor (CodeConcern, 
+                levels = c("Others might find errors in my published work", 
+                         "Reuse could violate epistemological framework", 
+                         "Others might ask for my assistance with their research", 
+                         "Others might criticise my materials/code", 
+                        "Others might find it difficult to understand my materials/code", 
+                         "I might lose control over how they are used", 
+                         "I might not receive appropriate credit", 
+                         "Issues related to intellectual property", 
+                         "No concerns")))
+  # I don't get it. tb & tb2 look the same in the tibble, but the order is completely different
+  # when they are graphed..
 
-p <- ggplot(CodeCon_long, aes (x = CodeConcern)) +
-         geom_bar(fill = "lightskyblue3", colour = "black")  +
-    labs (x = element_blank(),
-      y = "Frequency", 
+# create a character vector for the colours for each bar
+cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
+          "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", "grey50")
+
+# build the bar chart
+title = sprintf("Concerns about open materials\n and/or code (n = %d)", n_code_con)
+
+# plot the reordered data and colours. Because the data is in a tibble rather than a dataframe with
+# counts, I could use 'geom_col' rather than 'geom_bar'(or I could use stat = "identity" with
+# 'geom_bar')
+
+p <- ggplot(tb2) + 
+  aes(x = CodeConcern, y = Percentage) +
+  geom_bar(stat = "identity", colour = "black", fill = cols) +
+  labs (x = element_blank(),
+        y = "Percentage", 
         title = title) +
-  coord_flip() +
+  coord_flip(ylim = c(0,60)) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 50)) + #wrap the labels
   theme_classic(base_size = 12) 
 p
 
@@ -889,3 +1010,23 @@ average_response_small <- average_response_small %>%
 average_response_small
 
 ```
+
+```{r clean environment, echo = FALSE}
+rm(a2)
+rm(a3)
+rm(c_os_exp)
+#rm(d_assh)
+#rm(d_stem)
+rm(d2)
+rm(d3)
+rm(df)
+rm(f2)
+rm(FOR_freq)
+rm(n)
+rm(nvalid_ac_level)
+rm(nvalid_crisis)
+rm(nvalid_disc)
+rm(nvalid_os_exp)
+rm(nvalid_rep_est)
+```
+

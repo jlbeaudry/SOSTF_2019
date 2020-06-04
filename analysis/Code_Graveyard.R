@@ -105,4 +105,36 @@ p <- ggplot(data = subset(df, !is.na(RepEstimate_1)),
   scale_y_continuous(name = "Estimated %age of reproducible studies") +
   coord_cartesian(ylim = c(0,100)) +
   theme (text = element_text(size = 12))
+
 p + ggtitle("Estimates of reproducibility by perceived crisis in field (n = 137)")
+
+# code for bar chart for preregistration concerns
+  # as of April 2020, I am not using this because I am presenting the percentages
+
+# this works, but with counts
+p <- ggplot(PreRegCon_long, aes (x = PreRegConcern)) +
+  geom_bar(fill = "lightskyblue3", colour = "black")  +
+  labs (x = element_blank(),
+        y = "Frequency", 
+        title = title) +
+  coord_flip() +
+  theme_classic(base_size = 12) 
+p
+
+
+# this works too and calculates the percentage within the code itself. I could also use
+  # "..count../..sum.." to calculate the proportion. 
+p <- ggplot(PreRegCon_long) + aes (x = PreRegConcern) +
+         geom_bar(aes(y = ((..count../n_prereg_con)*100)),
+                      fill = "lightskyblue3", colour = "black")  +
+    labs (x = element_blank(),
+      y = "Percentage", 
+        title = title) +
+  coord_flip() +
+ theme_classic(base_size = 12) 
+
+
+
+
+
+

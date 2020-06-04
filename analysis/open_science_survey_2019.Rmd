@@ -502,10 +502,10 @@ d_assh <- df %>% filter(assh == "ASSH")
 
 # pie chart
 colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(the_data = d_assh, label_var = "OverallExp",
+p_assh <- simple_pie_chart(the_data = d_assh, label_var = "OverallExp",
                       the_title = title, 
                       colours,the_quantity = "percent")
-p
+p_assh
 
 # data for just STEM respondents
 title = "What is your experience with open science practices? STEM respondents (n = %d)"
@@ -513,15 +513,16 @@ d_stem <- df %>% filter(assh == "STEM")
 
 # pie chart
 colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(the_data = d_stem, label_var = "OverallExp",
+p_stem <- simple_pie_chart(the_data = d_stem, label_var = "OverallExp",
                       the_title = title, 
                       colours,the_quantity = "percent")
-p
+p_stem
 ```
 
 ```{r tables_os_experience, echo = FALSE, eval = TRUE}
 
-# keeping this for now because it's useful to double check values.
+# keeping this for now because it's useful to double check values, but will remove 
+  # once we are happy with everything..
 
 os2 <- valid_os_exp %>% 
     dplyr::count(OverallExp) %>% 
@@ -577,10 +578,10 @@ title = "What is your experience with preregistration? HAS respondents (n = %d)"
 
 # pie chart
 colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(the_data = d_assh, label_var = "PreregExp1", 
+p_assh <- simple_pie_chart(the_data = d_assh, label_var = "PreregExp1", 
                       the_title = title, 
                       colours,the_quantity = "percent")
-p
+p_assh
 
 rm(title)
 ```
@@ -659,22 +660,22 @@ d_assh <- df %>%
 
 # pie chart
 colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(the_data = d_assh, label_var = "PreRegImp", 
+p_assh <- simple_pie_chart(the_data = d_assh, label_var = "PreRegImp", 
                       the_title = title, 
                       colours,the_quantity = "percent")
-p
+p_assh
 ```
 
 
 ```{r prereg_imp_ex_table, echo=FALSE, warning=TRUE}
 
-p2 <- valid_prereg_imp_ex %>% 
+df2 <- valid_prereg_imp_ex %>% 
   dplyr::count(PreRegImp) %>% 
   mutate(Percentage = round (n/nvalid_prereg_imp_ex*100))
 
-p3 <-p2 [c(2,4,3,1),]
+df3 <-df2 [c(2,4,3,1),] # rearrange the responses
 
-p3 %>% 
+df3 %>% 
 knitr::kable (col.names = c("Perceived Importance of Preregistration", "Frequency", "Percentage"), caption = sprintf("Perceived Importance of Preregistration (n = %d)", nvalid_prereg_imp_ex)) %>% 
     kable_styling(bootstrap_options = "striped", full_width = F, position = 'center')
 
@@ -682,12 +683,29 @@ knitr::kable (col.names = c("Perceived Importance of Preregistration", "Frequenc
 
 
 ```{r prereg_concerns_data, echo=FALSE, warning=TRUE}
+
 # wrangle this data so it's in long form & only includes endorsements.
 
 PreRegCon_long <- df %>% 
-     select(c("ParticipantNumber", "PreRegCon_delay", "PreRegCon_look", "PreRegCon_prevent_exp", "PreRegCon_stifle_creativity", "PreRegCon_scooping", "PreRegCon_prevent_sig", "PreRegCon_diff_pub", "PreRegCon_no_con")) %>%  
-     pivot_longer(c("PreRegCon_delay", "PreRegCon_look", "PreRegCon_prevent_exp", "PreRegCon_stifle_creativity", "PreRegCon_scooping", "PreRegCon_prevent_sig", "PreRegCon_diff_pub", "PreRegCon_no_con"), 
-     names_to = "PreRegConcern", values_to = "PreReg_Endorsement") %>% 
+     select(c("ParticipantNumber", 
+              "PreRegCon_delay", 
+              "PreRegCon_look", 
+              "PreRegCon_prevent_exp", 
+              "PreRegCon_stifle_creativity", 
+              "PreRegCon_scooping", 
+              "PreRegCon_prevent_sig", 
+              "PreRegCon_diff_pub", 
+              "PreRegCon_no_con")) %>%  
+     pivot_longer(c("PreRegCon_delay", 
+                    "PreRegCon_look", 
+                    "PreRegCon_prevent_exp", 
+                    "PreRegCon_stifle_creativity", 
+                    "PreRegCon_scooping", 
+                    "PreRegCon_prevent_sig", 
+                    "PreRegCon_diff_pub", 
+                    "PreRegCon_no_con"), 
+     names_to = "PreRegConcern", 
+     values_to = "PreReg_Endorsement") %>% 
   filter(PreReg_Endorsement == "1")  
 
 # recode the data so the response options have proper labels
@@ -701,7 +719,7 @@ prereg_con_key <- c (PreRegCon_delay = "Delays data collection",
                      PreRegCon_diff_pub = "More difficult to publish in certain journals", 
                      PreRegCon_no_con = "No concerns")
 
-  # recode the values with this character vector
+  # recode the values with this character vector 
 PreRegCon_long$PreRegConcern <- recode(PreRegCon_long$PreRegConcern, !!!prereg_con_key)
 
 # getting a tibble for the counts
@@ -710,17 +728,12 @@ c_prereg_con <- plyr::count(PreRegCon_long$PreRegConcern)
 # to figure out how many respondents shared concerns calculate unique number of participants
 n_prereg_con <- length(unique(PreRegCon_long$ParticipantNumber))
 
-# create a tibble with count & percentages (of respondents who answered this question) & 
+# create a tibble with percentages (of respondents who answered this question) & 
   # then reorder them by descending percentages
 b <- PreRegCon_long %>% 
   dplyr::count(PreRegConcern) %>% 
   mutate(Percentage = round (n/n_prereg_con*100)) %>% 
   dplyr::arrange(desc(n))
-
-# calculate the percentage for each response (of the percentage who answered the question)
-#per_prereg_con <- perc(x = PreRegCon_long$PreRegConcern, y = n_prereg_con)
-
-# df <- c(c_prereg_con, per_prereg_con)
 
 ```
 
@@ -729,18 +742,27 @@ After asking respondents to share their concerns in a free text format, we then 
 list of possible concerns that researchers could have about preregistering their studies. 
 Respondents were able to select as many concerns as they liked. Of the `r n_prereg_con`
 respondents who answered this question, `r b [7,2]` (`r b [7,3]`) 
-reported that they do not share any of the listed concerns. The following table presents
-the percentage of respondents who selected each of the concerns provided. 
+reported that they do not share any of the listed concerns. The
+following figure presents, of those who answered this question, the percentage
+who selected each of the concerns.  
 
 ```{r prereg_concerns_bar, echo=FALSE, warning=TRUE}
 
-# need to reorder the response options...
+# reorder the response options from lowest to highest, with concerns last
 b2 <- b %>% 
   dplyr::mutate(PreRegConcern = factor (PreRegConcern, 
-                                levels = c("More difficult to find significant results", "More difficult to publish in certain journals", "Delays data collection", "Stifles creativity",  "Prevents exploratory research", "Need to look at data to analyse it", "Risk of scooping", "No concerns")))
+                                levels = c("More difficult to find significant results", 
+                                           "More difficult to publish in certain journals", 
+                                           "Delays data collection", 
+                                           "Stifles creativity",  
+                                           "Prevents exploratory research", 
+                                           "Need to look at data to analyse it", 
+                                           "Risk of scooping", 
+                                           "No concerns")))
 
 # create a character vector for the colours for each bar
-cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", "grey50")
+cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
+          "lightskyblue3", "lightskyblue3", "lightskyblue3", "grey50")
 
 # build the bar chart
 title = sprintf("Concerns about preregistering studies (n = %d)", n_prereg_con)
@@ -748,6 +770,7 @@ title = sprintf("Concerns about preregistering studies (n = %d)", n_prereg_con)
 # plot the reordered data and colours. Because the data is in a tibble rather than a dataframe with
   # counts, I could use 'geom_col' rather than 'geom_bar'(or I could use stat = "identity" with
   # 'geom_bar')
+
 p <- ggplot(b2) + 
   aes(x = PreRegConcern, y = Percentage) +
    geom_bar(stat = "identity", colour = "black", fill = cols) +
@@ -759,8 +782,6 @@ p <- ggplot(b2) +
 p
 
 ```
-
-<em> %age of those who responded to this question & also make "no concerns" a different colour</em> 
 
 ### Experience with Open Materials and/or Code
 
@@ -809,16 +830,39 @@ p
 <emp> %age of those who responded to this question & also make "no concerns" a different colour</emp> 
 
 ```{r code_concerns_data, echo=FALSE, warning=TRUE}
+
 # wrangle this data so it's in long form & only includes endorsements.
+
 CodeCon_long <- df %>% 
-  select (c("ParticipantNumber", "CodeCon_criticise", "CodeCon_diff_understand", "CodeCon_assistance", "CodeCon_lose_control", "CodeCon_errors", "CodeCon_credit", "CodeCon_no_con", "CodeCon_violate", "CodeCon_ip", "FORcode_2_label")) %>%  
-  pivot_longer(c("CodeCon_criticise", "CodeCon_diff_understand", "CodeCon_assistance", "CodeCon_lose_control", "CodeCon_errors", "CodeCon_credit", "CodeCon_no_con", "CodeCon_violate", "CodeCon_ip"), names_to = "CodeConcern", values_to = "CodeCon_Endorsement") %>% 
+  select (c("ParticipantNumber", 
+            "CodeCon_criticise", 
+            "CodeCon_diff_understand", 
+            "CodeCon_assistance", 
+            "CodeCon_lose_control", 
+            "CodeCon_errors", 
+            "CodeCon_credit", 
+            "CodeCon_no_con", 
+            "CodeCon_violate", 
+            "CodeCon_ip", 
+            "FORcode_2_label")) %>%  
+  pivot_longer(c("CodeCon_criticise", 
+                 "CodeCon_diff_understand", 
+                 "CodeCon_assistance", 
+                 "CodeCon_lose_control", 
+                 "CodeCon_errors", 
+                 "CodeCon_credit", 
+                 "CodeCon_no_con", 
+                 "CodeCon_violate", 
+                 "CodeCon_ip"), 
+               names_to = "CodeConcern", 
+               values_to = "CodeCon_Endorsement") %>% 
   filter(CodeCon_Endorsement == "1")
 
 # recode the data so the response options have proper labels
   # create a character vector with proper labels
 code_con_key <- c (CodeCon_criticise = "Others might criticise my materials/code", 
-                     CodeCon_diff_understand = "Others might find it difficult to understand my materials/code",
+                     CodeCon_diff_understand = "Others might find it difficult to understand my 
+                   materials/code",
                      CodeCon_assistance = "Others might ask for my assistance with their research",
                      CodeCon_lose_control = "I might lose control over how they are used", 
                      CodeCon_errors = "Others might find errors in my published work", 
@@ -826,40 +870,67 @@ code_con_key <- c (CodeCon_criticise = "Others might criticise my materials/code
                      CodeCon_violate = "Reuse could violate epistemological framework", 
                      CodeCon_ip = "Issues related to intellectual property", 
                      CodeCon_no_con = "No concerns")
-  # recode the values with this character vector
+ 
+ # recode the values with this character vector
 CodeCon_long$CodeConcern <- recode(CodeCon_long$CodeConcern, !!!code_con_key)
 
 # getting a tibble for the counts
-code_con <- plyr::count(CodeCon_long$CodeConcern)
+c_code_con <- plyr::count(CodeCon_long$CodeConcern)
 
-# need this data to figure out how many respondents shared concerns
-  # figure out unique number of participants
-
+# to figure out how many respondents shared concerns calculate unique number of participants
 n_code_con <- length(unique(CodeCon_long$ParticipantNumber))
-  # count the number of unique values (can do that in the title itself in next chunk)
-# length(n_con)
 
-
-c2 <- CodeCon_long %>% 
-  filter(CodeCon_long$CodeConcern == "Reuse could violate epistemological framework")
+# create a tibble with percentages (of respondents who answered this question) & 
+# then reorder them by descending percentages
+tb <- CodeCon_long %>% 
+  dplyr::count(CodeConcern) %>% 
+  mutate(Percentage = round (n/n_code_con*100)) %>% 
+  dplyr::arrange(desc(n))
 
 ```
 
 We also asked respondents if they have any concerns about making their research materials
 and/or code open. After asking respondents to share their concerns in a free text format, 
 we provided a list of possible concerns that researchers could have about sharing their materials
-and/or code. Respondents were able to select as many concerns as they liked. A total of `r length(n_code_con)` respondents answered this question. Of those who respondended to this question,
-`r code_con[4,2]` reported that they do not share any of the listed concerns. 
+and/or code. Respondents were able to select as many concerns as they liked. A total of 
+`r n_code_con` respondents answered this question. Of those who respondended to this question,
+`r tb [4,2]` (`r tb [4,3]`) reported that they do not share any of the listed concerns. The
+following figure presents, of those who answered this question, the percentage
+who selected each of the concerns.  
 
 ```{r code_concerns_bar, echo=FALSE, warning=TRUE}
 # build the bar chart
 
-title = sprintf("Open materials and/or code\n concerns (n = %d)", length(n_code_con))
+# reorder the response options from lowest to highest, with concerns last
+tb2 <- tb %>% 
+  dplyr::mutate(CodeConcern = factor (CodeConcern, 
+                levels = c("Others might find errors in my published work", 
+                         "Reuse could violate epistemological framework", 
+                         "Others might ask for my assistance with their research", 
+                         "Others might criticise my materials/code", 
+                        "Others might find it difficult to understand my materials/code", 
+                         "I might lose control over how they are used", 
+                         "I might not receive appropriate credit", 
+                         "Issues related to intellectual property", 
+                         "No concerns")))
+  # I don't get it. tb & tb2 look the same in the tibble, but the order is completely different
+  # when they are graphed..
 
-p <- ggplot(CodeCon_long, aes (x = CodeConcern)) +
-         geom_bar(fill = "lightskyblue3", colour = "black")  +
-    labs (x = element_blank(),
-      y = "Frequency", 
+# create a character vector for the colours for each bar
+cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", "grey50")
+
+# build the bar chart
+title = sprintf("Concerns about open materials\n and/or code (n = %d)", n_code_con)
+
+# plot the reordered data and colours. Because the data is in a tibble rather than a dataframe with
+# counts, I could use 'geom_col' rather than 'geom_bar'(or I could use stat = "identity" with
+# 'geom_bar')
+
+p <- ggplot(tb2) + 
+  aes(x = CodeConcern, y = Percentage) +
+  geom_bar(stat = "identity", colour = "black", fill = cols) +
+  labs (x = element_blank(),
+        y = "Percentage", 
         title = title) +
   coord_flip() +
   theme_classic(base_size = 12) 

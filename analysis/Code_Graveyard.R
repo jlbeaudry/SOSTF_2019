@@ -134,7 +134,35 @@ p <- ggplot(PreRegCon_long) + aes (x = PreRegConcern) +
  theme_classic(base_size = 12) 
 
 
+#### CODE FOR OPEN MATERIALS / CODE EXPERIENCE ####
+
+{r code_bar, echo = FALSE, warning = TRUE, eval = FALSE}
+
+title = "What is your experience with open materials and/or code (n = %d)"
+p <- simple_bar_graph(df, label_var = "CodeExp", the_title = title, xname = "Response given", 
+                      bar_colour = "orange",line_colour = "black",the_quantity="count")
+p
+
+# arrange by descending frequency
+
+# dplyr::arrange(a2, desc(n)) %>% 
+# knitr::kable(col.names = c("Academic Levels", "Frequency", "Percentage"), caption = sprintf("Academic # Levels of Respondents (n = %d)",nvalid_ac_level)) %>% 
+#  kable_styling(bootstrap_options = "striped", full_width = F, position = 'center')
+
+# rearrange the rows
 
 
+
+#ap <- ggplot(data = valid_ac_level, aes (AcLevel_Label)) + 
+#  geom_bar() +
+#  labs (x = "Frequency", 
+#        y = "Academic Levels", 
+#        title = sprintf("Reported Academic Levels (n = %d)",nvalid_ac_level)) +
+#  coord_flip() + 
+#  theme_classic(base_size = 12)
+#ap
+
+# code to save figure. If using it for slides, increase the 'base_size' from 12 to 18. 
+#ggsave(here::here("figs", "aclevels_bar.png"))
 
 

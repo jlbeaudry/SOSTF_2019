@@ -3,8 +3,10 @@ title: "Swinburne Open Science Task Force Survey (2019)"
 author: "Jennifer L Beaudry, Tom Johnstone, Jordy Kaufman & Lisa Given"
 date: '`r format (Sys.time(), "%d %B %Y")`'
 output:
- # word_document: default
-  html_document: default
+  # word_document: default 
+  html_document: default 
+ # pdf_document: default # this works now!
+always_allow_html: true
 csl: apa-old-doi-prefix.csl
 bibliography: Beaudry_Library.bib
 ---
@@ -13,11 +15,18 @@ bibliography: Beaudry_Library.bib
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 options(scipen = 999)
+
+# If knit as a pdf, include width and height parameters in the plot_ly function
+  #  width = 300, 
+  #  height = NULL,
+  # along with all other parameters
+# need to also figure out how to modify the margins (maybe the orca package or 
+  # maybe the webshot settings? More research needed.)
 ```
 
 
 ```{r library, include=FALSE}
-#load the library
+# load the library
 library(tinytex)
 library(knitr)
 library(here)
@@ -188,13 +197,17 @@ We conducted a survey in September 2019 to examine people's current use of open
 science practices, to examine their perceptions of these practices, and to examine
 their perceived barriers to adopting these practices. Across the university, `r n` 
 started the survey, although not all respondents completed all questions; thus, 
-we report the sample size for each question. This document presents an overview of their responses. 
+we report the sample size for each question. This document presents an overview 
+of their responses. 
 
-In terms of respondents' demographic information, we did not collect information about gender or age
-to provide more anonymity to our respondents. We did, however, ask about their Academic 
-Level/Type and their Discpline (based on 2-digit and 4-digit Field of Research [FOR] codes). Of the `r nrow(valid_ac_level)` respondents who provided details about their Academic Level, `r per_ac_level [5]`% were PhD students, `r per_ac_level [7]`% were Professors, and 
-`r per_ac_level [10]`% were Senior Lecturers. The breakdown of the rest of the academic
-levels for the rest of the respondents are in the table below. 
+In terms of respondents' demographic information, we did not collect information 
+about gender or age to provide more anonymity to our respondents. We did, however,
+ask about their Academic Level/Type and their Discpline (based on 2-digit and 
+4-digit Field of Research [FOR] codes). Of the `r nrow(valid_ac_level)`
+respondents who provided details about their Academic Level, `r per_ac_level [5]`%
+were PhD students, `r per_ac_level [7]`% were Professors, and 
+`r per_ac_level [10]`% were Senior Lecturers. The breakdown of the rest of the 
+academic levels for the rest of the respondents are in the table below. 
 
 ```{r ac_level_table, echo=FALSE, warning=TRUE}
 
@@ -202,33 +215,12 @@ a2 <- valid_ac_level %>%
   dplyr::count(AcLevel_Label) %>% 
    mutate (Percentage = round (n/nvalid_ac_level*100))
 
-# arrange by descending frequency
-
-# dplyr::arrange(a2, desc(n)) %>% 
-# knitr::kable(col.names = c("Academic Levels", "Frequency", "Percentage"), caption = sprintf("Academic # Levels of Respondents (n = %d)",nvalid_ac_level)) %>% 
-#  kable_styling(bootstrap_options = "striped", full_width = F, position = 'center')
-
-# rearrange the rows
-
 # specify the exact order of the columns based on AcLevels (select them according to the order
-  # of the rows in the tibble! YES IT WORKS!)
+  # of the rows in the tibble)
 a3 <-a2 [c(7,1,10,11,2,9,6,5,3,8,4),]
 
 knitr::kable(a3, col.names = c("Academic Levels", "Frequency", "Percentage"), caption = sprintf("Academic Levels of Respondents (n = %d)",nvalid_ac_level)) %>% 
   kable_styling(bootstrap_options = "striped", full_width = F, position = 'center')
-
-
-#ap <- ggplot(data = valid_ac_level, aes (AcLevel_Label)) + 
-#  geom_bar() +
-#  labs (x = "Frequency", 
-#        y = "Academic Levels", 
-#        title = sprintf("Reported Academic Levels (n = %d)",nvalid_ac_level)) +
-#  coord_flip() + 
-#  theme_classic(base_size = 12)
-#ap
-
-# code to save figure. If using it for slides, increase the 'base_size' from 12 to 18. 
-#ggsave(here::here("figs", "aclevels_bar.png"))
 
 ```
 
@@ -242,15 +234,16 @@ FOR_freq <- df %>%
   select (FORcode_2_num, FORcode_2_label) %>% 
   dplyr::count(FORcode_2_num, FORcode_2_label) %>% 
   arrange(-desc(FORcode_2_num))
+
+a <- colSums(FOR_freq[1:18,3])
 ```
 
-
-In terms of Field of Research Codes, we had at least one response from respondents 
-who classified themselves as belonging to the two-digit FOR codes from 01 to 20, one 
-person indicated "Other", and `r FOR_freq[20,3]` respondents did not specify their 
-FOR code. We did not have any responses from researchers in Earth Sciences (04), 
-Agricultural and Veterinary Sciences (07), History and Archeology (21),
-and Philosophy and Religious Studies (22). 
+In terms of Field of Research Codes, `r a` respondents classified themselves 
+as belonging to one of the two-digit FOR codes from 01 to 20, one person indicated 
+"Other", and `r FOR_freq[20,3]` respondents did not specify their FOR code. We 
+did not have any responses from researchers in Earth Sciences (04), Agricultural 
+and Veterinary Sciences (07), History and Archeology (21), and Philosophy and 
+Religious Studies (22). 
 
 ```{r FOR_table, echo=FALSE, warning=TRUE}
 
@@ -303,29 +296,31 @@ knitr::kable(col.names = c("FOR Code", "Field of Research Division", "Frequency"
 ```
 
 For ease of interpretation and to reduce the identifiability of the respondents, 
-for the FOR divisions with a small number of respondents (less than 10), we combined 
-similar divisions into disciplinary groups. Specifically, the new discipline grouping of Arts, 
-Social Sciences, and Humanities (ASSH) included Education (FOR = `r FOR_freq[11,1]`, 
-<em>n</em> = `r FOR_freq[11,3]`); Studies in Human Society (FOR = `r FOR_freq[14,1]`, 
-<em>n</em> = `r FOR_freq[14,3]`); Studies in Creative Arts and Writing 
-(FOR = `r FOR_freq[17,1]`, <em>n</em> = `r FOR_freq[17,3]`); and Language, Communication
-and Culture (FOR = `r FOR_freq[18,1]`, <em>n</em> = `r FOR_freq[18,3]`). 
-The new discipline grouping of Business & Law included Economics (FOR = 
-`r FOR_freq[12,1]`, <em>n</em> = `r FOR_freq[12,3]`); Commerce, Management, Tourism
-and Services (FOR = `r FOR_freq[13,1]`, <em>n</em> = `r FOR_freq[13,3]`), and Law
-and Legal Studies (FOR = `r FOR_freq[16,1]`, <em>n</em> = `r FOR_freq[16,3]`), 
-The new discipline grouping of Technology & Computer Sciences included Information 
+for the FOR divisions with a small number of respondents (less than 10), we
+combined similar divisions into disciplinary groups. Specifically, the new 
+discipline grouping of Arts, Social Sciences, and Humanities (ASSH) included 
+Education (FOR = `r FOR_freq[11,1]`, <em>n</em> = `r FOR_freq[11,3]`); Studies 
+in Human Society (FOR = `r FOR_freq[14,1]`, <em>n</em> = `r FOR_freq[14,3]`); 
+Studies in Creative Arts and Writing (FOR = `r FOR_freq[17,1]`, <em>n</em> =
+`r FOR_freq[17,3]`); and Language, Communication and Culture (FOR = 
+`r FOR_freq[18,1]`, <em>n</em> = `r FOR_freq[18,3]`). The new discipline grouping
+of Business & Law included Economics (FOR = `r FOR_freq[12,1]`, <em>n</em> = 
+`r FOR_freq[12,3]`); Commerce, Management, Tourism and Services (FOR = 
+`r FOR_freq[13,1]`, <em>n</em> = `r FOR_freq[13,3]`), and Law and Legal Studies
+(FOR = `r FOR_freq[16,1]`, <em>n</em> = `r FOR_freq[16,3]`). 
+The new discipline grouping of Technology & Computer Sciences included Information
 and Computing Sciences (FOR = `r FOR_freq[6,1]`, <em>n</em> = `r FOR_freq[6,3]`),
 and Technology (FOR = `r FOR_freq[8,1]`, <em>n</em> = `r FOR_freq[8,3]`). We 
 allocated Built Environment and Design (FOR = `r FOR_freq[10,1]`, <em>n</em> = 
 `r FOR_freq[10,3]`) to the "Other" category. 
   
-We retained the FOR divisions of Engineering (FOR = `r FOR_freq[7,1]`, <em>n</em> = 
-`r FOR_freq[7,3]`); Medical and Health Sciences (FOR = `r FOR_freq[9,1]`, <em>n</em> = 
-`r FOR_freq[9,3]`); Physical Sciences (FOR = `r FOR_freq[2,1]`, <em>n</em> = 
-`r FOR_freq[2,3]`); and Psychology and Cognitive Sciences (FOR = `r FOR_freq[15,1]`, 
-<em>n</em> = `r FOR_freq[15,3]`) as their own discipline groupings. The breakdown 
-for the number of respondents according to discpline groupings is displayed in the next table.
+We retained the FOR divisions of Engineering (FOR = `r FOR_freq[7,1]`, <em>n</em> 
+= `r FOR_freq[7,3]`); Medical and Health Sciences (FOR = `r FOR_freq[9,1]`,
+<em>n</em> = `r FOR_freq[9,3]`); Physical Sciences (FOR = `r FOR_freq[2,1]`,
+<em>n</em> = `r FOR_freq[2,3]`); and Psychology and Cognitive Sciences (FOR = 
+`r FOR_freq[15,1]`, <em>n</em> = `r FOR_freq[15,3]`) as their own discipline 
+groupings. The breakdown for the number of respondents according to discpline 
+groupings is displayed in the next table.
   
 <em>I AM SURE YOU WILL ALL AGREE THAT WE DON'T NEED THESE TWO PARAGRAPHS IN THE 
 MAIN TEXT, BUT LEAVING IT FOR NOW TO MAKE SURE WE UNDERSTAND HOW EVERYTHING WAS 
@@ -796,11 +791,11 @@ nvalid_code <- nrow(valid_code)
 
 ```
 
-
 The following section shows how many people have experience with open code and/or materials. A
 total of `r nvalid_code` answered this question.
 
 ```{r code_pie, echo = FALSE, warning = TRUE}
+
 title = "What is your experience with open materials and/or code (n = %d)"
 #pie chart
 
@@ -809,25 +804,19 @@ p <- simple_pie_chart(df,label_var="CodeExp",the_title = title, colours = colour
 p
 ```
 
-```{r code_table, echo=FALSE, warning=TRUE}
+```{r code_table, echo=FALSE, warning=TRUE , eval=FALSE}
 
 c2 <- valid_code %>% 
   dplyr::count(CodeExp) %>%  
     mutate(Percentage = round (n/nvalid_code*100))
 
 dplyr::arrange(c2, desc(n)) %>% 
-knitr::kable (col.names = c("Experience with Open Materials & Code", "Frequency", "Percentage"), caption = sprintf("Experience with Open Materials & Code (n = %d)", nvalid_code)) %>% 
+knitr::kable (col.names = c("Experience with Open Materials & Code", "Frequency", "Percentage"), 
+              caption = sprintf("Experience with Open Materials & Code (n = %d)", nvalid_code)) %>% 
     kable_styling(bootstrap_options = "striped", full_width = F, position = 'center')
 
 ```
 
-```{r code_bar, echo = FALSE, warning = TRUE, eval = FALSE}
-title = "What is your experience with open materials and/or code (n = %d)"
-p <- simple_bar_graph(df, label_var = "CodeExp", the_title = title, xname = "Response given", bar_colour = "orange",line_colour = "black",the_quantity="count")
-p
-```
-
-<emp> %age of those who responded to this question & also make "no concerns" a different colour</emp> 
 
 ```{r code_concerns_data, echo=FALSE, warning=TRUE}
 

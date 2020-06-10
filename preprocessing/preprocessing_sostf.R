@@ -131,11 +131,13 @@ df$crisis_num <- factor(df$crisis)
 
 df$OverallExp_num <- factor(df$OverallExperience) 
 
+df$PreRegImp_num <- factor(df$PreRegImp)
+
 df$PreregExp1_num <- factor(df$PreregExp1) 
 
-df$CodeExp_num <- factor(df$CodeExp) 
+df$CodeImp_num <- factor(df$CodeImp)
 
-df$PreRegImp_num <- factor(df$PreRegImp)
+df$CodeExp_num <- factor(df$CodeExp) 
 
 # recode preregistration concerns
 df$PreRegCon_delay <- factor(df$PreregConcern_4)
@@ -171,21 +173,28 @@ df$OverallExp <- df$OverallExperience %>%
     c("1", "2", "3", "4"), 
     c("Unaware", "Aware, But Not Used", "Some", "Extensive"))
 
+df$PreRegImp <- df$PreRegImp %>% 
+  mapvalues(
+    c ("0", "1", "2", "3", "4"),
+    c ("Researchers in my discipline do not conduct research studies", "Extremely important", "Somewhat important", "Somewhat unimportant", "Not at all")
+  )
+
 df$PreregExp1 <- df$PreregExp1 %>% 
   mapvalues(
     c("1", "2", "3", "4"), 
     c("Unaware", "Aware, But Not Used", "Some Experience", "Reg Use"))
+
+df$CodeImp <- df$CodeImp %>% 
+  mapvalues(
+    c ("0", "1", "2", "3", "4"),
+    c ("Researchers in my discipline do not use materials and/or code", "Extremely important", "Somewhat important", "Somewhat unimportant", "Not at all")
+  )
 
 df$CodeExp <- df$CodeExp %>%
   mapvalues(
     c("1", "2", "3", "4"),
     c("Unaware", "Aware, But Not Used", "Some Use", "Regular Use"))
 
-df$PreRegImp <- df$PreRegImp %>% 
-  mapvalues(
-    c ("0", "1", "2", "3", "4"),
-    c ("Researchers in my discipline do not conduct research studies", "Extremely important", "Somewhat important", "Somewhat unimportant", "Not at all")
-  )
 
 
 ## RECODE ACADEMIC LEVELS ##

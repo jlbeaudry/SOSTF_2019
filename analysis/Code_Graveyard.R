@@ -134,7 +134,98 @@ p <- ggplot(PreRegCon_long) + aes (x = PreRegConcern) +
  theme_classic(base_size = 12) 
 
 
+#### CODE FOR OPEN MATERIALS / CODE EXPERIENCE ####
+
+{r code_bar, echo = FALSE, warning = TRUE, eval = FALSE}
+
+title = "What is your experience with open materials and/or code (n = %d)"
+p <- simple_bar_graph(df, label_var = "CodeExp", the_title = title, xname = "Response given", 
+                      bar_colour = "orange",line_colour = "black",the_quantity="count")
+p
+
+# arrange by descending frequency
+
+# dplyr::arrange(a2, desc(n)) %>% 
+# knitr::kable(col.names = c("Academic Levels", "Frequency", "Percentage"), caption = sprintf("Academic # Levels of Respondents (n = %d)",nvalid_ac_level)) %>% 
+#  kable_styling(bootstrap_options = "striped", full_width = F, position = 'center')
+
+# rearrange the rows
 
 
+
+#ap <- ggplot(data = valid_ac_level, aes (AcLevel_Label)) + 
+#  geom_bar() +
+#  labs (x = "Frequency", 
+#        y = "Academic Levels", 
+#        title = sprintf("Reported Academic Levels (n = %d)",nvalid_ac_level)) +
+#  coord_flip() + 
+#  theme_classic(base_size = 12)
+#ap
+
+# code to save figure. If using it for slides, increase the 'base_size' from 12 to 18. 
+#ggsave(here::here("figs", "aclevels_bar.png"))
+
+###################### EFFORTS TO SPLIT OUT ASSH VS STEM RESPONDENTS ######
+
+#### OS Experience ####
+```{r os_experience_pie_assh, echo = FALSE, eval = FALSE}
+
+# data for just ASSH respondents
+title = "What is your experience with open science practices? HAS respondents (n = %d)"
+d_assh <- df %>% filter(assh == "ASSH")
+
+# pie chart
+colours <- brewer.pal(4, "Blues")
+p_assh <- simple_pie_chart(the_data = d_assh, label_var = "OverallExp",
+                           the_title = title, 
+                           colours,the_quantity = "percent")
+p_assh
+
+# data for just STEM respondents
+title = "What is your experience with open science practices? STEM respondents (n = %d)"
+d_stem <- df %>% filter(assh == "STEM")
+
+# pie chart
+colours <- brewer.pal(4, "Blues")
+p_stem <- simple_pie_chart(the_data = d_stem, label_var = "OverallExp",
+                           the_title = title, 
+                           colours,the_quantity = "percent")
+p_stem
+```
+
+#### PREREG EXPERIENCE ####
+
+```{r prereg_exp_pie_chart_assh, echo = FALSE, warning = TRUE, eval=FALSE}
+
+d_assh <- df %>% filter(assh == "ASSH") 
+title = "What is your experience with preregistration? HAS respondents (n = %d)"
+
+# pie chart
+colours <- brewer.pal(4, "Blues")
+p_assh <- simple_pie_chart(the_data = d_assh, label_var = "PreregExp1", 
+                           the_title = title, 
+                           colours,the_quantity = "percent")
+p_assh
+
+rm(title)
+```
+
+#### PREREG IMPORTANCE ####
+
+```{r prereg_imp_ex_pie_chart_assh, echo = FALSE, warning = TRUE, eval = FALSE}
+
+title = "How important is it that researchers preregister their studies? HAS respondents (n = %d)"
+
+d_assh <- df %>% 
+  filter(assh == "ASSH") %>% 
+  filter(PreRegImp != "Researchers in my discipline do not conduct research studies")
+
+# pie chart
+colours <- brewer.pal(4, "Blues")
+p_assh <- simple_pie_chart(the_data = d_assh, label_var = "PreRegImp", 
+                           the_title = title, 
+                           colours,the_quantity = "percent")
+p_assh
+```
 
 

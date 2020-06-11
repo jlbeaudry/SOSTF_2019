@@ -98,15 +98,15 @@ simple_pie_chart <- function (the_data, label_var="", the_title="", colours, ord
   
   # Create the pie chart
   p <- plot_ly(pie_data, labels = pie_data[[label_var]], values = pie_data$freq, type = 'pie',
-               textposition = "auto",
+               textposition = "inside",
                textinfo = the_textinfo,
                text = the_text,
-               marker = list(colors = colours, line=list(color="white", width=10)),
+               marker = list(colors = colours, line=list(color="white", width=6)),
                showlegend = FALSE,
                sort = FALSE,
                direction = "clockwise",
                rotation = 0,
-               hole = 0.3,
+               hole = 0.25,
                pull = 0,
                title = list 
                   (text = the_title, position = "top center",font = list (size=20, color="black")))
@@ -221,7 +221,7 @@ a3 <-a2 [c(7,1,10,11,2,9,6,5,3,8,4),]
 
 knitr::kable(a3, col.names = c("Academic Levels", "Frequency", "Percentage"), 
              caption = sprintf("Academic Levels of Respondents (n = %d)", 
-                               nvalid_ac_level)) %>% 
+                               nvalid_ac_level), align = 'lcc') %>% 
   kable_styling(bootstrap_options = "striped", full_width = F, position = 'center', 
                 font_size = 14)
 
@@ -265,7 +265,7 @@ d2 <- df %>%
 dplyr::arrange(d2,-desc(FORcode_2_num)) %>% 
 knitr::kable(col.names = c("FOR Code", "Field of Research Division", "Frequency",
                            "Percentage"), 
-             caption = sprintf("Reported Two-Digit Field of Research Codes for Respondents (n = %d)", nrow(df))) %>% 
+             caption = sprintf("Reported Two-Digit Field of Research Codes for Respondents (n = %d)", nrow(df)), align = 'clcc') %>% 
   kable_styling(bootstrap_options = "striped", full_width = F, position = 'center', 
                 font_size = 14)
 
@@ -285,7 +285,7 @@ student <- dplyr::filter(df, AcLevel_Label == "PhD Student" |
 
 dplyr::arrange(student,-desc(FORcode_2_num)) %>% 
 knitr::kable(col.names = c("FOR Code", "Field of Research Division", "Frequency"),
-             caption = sprintf("Reported Two-Digit Field of Research Codes for Student Respondents (n = %d)", (sum(student[3])))) %>% 
+             caption = sprintf("Reported Two-Digit Field of Research Codes for Student Respondents (n = %d)", (sum(student[3]))), align = 'clc') %>% 
   kable_styling(bootstrap_options = "striped", full_width = F, position = 'center', font_size = 14)
 
 # now showing the staff breakdown
@@ -301,7 +301,7 @@ staff <- dplyr::filter(df, AcLevel_Label == "Professor" |
 
 dplyr::arrange(staff,-desc(FORcode_2_num)) %>% 
 knitr::kable(col.names = c("FOR Code", "Field of Research Division", "Frequency"),
-             caption = sprintf("Reported Two-Digit Field of Research Codes for Staff Respondents (n = %d)", (sum(staff[3])))) %>% 
+             caption = sprintf("Reported Two-Digit Field of Research Codes for Staff Respondents (n = %d)", (sum(staff[3]))), align = 'clc') %>% 
   kable_styling(bootstrap_options = "striped", full_width = F, position = 'center', 
                 font_size = 14)
 
@@ -360,7 +360,8 @@ d2 <- df %>%
 d3 <-d2 [c(4,8,10,3,5,1,2,9,7,6),]
 
 d3 %>% 
-knitr::kable(col.names = c("Disciplines", "Frequency", "Percentage"), caption = sprintf("Discipline Groupings of Respondents (n = %d)",nrow(df))) %>% 
+knitr::kable(col.names = c("Disciplines", "Frequency", "Percentage"), caption = sprintf("Discipline Groupings of Respondents (n = %d)",nrow(df)), 
+              align = 'lcc') %>% 
   kable_styling(bootstrap_options = "striped", full_width = F, position = 'center', 
                 font_size = 14)
 
@@ -518,7 +519,8 @@ title = "What is your experience with open science practices? (n = %d)"
 colours <- brewer.pal(4, "Blues")
 p <- simple_pie_chart(the_data = df, label_var = "OverallExp",
                       the_title = title, 
-                      colours,the_quantity = "percent")
+                      colours,
+                      the_quantity = "percent")
 p
 ```
 
@@ -536,9 +538,11 @@ tb_os_exp <-os_exp [c(3,1,2,4),] # rearrange the responses
 tb_os_exp %>% 
 knitr::kable(col.names = c("Reported Experience", "Frequency", "Percentage"), 
              caption = sprintf("Overall Experience with Open Science Practices (n = %d)",
-                               nvalid_os_exp))  %>% 
+                               nvalid_os_exp), align = 'lcc')  %>% 
     kable_styling(bootstrap_options = "striped", full_width = F, position = 'center', 
                   font_size = 14)
+
+# the align parameter changes how the columns are aligned. l = left; c = centre
 
 ```
 
@@ -561,9 +565,10 @@ the original research plan is visible to the scientific community."
 
 # CLEAN ALL OF THIS UP -- USE THE CODE FROM CODE_IMP
 
-# filter rows with valid responses for this variable; first df contains all valid responses
-  # the second df contains all valid responses, except "Researchers...do not conduct research
-  # studies"
+# filter rows with valid responses for this variable; first df contains all valid 
+  # responses
+  # the second df contains all valid responses, except "Researchers...do not conduct 
+  # research studies"
 valid_prereg_imp <- filter(df, PreRegImp != "NA")
 valid_prereg_imp_ex <- filter(valid_prereg_imp, PreRegImp != "Researchers in my discipline do not conduct research studies")
 
@@ -615,7 +620,8 @@ df3 %>%
 knitr::kable (col.names = c("Perceived Importance", "Frequency",
                             "Percentage"), 
               caption = sprintf("Perceived Importance of Preregistration <br> (n = %d)",
-                                nvalid_prereg_imp_ex)) %>% 
+                                nvalid_prereg_imp_ex), 
+              align = 'lcc') %>% 
     kable_styling(bootstrap_options = "striped", full_width = F, position = 'center', 
                   font_size = 14)
 
@@ -674,7 +680,8 @@ p2$PreregExp1 <- p2$PreregExp1 %>%
 dplyr::arrange(p2, desc(n)) %>% 
 knitr::kable (col.names = c("Reported Experience", "Frequency", "Percentage"),
               caption = sprintf("Experience with Study Preregistration <br>(n = %d)",
-                                nvalid_prereg_exp)) %>% 
+                                nvalid_prereg_exp), 
+              align = 'lcc') %>% 
     kable_styling(bootstrap_options = "striped", full_width = F, position = 'center', 
                   font_size = 14)
 
@@ -857,7 +864,8 @@ title = "In your opinion, how important for your field is it that materials and/
 
 # pie chart
 colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(the_data = valid_code_imp_ex, label_var = "CodeImp", 
+p <- simple_pie_chart(the_data = valid_code_imp_ex, 
+                      label_var = "CodeImp", 
                       the_title = title, 
                       colours,the_quantity = "percent")
 p
@@ -876,7 +884,8 @@ tb_ex2 <-tb_ex [c(4,3,1,2),] # rearrange the responses
 
 tb_ex2 %>% 
 knitr::kable (col.names = c("Perceived Importance", "Frequency", "Percentage"), 
-              caption = sprintf("Perceived Importance of Open Materials and/or Code (n = %d)", nvalid_code_imp_ex)) %>% 
+              caption = sprintf("Perceived Importance of Open Materials and/or Code (n = %d)", nvalid_code_imp_ex), 
+              align = 'lcc') %>% 
     kable_styling(bootstrap_options = "striped", full_width = F, position = 'center',
                   font_size = 14)
 
@@ -909,7 +918,7 @@ p <- simple_pie_chart(df,label_var="CodeExp",the_title = title, colours = colour
 p
 ```
 
-```{r code_exp_table, echo=FALSE, warning=TRUE , eval=FALSE}
+```{r code_exp_table, echo=FALSE, warning=TRUE}
 
 tb_c_exp <- valid_code_exp %>% 
   dplyr::count(CodeExp) %>%  
@@ -919,8 +928,7 @@ tb_c_exp2 <- tb_c_exp [c(4,1,3,2),] # fix the order of responses
 
 tb_c_exp2 %>% 
 knitr::kable (col.names = c("Reported Experience", "Frequency", "Percentage"), 
-              caption = sprintf("Experience with Open Materials and/or Code (n = %d)",
-                                nvalid_code_exp)) %>% 
+              caption = sprintf("Experience with Open Materials and/or Code (n = %d)", nvalid_code_exp), align = 'lcc') %>% 
     kable_styling(bootstrap_options = "striped", full_width = F, position = 'center',
                   font = 14)
 
@@ -1115,12 +1123,9 @@ average_response_small
 rm(a2)
 rm(a3)
 rm(c_os_exp)
-#rm(d_assh)
-#rm(d_stem)
 rm(d2)
 rm(d3)
 rm(df)
-rm(f2)
 rm(FOR_freq)
 rm(n)
 rm(nvalid_ac_level)

@@ -98,15 +98,15 @@ simple_pie_chart <- function (the_data, label_var="", the_title="", colours, ord
   
   # Create the pie chart
   p <- plot_ly(pie_data, labels = pie_data[[label_var]], values = pie_data$freq, type = 'pie',
-               textposition = "auto",
+               textposition = "inside",
                textinfo = the_textinfo,
                text = the_text,
-               marker = list(colors = colours, line=list(color="white", width=10)),
+               marker = list(colors = colours, line=list(color="white", width=6)),
                showlegend = FALSE,
                sort = FALSE,
                direction = "clockwise",
                rotation = 0,
-               hole = 0.3,
+               hole = 0.25,
                pull = 0,
                title = list 
                   (text = the_title, position = "top center",font = list (size=20, color="black")))
@@ -200,6 +200,8 @@ started the survey, although not all respondents completed all questions; thus,
 we report the sample size for each question. This document presents an overview 
 of their responses. 
 
+## Demographics: Academic Levels
+
 In terms of respondents' demographic information, we did not collect information 
 about gender or age to provide more anonymity to our respondents. We did, however,
 ask about their Academic Level/Type and their Discpline (based on 2-digit and 
@@ -221,7 +223,7 @@ a3 <-a2 [c(7,1,10,11,2,9,6,5,3,8,4),]
 
 knitr::kable(a3, col.names = c("Academic Levels", "Frequency", "Percentage"), 
              caption = sprintf("Academic Levels of Respondents (n = %d)", 
-                               nvalid_ac_level)) %>% 
+                               nvalid_ac_level), align = 'lcc') %>% 
   kable_styling(bootstrap_options = "striped", full_width = F, position = 'center', 
                 font_size = 14)
 
@@ -240,6 +242,8 @@ FOR_freq <- df %>%
 
 a <- colSums(FOR_freq[1:18,3])
 ```
+
+## Demographics: Disciplines
 
 In terms of Field of Research Codes, `r a` respondents classified themselves 
 as belonging to one of the two-digit FOR codes from 01 to 20, one person indicated 
@@ -265,7 +269,7 @@ d2 <- df %>%
 dplyr::arrange(d2,-desc(FORcode_2_num)) %>% 
 knitr::kable(col.names = c("FOR Code", "Field of Research Division", "Frequency",
                            "Percentage"), 
-             caption = sprintf("Reported Two-Digit Field of Research Codes for Respondents (n = %d)", nrow(df))) %>% 
+             caption = sprintf("Reported Two-Digit Field of Research Codes for Respondents (n = %d)", nrow(df)), align = 'clcc') %>% 
   kable_styling(bootstrap_options = "striped", full_width = F, position = 'center', 
                 font_size = 14)
 
@@ -285,7 +289,7 @@ student <- dplyr::filter(df, AcLevel_Label == "PhD Student" |
 
 dplyr::arrange(student,-desc(FORcode_2_num)) %>% 
 knitr::kable(col.names = c("FOR Code", "Field of Research Division", "Frequency"),
-             caption = sprintf("Reported Two-Digit Field of Research Codes for Student Respondents (n = %d)", (sum(student[3])))) %>% 
+             caption = sprintf("Reported Two-Digit Field of Research Codes for Student Respondents (n = %d)", (sum(student[3]))), align = 'clc') %>% 
   kable_styling(bootstrap_options = "striped", full_width = F, position = 'center', font_size = 14)
 
 # now showing the staff breakdown
@@ -301,7 +305,7 @@ staff <- dplyr::filter(df, AcLevel_Label == "Professor" |
 
 dplyr::arrange(staff,-desc(FORcode_2_num)) %>% 
 knitr::kable(col.names = c("FOR Code", "Field of Research Division", "Frequency"),
-             caption = sprintf("Reported Two-Digit Field of Research Codes for Staff Respondents (n = %d)", (sum(staff[3])))) %>% 
+             caption = sprintf("Reported Two-Digit Field of Research Codes for Staff Respondents (n = %d)", (sum(staff[3]))), align = 'clc') %>% 
   kable_styling(bootstrap_options = "striped", full_width = F, position = 'center', 
                 font_size = 14)
 
@@ -360,7 +364,8 @@ d2 <- df %>%
 d3 <-d2 [c(4,8,10,3,5,1,2,9,7,6),]
 
 d3 %>% 
-knitr::kable(col.names = c("Disciplines", "Frequency", "Percentage"), caption = sprintf("Discipline Groupings of Respondents (n = %d)",nrow(df))) %>% 
+knitr::kable(col.names = c("Disciplines", "Frequency", "Percentage"), caption = sprintf("Discipline Groupings of Respondents (n = %d)",nrow(df)), 
+              align = 'lcc') %>% 
   kable_styling(bootstrap_options = "striped", full_width = F, position = 'center', 
                 font_size = 14)
 
@@ -452,22 +457,17 @@ p
 # filter rows with valid response for this variable & rename variable accordingly
 
 valid_os_exp <- filter(df, OverallExp != "NA")
-valid_os_exp_num <- filter(df, OverallExp_num != "NA")
-# these should be the same, but based on variable with numbers & one based on labels 
 
 # calculate number of rows with a valid response for this variable
 nvalid_os_exp <- nrow(valid_os_exp)
 
-per_os_exp <- perc(x = valid_os_exp$OverallExp, y = nvalid_os_exp)
+# create tibble with frequencies & percentages 
 
+os_exp <- valid_os_exp %>% 
+  dplyr::count(OverallExp) %>% 
+  mutate(Percentage = round (n/(nrow(valid_os_exp))*100)) %>% 
+  dplyr::arrange(desc(n))
 
-#count outputs in case that's what we are going to report instead...
-c_os_exp <- plyr::count(valid_os_exp$OverallExp)
-
-# just an FYI that this does the same thing as the code above
-#nvalid_os_exp <- df %>% 
-  #filter (OverallExperience != "NA") %>% 
-  #nrow()
 ```
 
 Before we asked participants about their experience with open science practices, 
@@ -476,12 +476,13 @@ were study preregistration, open materials and/or code, open data, pre-publicati
 archiving, and open access publishing.   
 
 The figure below shows participants' experience with open science practices in general. 
-Of the `r nvalid_os_exp` participants who answered this question, `r per_os_exp[4]`% 
-(or, `r c_os_exp[4,2]` if we are going to use frequencies here) reported that they were
-unaware of open science practices; `r per_os_exp[1]`% reported that they were 
-aware of open science practices, but had not used them; `r per_os_exp[3]`% reported 
-that they had some experience with open science practices; and only `r per_os_exp[2]`%
-reported that they had extensive experience with open science practices. 
+Of the `r nvalid_os_exp` participants who answered this question, `r os_exp[3,2]` 
+(`r os_exp[3,3]`%) reported that they were unaware of open science practices; 
+`r os_exp[1,2]` (`r os_exp[1,3]`%) reported that they were aware of open science
+practices, but had not used them; `r os_exp[2,2]` (`r os_exp[2,3]`%) reported 
+that they had some experience with open science practices; and only `r os_exp[4,2]`
+ (`r os_exp[4,3]`%) reported that they had extensive experience with open science
+ practices. 
 
 ```{r os_experience_bar, echo=FALSE, warning=TRUE, eval = FALSE}
 
@@ -518,27 +519,23 @@ title = "What is your experience with open science practices? (n = %d)"
 colours <- brewer.pal(4, "Blues")
 p <- simple_pie_chart(the_data = df, label_var = "OverallExp",
                       the_title = title, 
-                      colours,the_quantity = "percent")
+                      colours,
+                      the_quantity = "percent")
 p
 ```
 
 ```{r tables_os_experience, echo = FALSE, eval = TRUE}
-
-os_exp <- valid_os_exp %>% 
-  dplyr::count(OverallExp) %>% 
-  mutate(Percentage = round (n/(nrow(valid_os_exp))*100)) %>% 
-  dplyr::arrange(desc(n))
-
-nvalid_os_exp <- sum(os_exp[2]) # I need this for the title
 
 tb_os_exp <-os_exp [c(3,1,2,4),] # rearrange the responses
 
 tb_os_exp %>% 
 knitr::kable(col.names = c("Reported Experience", "Frequency", "Percentage"), 
              caption = sprintf("Overall Experience with Open Science Practices (n = %d)",
-                               nvalid_os_exp))  %>% 
+                               nvalid_os_exp), align = 'lcc')  %>% 
     kable_styling(bootstrap_options = "striped", full_width = F, position = 'center', 
                   font_size = 14)
+
+# the align parameter changes how the columns are aligned. l = left; c = centre
 
 ```
 
@@ -559,41 +556,44 @@ the original research plan is visible to the scientific community."
 
 ```{r prereg_imp_count, echo = FALSE, warning=TRUE}
 
-# CLEAN ALL OF THIS UP -- USE THE CODE FROM CODE_IMP
+# filter rows with valid responses for this variable; first df contains all valid 
+  # responses; the second df contains all valid responses, except 
+  # "Researchers in my discipline...do not conduct research studies"
 
-# filter rows with valid responses for this variable; first df contains all valid responses
-  # the second df contains all valid responses, except "Researchers...do not conduct research
-  # studies"
 valid_prereg_imp <- filter(df, PreRegImp != "NA")
 valid_prereg_imp_ex <- filter(valid_prereg_imp, PreRegImp != "Researchers in my discipline do not conduct research studies")
 
-# create objects with the counts for each valid response for the variable
-c_prereg_imp <- plyr::count(valid_prereg_imp$PreRegImp)
-c_prereg_imp_ex <- plyr::count(valid_prereg_imp_ex$PreRegImp)
-
-# calculate number of rows with a valid response for this variable
+# calculate number of rows with a valid response for these variables
 nvalid_prereg_imp <- nrow(valid_prereg_imp)
 nvalid_prereg_imp_ex <- nrow(valid_prereg_imp_ex)
 
-# calculate the percentage for each response
-per_prereg_imp <- perc(x = valid_prereg_imp$PreRegImp, y = nvalid_prereg_imp)
-per_prereg_imp_ex <- perc(x = valid_prereg_imp_ex$PreRegImp, y = nvalid_prereg_imp_ex)
+# create a tibble with frequency & percentage for all who answered question
+tb <- valid_prereg_imp %>% 
+  dplyr::count(PreRegImp) %>% 
+  mutate(Percentage = round (n/(nrow(valid_prereg_imp))*100)) %>% 
+  dplyr::arrange(desc(n))
+
+# create a tibble with frequency & percentage for data excluding "do not use"
+tb_ex <- valid_prereg_imp_ex %>% 
+  dplyr::count(PreRegImp) %>% 
+  mutate(Percentage = round (n/(nrow(valid_prereg_imp_ex))*100)) %>% 
+  dplyr::arrange(desc(n))
 
 ```
 
 We first asked participants how important preregistration of studies is for their field. 
 Of the `r nvalid_prereg_imp` participants who answered this question, a small percentage 
-(`r per_prereg_imp[3]`%) indicated that researchers in their discipline do not conduct 
+(`r tb[5,3]`%) indicated that researchers in their discipline do not conduct 
 research studies. As such, we excluded them from this analysis. Of the remaining 
-`r nvalid_prereg_imp_ex` respondents, `r per_prereg_imp_ex[1]`% indicated that 
-preregistration was extremely important for their field; `r per_prereg_imp_ex[3]`% 
-indicated that it was somewhat important; `r per_prereg_imp_ex[4]`% indicated that 
-preregistration was somewhat unimportant; and `r per_prereg_imp_ex[2]`% indicated 
-that it was not at all important for their field. 
+`r nvalid_prereg_imp_ex` respondents, `r tb_ex[3,2]` (`r tb_ex[3,3]`%) indicated that 
+preregistration was extremely important for their field; `r tb_ex[1,2]` (`r tb_ex[1,3]`%)
+indicated that it was somewhat important; `r tb_ex[4,2]` (`r tb_ex[4,3]`)% indicated 
+that preregistration was somewhat unimportant; and `r tb_ex[2,2]` (`r tb_ex[2,3]`%)
+indicated that it was not at all important for their field. 
 
 ```{r prereg_imp_ex_pie_chart, echo = FALSE, warning = TRUE}
 
-title = "In your opinion, how important for your field is it that researchers preregister their studies (n = %d)"
+title = "Perceived Importance of Preregistration (n = %d)"
 
 # pie chart
 colours <- brewer.pal(4, "Blues")
@@ -605,17 +605,14 @@ p
 
 ```{r prereg_imp_ex_table, echo=FALSE, warning=TRUE}
 
-df2 <- valid_prereg_imp_ex %>% 
-  dplyr::count(PreRegImp) %>% 
-  mutate(Percentage = round (n/nvalid_prereg_imp_ex*100))
+tb_ex2 <- tb_ex [c(2,4,1,3),]  # rearrange the responses
 
-df3 <-df2 [c(2,4,3,1),] # rearrange the responses
-
-df3 %>% 
+tb_ex2 %>% 
 knitr::kable (col.names = c("Perceived Importance", "Frequency",
                             "Percentage"), 
               caption = sprintf("Perceived Importance of Preregistration <br> (n = %d)",
-                                nvalid_prereg_imp_ex)) %>% 
+                                nvalid_prereg_imp_ex), 
+              align = 'lcc') %>% 
     kable_styling(bootstrap_options = "striped", full_width = F, position = 'center', 
                   font_size = 14)
 
@@ -627,23 +624,23 @@ knitr::kable (col.names = c("Perceived Importance", "Frequency",
 # filter rows with valid responses for this variable
 valid_prereg_exp <- filter(df, PreregExp1 != "NA")
 
-# create object with the counts for each valid response for this variable
-c_prereg_exp <- plyr::count(valid_prereg_exp$PreregExp1)
-
 # calculate number of rows with a valid response for this variable
 nvalid_prereg_exp <- nrow(valid_prereg_exp)
 
-# calculate the percentage for each response
-per_prereg_exp <- perc(x = valid_prereg_exp$PreregExp1, y = nvalid_prereg_exp)
+# create a tibble with frequency & percentage for all who answered question
+tb <- valid_prereg_exp %>% 
+  dplyr::count(PreregExp1) %>% 
+  mutate(Percentage = round (n/(nrow(valid_prereg_exp))*100)) %>% 
+  dplyr::arrange(desc(n))
 
 ```
 
 We then asked respondents about their own experience with study preregistration. 
-Of the `r nvalid_prereg_exp` participants who answered this question, `r per_prereg_exp[4]`% 
-were unaware of study preregistration; `r per_prereg_exp[1]`% were aware of study 
-preregistration, but had not used it; `r per_prereg_exp[3]`% had some experience 
-with it, but did not regularly preregister their studies; and `r per_prereg_exp[2]`% 
-regularly preregistered their studies. 
+Of the `r nvalid_prereg_exp` participants who answered this question, `r tb[1,2]`
+ (`r tb[1,3]`%) were unaware of study preregistration; `r tb[2,2]` (`r tb[2,3]`%) 
+were aware of study preregistration, but had not used it; `r tb[3,2]` (`r tb[3,3]`%) 
+had some experience with it, but did not regularly preregister their studies; and 
+`r tb[4,2]` (`r tb[4,3]`%) regularly preregister their studies. 
 
 ```{r prereg_exp_pie_chart, echo = FALSE, warning = TRUE}
 
@@ -660,21 +657,19 @@ rm(title)
 
 ```{r prereg_exp_table, echo=FALSE, warning=TRUE}
 
-p2 <- valid_prereg_exp %>% 
-  dplyr::count(PreregExp1) %>% 
-  mutate(Percentage = round (n/nvalid_prereg_exp*100))
-
-p2$PreregExp1 <- p2$PreregExp1 %>% 
+# change the label for Regular Use
+tb$PreregExp1 <- tb$PreregExp1 %>% 
   mapvalues(
     c("Unaware", "Aware, But Not Used", "Some Experience", "Reg Use"), 
     c("Unaware", "Aware, But Not Used", "Some Experience", "Regular Use"))
 
-# check this order & use the other ordering approach rather than using descending
+tb2 <- tb[c(1,2,3,4),] #fix order
 
-dplyr::arrange(p2, desc(n)) %>% 
+tb2 %>% 
 knitr::kable (col.names = c("Reported Experience", "Frequency", "Percentage"),
               caption = sprintf("Experience with Study Preregistration <br>(n = %d)",
-                                nvalid_prereg_exp)) %>% 
+                                nvalid_prereg_exp), 
+              align = 'lcc') %>% 
     kable_styling(bootstrap_options = "striped", full_width = F, position = 'center', 
                   font_size = 14)
 
@@ -730,7 +725,8 @@ n_prereg_con <- length(unique(PreRegCon_long$ParticipantNumber))
 
 # create a tibble with percentages (of respondents who answered this question) & 
   # then reorder them by descending percentages
-b <- PreRegCon_long %>% 
+
+tb <- PreRegCon_long %>% 
   dplyr::count(PreRegConcern) %>% 
   mutate(Percentage = round (n/n_prereg_con*100)) %>% 
   dplyr::arrange(desc(n))
@@ -743,7 +739,7 @@ we then provided a list of possible concerns that researchers could have about
 preregistering their studies. 
 
 Respondents were able to select as many concerns as they liked. Of the `r n_prereg_con`
-respondents who answered this question, `r b [7,2]` (`r b [7,3]`%) 
+respondents who answered this question, `r tb [7,2]` (`r tb [7,3]`%) 
 reported that they do not share any of the listed concerns. The following figure 
 presents, of those who answered this question, the percentage who selected 
 each of the concerns.  
@@ -751,7 +747,7 @@ each of the concerns.
 ```{r prereg_concerns_bar, echo=FALSE, warning=TRUE}
 
 # reorder the response options from lowest to highest, with concerns last
-b2 <- b %>% 
+tb2 <- tb %>% 
   dplyr::mutate(PreRegConcern = factor (PreRegConcern, 
                                 levels = c("More difficult to find significant results", 
                                            "More difficult to publish in certain journals", 
@@ -769,11 +765,11 @@ cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3",
 # build the bar chart
 title = sprintf("Concerns about preregistering studies\n (n = %d)", n_prereg_con)
 
-# plot the reordered data and colours. Because the data is in a tibble rather than a dataframe with
-  # counts, I could use 'geom_col' rather than 'geom_bar'(or I could use stat = "identity" with
-  # 'geom_bar')
+# plot the reordered data and colours. Because the data is in a tibble rather than 
+  # a dataframe with counts, I could use 'geom_col' rather than 'geom_bar' 
+  # (or I could use stat = "identity" with 'geom_bar')
 
-p <- ggplot(b2) + 
+p <- ggplot(tb2) + 
   aes(x = PreRegConcern, y = Percentage) +
    geom_bar(stat = "identity", colour = "black", fill = cols) +
     labs (x = element_blank(),
@@ -805,24 +801,8 @@ are made openly available to the research community.
 valid_code_imp <- filter(df, CodeImp != "NA")
 valid_code_imp_ex <- filter(valid_code_imp, CodeImp != "Researchers in my discipline do not use materials and/or code")
 
-# THE COMMENTED OUT CODE HELPS ME TO TROUBLESHOOT, BUT ULTIMATELY THE TB CODE
-  # GETS ME WHAT I NEED IN THE END WITH A LOT LESS CODE --> I SHOULD GO BACK TO 
-  # PREREG AND SIMPLIFY THAT CODE! 
-
-# create objects with the counts for each valid response for the variable
-  # I DON'T THINK I NEED THIS...
-# c_code_imp <- plyr::count(valid_code_imp$CodeImp)
-# c_code_imp_ex <- plyr::count(valid_code_imp_ex$CodeImp)
-
-# calculate number of rows with a valid response for this variable
-  # I DON'T THINK I NEED THIS...
-# nvalid_code_imp <- nrow(valid_code_imp)
-# nvalid_code_imp_ex <- nrow(valid_code_imp_ex)
-
-# calculate the percentage for each response
-  # I DON'T THINK I NEED THIS...
-# per_code_imp <- perc(x = valid_code_imp$CodeImp, y = nvalid_code_imp)
-# per_code_imp_ex <- perc(x = valid_code_imp_ex$CodeImp, y = nvalid_code_imp_ex)
+nvalid_code_imp <- nrow(valid_code_imp)
+nvalid_code_imp_ex <- nrow(valid_code_imp_ex)
 
 # create a tibble with frequency & percentage for all who answered question
 tb <- valid_code_imp %>% 
@@ -849,15 +829,15 @@ somewhat important; `r tb_ex[3,3]`% indicated that they were somewhat unimportan
 and `r tb_ex[4,3]`% indicated that open materials and/or code were not at all 
 important for their field. 
 
-THIS ALL NEEDS TO BE RECODED FOR CODE RATHER THAN PREREG!
 
 ```{r code_imp_ex_pie_chart, echo = FALSE, warning = TRUE}
 
-title = "In your opinion, how important for your field is it that materials and/or code are openly available (n = %d)"
+title = "Perceived importance of open materials and/or code (n = %d)"
 
 # pie chart
 colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(the_data = valid_code_imp_ex, label_var = "CodeImp", 
+p <- simple_pie_chart(the_data = valid_code_imp_ex, 
+                      label_var = "CodeImp", 
                       the_title = title, 
                       colours,the_quantity = "percent")
 p
@@ -870,18 +850,18 @@ tb_ex <- valid_code_imp_ex %>%
   mutate(Percentage = round (n/(nrow(valid_code_imp_ex))*100)) %>% 
   dplyr::arrange(desc(n))
 
-nvalid_code_imp_ex <- sum(tb_ex[2]) # I need this for the title
-
 tb_ex2 <-tb_ex [c(4,3,1,2),] # rearrange the responses
 
 tb_ex2 %>% 
 knitr::kable (col.names = c("Perceived Importance", "Frequency", "Percentage"), 
-              caption = sprintf("Perceived Importance of Open Materials and/or Code (n = %d)", nvalid_code_imp_ex)) %>% 
+              caption = sprintf("Perceived Importance of Open Materials and/or Code (n = %d)", nvalid_code_imp_ex), 
+              align = 'lcc') %>% 
     kable_styling(bootstrap_options = "striped", full_width = F, position = 'center',
                   font_size = 14)
 
 ```
 
+THIS ALL NEEDS TO BE RECODED FOR CODE RATHER THAN PREREG! (OR DOES IT?)
 
 ##### Experience with Open Materials and/or Code
 
@@ -893,11 +873,16 @@ valid_code_exp <- filter(df,CodeExp != "NA")
 # calculate number of rows with a valid response for this variable
 nvalid_code_exp <- nrow(valid_code_exp)
 
+tb_c_exp <- valid_code_exp %>% 
+  dplyr::count(CodeExp) %>%  
+    mutate(Percentage = round (n/nvalid_code_exp*100))
 
 ```
 
 The following section shows how many people have experience with open code 
 and/or materials. A total of `r nvalid_code_exp` answered this question.
+
+%%%% ADD SUMMARY INFO HERE %%%%
 
 ```{r code_exp_pie, echo = FALSE, warning = TRUE}
 
@@ -909,23 +894,19 @@ p <- simple_pie_chart(df,label_var="CodeExp",the_title = title, colours = colour
 p
 ```
 
-```{r code_exp_table, echo=FALSE, warning=TRUE , eval=FALSE}
-
-tb_c_exp <- valid_code_exp %>% 
-  dplyr::count(CodeExp) %>%  
-    mutate(Percentage = round (n/nvalid_code_exp*100))
+```{r code_exp_table, echo=FALSE, warning=TRUE}
 
 tb_c_exp2 <- tb_c_exp [c(4,1,3,2),] # fix the order of responses
 
 tb_c_exp2 %>% 
 knitr::kable (col.names = c("Reported Experience", "Frequency", "Percentage"), 
-              caption = sprintf("Experience with Open Materials and/or Code (n = %d)",
-                                nvalid_code_exp)) %>% 
+              caption = sprintf("Experience with Open Materials and/or Code (n = %d)", nvalid_code_exp), align = 'lcc') %>% 
     kable_styling(bootstrap_options = "striped", full_width = F, position = 'center',
                   font = 14)
 
 ```
 
+##### Concerns about Open Materials and/or Code
 
 ```{r code_concerns_data, echo=FALSE, warning=TRUE}
 
@@ -1011,8 +992,8 @@ tb2 <- tb %>%
                          "I might not receive appropriate credit", 
                          "Issues related to intellectual property", 
                          "No concerns")))
-  # I don't get it. tb & tb2 look the same in the tibble, but the order is completely different
-  # when they are graphed..
+  # I don't get it. tb & tb2 look the same in the tibble, but the order is completely
+  # different when they are graphed..
 
 # create a character vector for the colours for each bar
 cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
@@ -1046,7 +1027,6 @@ p
 #skim(df)
 
 # Now learning about group_by which appears to be a wonderful development!
-
 
 frames %>%
   group_by(test_item, sample_size, n_obs, condition) %>%
@@ -1114,13 +1094,10 @@ average_response_small
 ```{r clean environment, echo = FALSE}
 rm(a2)
 rm(a3)
-rm(c_os_exp)
-#rm(d_assh)
-#rm(d_stem)
+rm(os_exp)
 rm(d2)
 rm(d3)
 rm(df)
-rm(f2)
 rm(FOR_freq)
 rm(n)
 rm(nvalid_ac_level)

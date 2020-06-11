@@ -131,13 +131,26 @@ df$crisis_num <- factor(df$crisis)
 
 df$OverallExp_num <- factor(df$OverallExperience) 
 
-df$PreRegImp_num <- factor(df$PreRegImp)
+df$PreRegImp_num_o <- factor(df$PreRegImp) #name as 'original' so we can reverse code it next
 
 df$PreregExp1_num <- factor(df$PreregExp1) 
 
-df$CodeImp_num <- factor(df$CodeImp)
+df$CodeImp_num_o <- factor(df$CodeImp) #name as 'original' so we can reverse code it next
 
 df$CodeExp_num <- factor(df$CodeExp) 
+
+# reverse code `importance` variables so lower values = less importance
+
+df$PreRegImp_num <- df$PreRegImp_num_o %>% 
+  mapvalues(
+    c("1", "2", "3", "4"), 
+    c("4", "3", "2", "1"))
+
+df$CodeImp_num <- df$CodeImp_num_o %>% 
+  mapvalues(
+    c("1", "2", "3", "4"), 
+    c("4", "3", "2", "1"))
+
 
 # recode preregistration concerns
 df$PreRegCon_delay <- factor(df$PreregConcern_4)
@@ -161,34 +174,36 @@ df$CodeCon_no_con <- factor(df$CodeConcern_12)
 df$CodeCon_violate <- factor(df$CodeConcern_13)
 df$CodeCon_ip <- factor(df$CodeConcern_14)
 
-# create new variables with text labels for levels
+# relabel number with text labels for levels
 
-df$crisis <- df$crisis %>% 
+df$crisis <- df$crisis_num %>% 
   mapvalues(
     c("1", "2", "3", "4"), 
     c("Significant Crisis", "Slight Crisis", "No Crisis", "Don't Know"))
 
-df$OverallExp <- df$OverallExperience %>% 
+df$OverallExp <- df$OverallExp_num %>% 
   mapvalues(
     c("1", "2", "3", "4"), 
     c("Unaware", "Aware, But Not Used", "Some", "Extensive"))
 
-df$PreRegImp <- df$PreRegImp %>% 
+df$PreRegImp <- df$PreRegImp_num %>% 
   mapvalues(
-    c ("0", "1", "2", "3", "4"),
-    c ("Researchers in my discipline do not conduct research studies", "Extremely important", "Somewhat important", "Somewhat unimportant", "Not at all")
-  )
+    c ("0", "4", "3", "2", "1"),
+    c ("Researchers in my discipline do not conduct research studies", 
+       "Extremely important", "Somewhat important", "Somewhat unimportant", 
+       "Not at all"))
 
-df$PreregExp1 <- df$PreregExp1 %>% 
+df$PreregExp1 <- df$PreregExp1_num %>% 
   mapvalues(
     c("1", "2", "3", "4"), 
     c("Unaware", "Aware, But Not Used", "Some Experience", "Reg Use"))
 
-df$CodeImp <- df$CodeImp %>% 
+df$CodeImp <- df$CodeImp_num %>% 
   mapvalues(
-    c ("0", "1", "2", "3", "4"),
-    c ("Researchers in my discipline do not use materials and/or code", "Extremely important", "Somewhat important", "Somewhat unimportant", "Not at all")
-  )
+    c ("0", "4", "3", "2", "1"),
+    c ("Researchers in my discipline do not use materials and/or code", 
+       "Extremely important", "Somewhat important", "Somewhat unimportant", 
+       "Not at all"))
 
 df$CodeExp <- df$CodeExp %>%
   mapvalues(

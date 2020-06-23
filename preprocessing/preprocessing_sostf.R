@@ -92,7 +92,7 @@ df$FORcode_2_label <- toTitleCase(tolower(df$FORcode_2_label))
 df$FORcode_2_num <- as.numeric(df$FORcode_2_num)
 df$FORcode_4_num <- as.numeric(df$FORcode_4_num)
 
-  # then recode according to discipline 
+  # then recode according to discipline [CHECK OUT "CASE WHEN"]
 
 df <- df %>% 
   mutate (discipline = ifelse (FORcode_2_num %in% c('14','15','18'), "Business & Law",

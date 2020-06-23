@@ -861,7 +861,6 @@ knitr::kable (col.names = c("Perceived Importance", "Frequency", "Percentage"),
 
 ```
 
-THIS ALL NEEDS TO BE RECODED FOR CODE RATHER THAN PREREG! (OR DOES IT?)
 
 ##### Experience with Open Materials and/or Code
 
@@ -873,16 +872,21 @@ valid_code_exp <- filter(df,CodeExp != "NA")
 # calculate number of rows with a valid response for this variable
 nvalid_code_exp <- nrow(valid_code_exp)
 
-tb_c_exp <- valid_code_exp %>% 
+tb <- valid_code_exp %>% 
   dplyr::count(CodeExp) %>%  
-    mutate(Percentage = round (n/nvalid_code_exp*100))
+    mutate(Percentage = round (n/nvalid_code_exp*100)) %>% 
+    dplyr::arrange(desc(n))
 
 ```
 
 The following section shows how many people have experience with open code 
-and/or materials. A total of `r nvalid_code_exp` answered this question.
-
-%%%% ADD SUMMARY INFO HERE %%%%
+and/or materials. Of the `r nvalid_code_exp` participants who answered this 
+question, `r tb[1,2]` (`r tb[1,3]`%) reported that, until now, they hadn't heard 
+of open materials and/or code; `r tb[2,2]` (`r tb[2,3]`%) were aware of open
+materials and/or code, but had not used it in their own research; `r tb[3,2]` 
+(`r tb[3,3]`%) had some experience with open materials and/or code, but do not use
+them regularly; and `r tb[4,2]` (`r tb[4,3]`%) regularly use open materials and/or
+code. 
 
 ```{r code_exp_pie, echo = FALSE, warning = TRUE}
 
@@ -894,17 +898,22 @@ p <- simple_pie_chart(df,label_var="CodeExp",the_title = title, colours = colour
 p
 ```
 
+
 ```{r code_exp_table, echo=FALSE, warning=TRUE}
 
-tb_c_exp2 <- tb_c_exp [c(4,1,3,2),] # fix the order of responses
+tb2 <- tb [c(2,1,3,4),] # fix the order of responses
 
-tb_c_exp2 %>% 
+tb2 %>% 
 knitr::kable (col.names = c("Reported Experience", "Frequency", "Percentage"), 
-              caption = sprintf("Experience with Open Materials and/or Code (n = %d)", nvalid_code_exp), align = 'lcc') %>% 
+              caption = sprintf("Experience with Open Materials and/or Code (n = %d)",
+                                nvalid_code_exp), align = 'lcc') %>% 
     kable_styling(bootstrap_options = "striped", full_width = F, position = 'center',
                   font = 14)
 
 ```
+
+For those XX%% participants who reported that they use open materials and/or code 
+(that is, those who reported some use or regular use)....%%%
 
 ##### Concerns about Open Materials and/or Code
 

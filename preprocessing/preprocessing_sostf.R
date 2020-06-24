@@ -105,6 +105,7 @@ df <- df %>%
                        ifelse (FORcode_2_num %in% '17', "Psyc & Cog Sciences",
                        ifelse (FORcode_2_num %in% c('12', '99'), "Other", "Not Specified"))))))))))
 
+
 # View the mapping from FOR to discipline & see the number of folks in each FOR 
   # code group (and then ungroup again)
 
@@ -133,11 +134,15 @@ df$OverallExp_num <- factor(df$OverallExperience)
 
 df$PreRegImp_num_o <- factor(df$PreRegImp) #name as 'original' so we can reverse code it next
 
-df$PreregExp1_num <- factor(df$PreregExp1) 
+df$PreRegExp_num <- factor(df$PreregExp1) 
 
 df$CodeImp_num_o <- factor(df$CodeImp) #name as 'original' so we can reverse code it next
 
 df$CodeExp_num <- factor(df$CodeExp) 
+
+df$DataExp_num <- factor(df$OpenDataExp)
+
+df$DataImp_num_o <- factor(df$OpenDataImp) #name as 'original' so we can reverse code it next
 
 # reverse code `importance` variables so lower values = less importance
 
@@ -147,6 +152,11 @@ df$PreRegImp_num <- df$PreRegImp_num_o %>%
     c("4", "3", "2", "1"))
 
 df$CodeImp_num <- df$CodeImp_num_o %>% 
+  mapvalues(
+    c("1", "2", "3", "4"), 
+    c("4", "3", "2", "1"))
+
+df$DataImp_num <- df$DataImp_num_o %>% 
   mapvalues(
     c("1", "2", "3", "4"), 
     c("4", "3", "2", "1"))
@@ -193,7 +203,7 @@ df$PreRegImp <- df$PreRegImp_num %>%
        "Extremely important", "Somewhat important", "Somewhat unimportant", 
        "Not at all"))
 
-df$PreregExp1 <- df$PreregExp1_num %>% 
+df$PreRegExp <- df$PreRegExp_num %>% 
   mapvalues(
     c("1", "2", "3", "4"), 
     c("Unaware", "Aware, But Not Used", "Some Experience", "Reg Use"))
@@ -205,11 +215,22 @@ df$CodeImp <- df$CodeImp_num %>%
        "Extremely important", "Somewhat important", "Somewhat unimportant", 
        "Not at all"))
 
-df$CodeExp <- df$CodeExp %>%
+df$CodeExp <- df$CodeExp_num %>%
   mapvalues(
     c("1", "2", "3", "4"),
     c("Unaware", "Aware, But Not Used", "Some Use", "Regular Use"))
 
+df$DataImp <- df$DataImp_num %>% 
+  mapvalues(
+    c ("0", "4", "3", "2", "1"),
+    c ("Research publications in my field are not based on data", 
+       "Extremely important", "Somewhat important", "Somewhat unimportant", 
+       "Not at all"))
+
+df$DataExp <- df$DataExp_num %>%
+  mapvalues(
+    c("1", "2", "3", "4"),
+    c("Unaware", "Aware, But Not Used", "Some Use", "Regular Use"))
 
 
 ## RECODE ACADEMIC LEVELS ##
@@ -260,7 +281,8 @@ df <- df %>%
   # transform into factor
   df$AcLevel_Label <- factor(df$AcLevel_Label) 
   
-
+  
+  
 ################### WRITE DATA TO CSV #############
 
 # when done recoding, write the data to a new file

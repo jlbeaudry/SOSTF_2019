@@ -15,7 +15,8 @@ bibliography: Beaudry_Library.bib
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, fig.align= "center")
+knitr::opts_chunk$set(echo = TRUE, fig.align= "center", 
+                      fig.width = 8, fig.height = 8)
 options(scipen = 999)
 options(kableExtra.auto_format = FALSE) # switch to 'false' for word doc; 'true' for pdf
 
@@ -420,17 +421,21 @@ per_crisis <- perc(x = df$crisis, y = nvalid_crisis)  #percentage per level
 
 ## Estimates of Reproducibility by Perceived Crisis  
 
-Participants were asked if they believed their field is experiencing a "reproducibility crisis". Of the `r nvalid_crisis` respondents who answered this question, `r per_crisis[1]`% indicated that they didn't know if there was a crisis, `r per_crisis[2]`% indicated there was no crisis, `r per_crisis[4]`% indicated that there was a slight crisis, and `r per_crisis[3]`% that there was a significant reproducibility crisis in their field.   
+Participants were asked if they believed their field is experiencing a
+"reproducibility crisis". Of the `r nvalid_crisis` respondents who answered this 
+question, `r per_crisis[1]`% indicated that they didn't know if there was a crisis, 
+`r per_crisis[2]`% indicated there was no crisis, `r per_crisis[4]`% indicated that 
+there was a slight crisis, and `r per_crisis[3]`% that there was a significant 
+reproducibility crisis in their field.   
 
 Participants were also asked to estimate the percentage of research publications 
 their field that are reproducible. In the figure below, we plotted participants' 
 reproducibility estimates according to their responses to the perceived 
 crisis in their field. The black bar is the mean estimate of reproducibility 
 perceived crisis. 
-  
-  
 
-```{r crisis_by_estimate_stripchart, echo = FALSE, include = TRUE, out.height=4, out.width=5}
+```{r crisis_by_estimate_stripchart, echo = FALSE, include = TRUE}
+
 #estimates of reproducibility by levels of crisis as a stripchart 
 
 title = sprintf("Estimates of reproducibility by perceived crisis in field (n = %d)",nvalid_rep_est)

@@ -3,12 +3,12 @@ title: "Swinburne Open Science Task Force Survey (2019)"
 author: "Jennifer L Beaudry, Tom Johnstone, Jordy Kaufman & Lisa Given"
 date: '`r format (Sys.time(), "%d %B %Y")`'
 output:
-  word_document: 
-   # fig_width: 12 # this works, but it changes the font of plot_ly, etc.
-   # fig_height: 10 # so, don't use for now
-  #html_document: default 
+  #word_document: 
+   # fig_width: 10 # this works, but it changes the font of plot_ly, etc.
+   # fig_height: 12 # so, don't use for now
+  html_document: default 
   #pdf_document: default # this works now [but margin issues around plot_ly]
-always_allow_html: true # true for word; false for pdf
+always_allow_html: true # true for word; false for pdf (?)
 csl: apa-old-doi-prefix.csl
 bibliography: Beaudry_Library.bib
 ---
@@ -18,7 +18,8 @@ bibliography: Beaudry_Library.bib
 knitr::opts_chunk$set(echo = TRUE, fig.align= "center", 
                       fig.width = 8, fig.height = 8)
 options(scipen = 999)
-options(kableExtra.auto_format = FALSE) # switch to 'false' for word doc; 'true' for pdf
+options(kableExtra.auto_format = TRUE) 
+  # switch to 'false' for word doc; 'true' for pdf or html
 
 # If knit as a pdf, include width and height parameters in the plot_ly function
   #  width = 300, 
@@ -386,17 +387,9 @@ knitr::kable(col.names = c("Disciplines", "Frequency", "Percentage"), caption = 
                 latex_options = "hold_position")
 # html output = font_size = 14 # insert in kable styling
 
-# grouping the stem & non-stem disciples together
+# grouping the stem & non-stem disciples together in a new variable
 df <- df %>% 
   mutate (assh = ifelse (discipline %in% c ("Business & Law", "ASSH"), "ASSH", "STEM"))
-                  
-#d4 <- assh %>% 
-#  dplyr::count(assh) %>% 
-#   mutate (Percentage = round (n/nrow(df)*100))
-
-#dplyr::arrange(d4) %>% 
-#knitr::kable(col.names = c("Disciplines", "Frequency", "Percentage"), caption = #sprintf("Discipline Groupings of Respondents (n = %d)",nrow(df))) %>% 
-#  kable_styling(bootstrap_options = "striped", full_width = F, position = 'center')
 
 ```
   
@@ -1065,13 +1058,10 @@ p
 
 #### Open Data
 
-<em> THIS TEXT NEEDS TO BE UPDATED WITH OPEN DATA, BUT FIGURES ARE GOOD </em>
-
 The next section of the survey related to the use of open data. 
-For our purposes, we explained that open data referred to researcher-
-created resources used while collecting or analyzing data (e.g., survey questions, 
-video stimuli, vignettes, algorithms, coding schemes, analytic code, etc.) that 
-are made openly available to the research community.
+For our purposes, we explained that open data can be defined as "online, free of 
+cost, accessible data that can be used, reused and distributed provided that the 
+data source is attributed and shared alike." [FIND SOURCE FROM SURVEY]
 
 ##### Perceived Importance of Open Data 
 
@@ -1101,19 +1091,16 @@ tb_ex <- valid_data_imp_ex %>%
 
 ```
 
-<em> THIS TEXT NEEDS TO BE UPDATED WITH OPEN DATA </em>
-
-We first asked participants how important they thought it was for their field to
-make materials and/or code openly available. Of the `r sum(tb[2])` participants 
-who answered this question, a small percentage (`r tb[5,3]`%) indicated 
-that researchers in their discipline do not use materials and/or code. As such, 
-we excluded them from this analysis. Of the remaining `r sum(tb_ex[2])` 
-respondents, `r tb_ex[2,3]`% indicated that open materials and/or code were 
-extremely important for their field; `r tb_ex[1,3]`% indicated that they were 
-somewhat important; `r tb_ex[3,3]`% indicated that they were somewhat unimportant; 
-and `r tb_ex[4,3]`% indicated that open materials and/or code were not at all 
+We first asked participants how important they thought it was for their field that 
+data from published research are openly available. Of the `r sum(tb[2])` participants 
+who answered this question, a small number `r tb[5,2]` (`r tb[5,3]`%) indicated that
+`r tolower(tb[5,1])`. As such, we excluded them from this analysis. Of the 
+remaining `r sum(tb_ex[2])` respondents, `r tb_ex[1,2]` (`r tb_ex[1,3]`%) indicated 
+that open data were `r tolower(tb_ex[1,1])` for their field; `r tb_ex[2,2]` 
+(`r tb_ex[2,3]`%) indicated that they were `r tolower(tb_ex[2,1])`; `r tb_ex[3,2]` 
+(`r tb_ex[3,3]`%) indicated that they were `r tolower(tb_ex[3,1])`; 
+and `r tb_ex[4,2]` (`r tb_ex[4,3]`%) indicated that open data were `r tolower(tb_ex[4,1])` 
 important for their field. 
-
 
 ```{r data_imp_ex_pie_chart, echo = FALSE, warning = TRUE}
 

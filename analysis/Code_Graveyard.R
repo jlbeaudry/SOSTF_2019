@@ -167,6 +167,16 @@ p
 
 ###################### EFFORTS TO SPLIT OUT ASSH VS STEM RESPONDENTS ######
 
+### Discipline
+
+#d4 <- assh %>% 
+#  dplyr::count(assh) %>% 
+#   mutate (Percentage = round (n/nrow(df)*100))
+
+#dplyr::arrange(d4) %>% 
+#knitr::kable(col.names = c("Disciplines", "Frequency", "Percentage"), caption = #sprintf("Discipline Groupings of Respondents (n = %d)",nrow(df))) %>% 
+#  kable_styling(bootstrap_options = "striped", full_width = F, position = 'center')
+
 #### OS Experience ####
 ```{r os_experience_pie_assh, echo = FALSE, eval = FALSE}
 

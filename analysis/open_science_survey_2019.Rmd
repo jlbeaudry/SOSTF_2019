@@ -15,13 +15,16 @@ bibliography: Beaudry_Library.bib
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, fig.align= "center", 
-                      fig.width = 8, fig.height = 8)
+knitr::opts_chunk$set(echo = TRUE, fig.align= "center")
 options(scipen = 999)
 options(kableExtra.auto_format = TRUE) 
-  # switch to 'false' for word doc; 'true' for pdf or html
+# If I knit as a word doc:
+  # switch auto_format to 'false'; 'true' for pdf or html
+  # add 'fig.width = 8, fig.height = 8' to opts_chunk 
 
-# If knit as a pdf, include width and height parameters in the plot_ly function
+# If knit as a pdf or html:
+# switch auto_format to 'true' 
+# include width and height parameters in the plot_ly function
   #  width = 300, 
   #  height = NULL,
   # along with all other parameters
@@ -380,7 +383,8 @@ d2 <- df %>%
 d3 <-d2 [c(4,8,10,3,5,1,2,9,7,6),]
 
 d3 %>% 
-knitr::kable(col.names = c("Disciplines", "Frequency", "Percentage"), caption = sprintf("Discipline Groupings of Respondents (n = %d)",nrow(df)), 
+knitr::kable(col.names = c("Disciplines", "Frequency", "Percentage"), 
+             caption = sprintf("Discipline Groupings of Respondents (n = %d)",nrow(df)), 
               align = 'lcc') %>% 
    kable_styling(bootstrap_options = "striped", full_width = F, 
                  position = 'center',
@@ -389,7 +393,8 @@ knitr::kable(col.names = c("Disciplines", "Frequency", "Percentage"), caption = 
 
 # grouping the stem & non-stem disciples together in a new variable
 df <- df %>% 
-  mutate (assh = ifelse (discipline %in% c ("Business & Law", "ASSH"), "ASSH", "STEM"))
+  mutate (assh = ifelse 
+          (discipline %in% c ("Business & Law", "ASSH"), "ASSH", "STEM"))
 
 ```
   
@@ -1153,16 +1158,13 @@ tb <- valid_data_exp %>%
 
 ```
 
-<em> THIS TEXT NEEDS TO BE UPDATED WITH OPEN DATA </em>
-
-The following section shows how many people have experience with open data. Of 
-the `r nvalid_code_exp` participants who answered this 
-question, `r tb[1,2]` (`r tb[1,3]`%) reported that, until now, they hadn't heard 
-of open materials and/or code; `r tb[2,2]` (`r tb[2,3]`%) were aware of open
-materials and/or code, but had not used it in their own research; `r tb[3,2]` 
-(`r tb[3,3]`%) had some experience with open materials and/or code, but do not use
-them regularly; and `r tb[4,2]` (`r tb[4,3]`%) regularly use open materials and/or
-code. 
+We also asked participants about their experience with open data. Of the 
+`r sum(tb[2])` participants who answered this question, `r tb[4,2]` (`r tb[4,3]`%) 
+indicated that until now, they were unaware of open data; `r tb[1,2]` 
+(`r tb[1,3]`%) indicated that they were were aware of open data, but had not used
+it in their research; `r tb[2,2]` (`r tb[2,3]`%) indicated that they had some 
+experience with open data, but did not use them regularly; and `r tb_ex[3,2]` 
+(`r tb_ex[3,3]`%) indicated that they regularly use open data. 
 
 ```{r data_exp_pie, echo = FALSE, warning = TRUE}
 

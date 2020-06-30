@@ -183,11 +183,26 @@ simple_bar_graph <- function (the_data, label_var = "", the_title = "",
   return(p)
 }
 
+ ### META RENAME ####
+
+meta_rename <-  function(df, metadata, old, new) {
+  
+  keys   <- metadata[[deparse(substitute(old))]]
+  values <- metadata[[deparse(substitute(new))]]
+  rename_at(df, vars(keys), ~ values)
+}
+
 ```
 
 ```{r import data, include=FALSE}
 #import the data. Here I'm using the original Qualtrics data, rather than Jordy's revised one.
 df <- read_csv (here::here("data", "data_sostf.csv"))
+
+# import the metadata.
+metadata <- here::here("survey", "data", "os_metadata_concerns.csv") %>% 
+  read_csv(col_names = TRUE, skip_empty_rows = TRUE) %>% 
+  filter(!is.na(OldVariable)) %>% 
+  select(-c(MinValue:ImportID)) #does not import the extraneous variables
 ```
 
 ```{r demographics_ac_level, include=FALSE}
@@ -942,10 +957,11 @@ knitr::kable (col.names = c("Reported Experience", "Frequency", "Percentage"),
 
 ```
 
-For those XX%% participants who reported that they use open materials and/or code 
-(that is, those who reported some use or regular use)....%%%
+For those participants who reported that they use open materials and/or code 
+(that is, those who reported some use or regular use), we asked them for more 
+information about how they use open materials and/or code. 'CODE USE'
 
-<em> THIS NEEDS TO BE UPDATED </em>
+<em> THIS NEEDS TO BE COMPLETED </em>
 
 ##### Concerns about Open Materials and/or Code
 
@@ -1192,75 +1208,53 @@ knitr::kable (col.names = c("Reported Experience", "Frequency", "Percentage"),
 
 ```
 
-<em> THIS NEEDS TO BE UPDATED WITH OPEN DATA CONCERNS </em>
+For those participants who reported that they use open data 
+(that is, those who reported some use or regular use), we asked them for more 
+information about how they use open data. 'DATA USE'
 
-For those XX%% participants who reported that they use open materials and/or code 
-(that is, those who reported some use or regular use)....%%%
-
+<em> THIS NEEDS TO BE COMPLETED </em>
 ##### Concerns about Open Materials and/or Code
 
-<em> THIS NEEDS TO BE UPDATED WITH OPEN DATA CONCERNS </em>
-
-```{r data_concerns_data, echo=FALSE, warning=TRUE, eval = FALSE}
+```{r data_concerns_data, echo=FALSE, warning=TRUE, eval = TRUE}
 
 # wrangle this data so it's in long form & only includes endorsements.
 
-CodeCon_long <- df %>% 
+DataConcern_long <- df %>% 
   select (c("ParticipantNumber", 
-            "CodeCon_criticise", 
-            "CodeCon_diff_understand", 
-            "CodeCon_assistance", 
-            "CodeCon_lose_control", 
-            "CodeCon_errors", 
-            "CodeCon_credit", 
-            "CodeCon_no_con", 
-            "CodeCon_violate", 
-            "CodeCon_ip", 
+            "DataConcern_criticise":"DataConcern_scoop",
             "FORcode_2_label")) %>%  
-  pivot_longer(c("CodeCon_criticise", 
-                 "CodeCon_diff_understand", 
-                 "CodeCon_assistance", 
-                 "CodeCon_lose_control", 
-                 "CodeCon_errors", 
-                 "CodeCon_credit", 
-                 "CodeCon_no_con", 
-                 "CodeCon_violate", 
-                 "CodeCon_ip"), 
-               names_to = "CodeConcern", 
-               values_to = "CodeCon_Endorsement") %>% 
-  filter(CodeCon_Endorsement == "1")
+  select(-"DataConcern_text") %>% 
+  pivot_longer(c("DataConcern_criticise":"DataConcern_scoop"),
+               names_to = "DataConcern", 
+               values_to = "DataConcern_Endorsement") %>% 
+  filter(DataConcern_Endorsement == "1")
 
 # recode the data so the response options have proper labels
-  # create a character vector with proper labels
-code_con_key <- c (CodeCon_criticise = "Others might criticise my materials/code", 
-                     CodeCon_diff_understand = "Others might find it difficult to understand my materials/code",
-                     CodeCon_assistance = "Others might ask for my assistance with their research",
-                     CodeCon_lose_control = "I might lose control over how they are used", 
-                     CodeCon_errors = "Others might find errors in my published work", 
-                     CodeCon_credit = "I might not receive appropriate credit",
-                     CodeCon_violate = "Reuse could violate epistemological framework", 
-                     CodeCon_ip = "Issues related to intellectual property", 
-                     CodeCon_no_con = "No concerns")
- 
- # recode the values with this character vector
-CodeCon_long$CodeConcern <- recode(CodeCon_long$CodeConcern, !!!code_con_key)
+
+b <- DataConcern_long
+c <- metadata %>% 
+    filter(NewVariable != "DataConcern_text") #remove this value from metadata
+
+d <- full_join(b, c, by = c("DataConcern" = "NewVariable")) %>% 
+  rename ("DataConcern_text" = "ItemText")
 
 # getting a tibble for the counts
-c_code_con <- plyr::count(CodeCon_long$CodeConcern)
+c_data_con <- plyr::count(d$DataConcern)
 
 # to figure out how many respondents shared concerns calculate unique number of participants
-n_code_con <- length(unique(CodeCon_long$ParticipantNumber))
+n_data_con <- length(unique(d$ParticipantNumber))
 
 # create a tibble with percentages (of respondents who answered this question) & 
 # then reorder them by descending percentages
-tb <- CodeCon_long %>% 
-  dplyr::count(CodeConcern) %>% 
-  mutate(Percentage = round (n/n_code_con*100)) %>% 
-  dplyr::arrange(desc(n))
+tb <- d %>% 
+  dplyr::count(DataConcern_text) %>% 
+  mutate(Percentage = round (n/n_data_con*100)) %>% 
+  dplyr::arrange(desc(n)) 
+  # mutate_if(is.character, ~factor(.)) # make it a factor
 
 ```
 
-<em> THIS NEEDS TO BE UPDATED WITH OPEN DATA CONCERNS </em>
+<em> THIS NEEDS TO BE UPDATED WITH TEXT OPEN DATA CONCERNS </em>
 We also asked respondents if they have any concerns about making their research 
 materials and/or code open. After asking respondents to share their concerns in 
 a free text format, we provided a list of possible concerns that researchers 
@@ -1271,37 +1265,33 @@ answered this question. Of those who respondended to this question,
 concerns. The following figure presents, of those who answered this question, 
 the percentage who selected each of the concerns.  
 
-```{r data_concerns_bar, echo=FALSE, warning=TRUE, eval=FALSE}
+```{r data_concerns_bar, echo=FALSE, warning=TRUE, eval=TRUE}
 # build the bar chart
 
-# reorder the response options from lowest to highest, with concerns last
-tb2 <- tb %>% 
-  dplyr::mutate(CodeConcern = factor (CodeConcern, 
-                levels = c("Others might find errors in my published work", 
-                         "Reuse could violate epistemological framework", 
-                         "Others might ask for my assistance with their research", 
-                         "Others might criticise my materials/code", 
-                        "Others might find it difficult to understand my materials/code", 
-                         "I might lose control over how they are used", 
-                         "I might not receive appropriate credit", 
-                         "Issues related to intellectual property", 
-                         "No concerns")))
+# reorder the response options with concerns first (or should it be last?)
+
+tb2 <- tb [c(11,1,2,3,4,5,6,7,8,9,10,12),] # fix the order of responses
   # I don't get it. tb & tb2 look the same in the tibble, but the order is completely
   # different when they are graphed..
 
+tb3 <- tb [c(12,10,9,8,7,6,5,4,3,2,1,11),]
+
 # create a character vector for the colours for each bar
 cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
-          "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", "grey50")
+          "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
+          "lightskyblue3", "lightskyblue3", "lightskyblue3", "grey50")
 
 # build the bar chart
-title = sprintf("Concerns about open materials\n and/or code (n = %d)", n_code_con)
+title = sprintf("Concerns about open data (n = %d)", n_data_con)
 
 # plot the reordered data and colours. Because the data is in a tibble rather than a     
   # dataframe with counts, I could use 'geom_col' rather than 'geom_bar'(or I 
   # could use stat = "identity" with 'geom_bar')
 
-p <- ggplot(tb2) + 
-  aes(x = CodeConcern, y = Percentage) +
+#there's an issue with the order for some reason....
+
+p <- ggplot(tb3) + 
+  aes(x = DataConcern_text, y = Percentage) +
   geom_bar(stat = "identity", colour = "black", fill = cols) +
   labs (x = element_blank(),
         y = "Percentage", 

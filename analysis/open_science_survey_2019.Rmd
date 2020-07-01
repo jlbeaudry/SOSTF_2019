@@ -1250,8 +1250,15 @@ tb <- d %>%
   dplyr::count(DataConcern_text) %>% 
   mutate(Percentage = round (n/n_data_con*100)) %>% 
   dplyr::arrange(desc(n)) 
-  # mutate_if(is.character, ~factor(.)) # make it a factor
+ # mutate_if(is.character, ~factor(.)) # make it a factor
 
+d2 <- d %>% # create tibble with the Data Concern counts
+  select(DataConcern, DataConcern_text)  %>% 
+      dplyr::count(DataConcern) 
+  #  mutate_if(is.character, ~factor(.))
+
+
+tb2 <- left_join(x = tb, y = d2, by = "n") # join the two tables together
 ```
 
 <em> THIS NEEDS TO BE UPDATED WITH TEXT OPEN DATA CONCERNS </em>
@@ -1274,7 +1281,30 @@ tb2 <- tb [c(11,1,2,3,4,5,6,7,8,9,10,12),] # fix the order of responses
   # I don't get it. tb & tb2 look the same in the tibble, but the order is completely
   # different when they are graphed..
 
-tb3 <- tb [c(12,10,9,8,7,6,5,4,3,2,1,11),]
+tb3 <- tb2 [c(12,10,9,8,7,6,5,4,3,2,1,11),]
+
+# I cannot get the ordering to work, and I want to avoid typing out all of the 
+  # levels of the factor, so I'm adding another column.
+
+tb2 <- tb %>% dplyr::mutate(rank = c(12,10,9,8,7,6,5,4,3,2,1,11)) %>% 
+  dplyr::mutate(DataConcern_text = factor (DataConcern_text, levels = desc(rank)))
+
+# reorder the rows according to the DataConcern (because it has less text)
+tb3 <- tb2 %>% 
+  dplyr::mutate(DataConcern = factor(DataConcern, 
+                levels = c("DataConcern_other", 
+                        "DataConcern_devalues",
+                        "DataConcern_unfair", 
+                        "DataConcern_criticise",
+                        "DataConcern_effort", 
+                        "DataConcern_control",
+                        "DataConcern_credit",
+                        "DataConcern_scoop",
+                        "DataConcern_ip",
+                        "DataConcern_privacy",
+                        "DataConcern_ethics",
+                        "DataConcern_none"))) %>% 
+  dplyr::mutate(DataConcern_text = factor(DataConcern_text)) #turn into factors
 
 # create a character vector for the colours for each bar
 cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
@@ -1283,15 +1313,10 @@ cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3",
 
 # build the bar chart
 title = sprintf("Concerns about open data (n = %d)", n_data_con)
-
-# plot the reordered data and colours. Because the data is in a tibble rather than a     
-  # dataframe with counts, I could use 'geom_col' rather than 'geom_bar'(or I 
-  # could use stat = "identity" with 'geom_bar')
-
-#there's an issue with the order for some reason....
+caption <- tb3$DataConcern_text %>% (function(x) str_wrap(x, width = 50))
 
 p <- ggplot(tb3) + 
-  aes(x = DataConcern_text, y = Percentage) +
+  aes(x = DataConcern, y = Percentage, label = DataConcern_text) +
   geom_bar(stat = "identity", colour = "black", fill = cols) +
   labs (x = element_blank(),
         y = "Percentage", 
@@ -1301,6 +1326,10 @@ p <- ggplot(tb3) +
   theme_classic(base_size = 12) + 
   theme(plot.title = element_text(hjust = 0.5)) # centre the title
 p
+
+
+### FUCK! I CAN'T FIGURE OUT HOW TO ARRANGE THIS ACCORDING TO DATACONCERN, BUT USE
+### THE LABELS FROM DATACONCERN_TEXT & now the order has changed!! ARGH.
 
 ```
 

@@ -975,13 +975,11 @@ CodeUse_long <- df %>%
   # there must be a way to only select the rows that "start with" a character string
   # but for now this works
 
-
-b <- CodeUse_long
 c <- metadata %>% 
     filter(Scale == "CodeUse") %>% 
     filter (NewVariable != "CodeUse_text")
 
-d <- full_join(b, c, by = c("CodeUse" = "NewVariable")) %>% 
+d <- full_join(CodeUse_long, c, by = c("CodeUse" = "NewVariable")) %>% 
   rename ("CodeUse_text" = "ItemText")
 
 # getting a tibble for the counts
@@ -1004,12 +1002,33 @@ d2 <- d %>% # create tibble with the Code Use counts
   #  mutate_if(is.character, ~factor(.))
 
 # join the two tables together
-tb2 <- left_join(x = tb, y = d2, by = "n") 
+tb2 <- left_join(x = tb, y = d2, by = "n") %>% 
+  dplyr::arrange(desc(n))
+
 ```
 
 For those participants who reported that they use open materials and/or code 
 (that is, those who reported some use or regular use), we asked them for more 
-information about how they use open materials and/or code. 'CODE USE' 
+information about how they have used open materials and/or code in previous work. 
+Respondents were allowed to select as many uses as applied. Of these `r n_code_use`
+researchers, the most popular response (`r tb2[1,3]`%) was that they used other 
+researchers' open materials and/or code in their own research. Few researchers 
+reported using open materials and/or code when peer reviewing other researchers'
+work (`r tb2[4,3]`%). 
+
+```{r code_use_table, echo=FALSE, warning=TRUE}
+
+tb2 <-tb2 %>% select(-CodeUse) # remove the CodeUse column
+
+tb2 %>% 
+knitr::kable (col.names = c("Reported Use", "Frequency", "Percentage"), 
+              caption = sprintf("Reported Use of Open Materials and/or Code (n = %d)", n_code_use), 
+              align = 'lcc') %>% 
+   kable_styling(bootstrap_options = "striped", full_width = F, 
+                 position = 'center',
+                latex_options = "hold_position")
+# html output = font_size = 14 # insert in kable styling
+```
 
 <em> THIS NEEDS TO BE COMPLETED </em>
 
@@ -1281,12 +1300,11 @@ DataConcern_long <- df %>%
 
 # recode the data so the response options have proper labels
 
-b <- DataConcern_long
 c <- metadata %>% 
     filter(Scale == "DataConcern") %>% 
     filter(NewVariable != "DataConcern_text") #remove this value from metadata
 
-d <- full_join(b, c, by = c("DataConcern" = "NewVariable")) %>% 
+d <- full_join(DataConcern_long, c, by = c("DataConcern" = "NewVariable")) %>% 
   rename ("DataConcern_text" = "ItemTextShort")
 
 # getting a tibble for the counts

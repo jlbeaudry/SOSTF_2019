@@ -1210,10 +1210,10 @@ knitr::kable (col.names = c("Reported Experience", "Frequency", "Percentage"),
 
 For those participants who reported that they use open data 
 (that is, those who reported some use or regular use), we asked them for more 
-information about how they use open data. 'DATA USE'
+information about how they use open data. 'DATA USE' ...
+<em> THIS NEEDS TO BE COMPLETED IF WE WANT IT </em>
 
-<em> THIS NEEDS TO BE COMPLETED </em>
-##### Concerns about Open Materials and/or Code
+##### Concerns about Open Data
 
 ```{r data_concerns_data, echo=FALSE, warning=TRUE, eval = TRUE}
 
@@ -1236,7 +1236,7 @@ c <- metadata %>%
     filter(NewVariable != "DataConcern_text") #remove this value from metadata
 
 d <- full_join(b, c, by = c("DataConcern" = "NewVariable")) %>% 
-  rename ("DataConcern_text" = "ItemText")
+  rename ("DataConcern_text" = "ItemTextShort")
 
 # getting a tibble for the counts
 c_data_con <- plyr::count(d$DataConcern)
@@ -1257,66 +1257,52 @@ d2 <- d %>% # create tibble with the Data Concern counts
       dplyr::count(DataConcern) 
   #  mutate_if(is.character, ~factor(.))
 
-
-tb2 <- left_join(x = tb, y = d2, by = "n") # join the two tables together
+# join the two tables together
+tb2 <- left_join(x = tb, y = d2, by = "n") 
 ```
 
-<em> THIS NEEDS TO BE UPDATED WITH TEXT OPEN DATA CONCERNS </em>
-We also asked respondents if they have any concerns about making their research 
-materials and/or code open. After asking respondents to share their concerns in 
-a free text format, we provided a list of possible concerns that researchers 
-could have about sharing their materials and/or code. Respondents were able to 
-select as many concerns as they liked. A total of `r n_code_con` respondents 
-answered this question. Of those who respondended to this question,
-`r tb [4,2]` (`r tb [4,3]`%) reported that they do not share any of the listed 
+We also asked respondents if they have any concerns about making their data open.
+After asking respondents to share their concerns in a free text format, we 
+provided a list of possible concerns that researchers could have about sharing 
+their data. Respondents were able to select as many concerns as they liked. 
+A total of `r n_data_con` respondents answered this question. Of those who respondended,
+`r tb2 [11,2]` (`r tb2 [11,3]`%) reported that they do not share any of the listed 
 concerns. The following figure presents, of those who answered this question, 
 the percentage who selected each of the concerns.  
 
 ```{r data_concerns_bar, echo=FALSE, warning=TRUE, eval=TRUE}
+
 # build the bar chart
 
-# reorder the response options with concerns first (or should it be last?)
-
-tb2 <- tb [c(11,1,2,3,4,5,6,7,8,9,10,12),] # fix the order of responses
-  # I don't get it. tb & tb2 look the same in the tibble, but the order is completely
-  # different when they are graphed..
-
-tb3 <- tb2 [c(12,10,9,8,7,6,5,4,3,2,1,11),]
-
-# I cannot get the ordering to work, and I want to avoid typing out all of the 
-  # levels of the factor, so I'm adding another column.
-
-tb2 <- tb %>% dplyr::mutate(rank = c(12,10,9,8,7,6,5,4,3,2,1,11)) %>% 
-  dplyr::mutate(DataConcern_text = factor (DataConcern_text, levels = desc(rank)))
-
-# reorder the rows according to the DataConcern (because it has less text)
+# reorder the rows according to the DataConcern_text 
 tb3 <- tb2 %>% 
-  dplyr::mutate(DataConcern = factor(DataConcern, 
-                levels = c("DataConcern_other", 
-                        "DataConcern_devalues",
-                        "DataConcern_unfair", 
-                        "DataConcern_criticise",
-                        "DataConcern_effort", 
-                        "DataConcern_control",
-                        "DataConcern_credit",
-                        "DataConcern_scoop",
-                        "DataConcern_ip",
-                        "DataConcern_privacy",
-                        "DataConcern_ethics",
-                        "DataConcern_none"))) %>% 
-  dplyr::mutate(DataConcern_text = factor(DataConcern_text)) #turn into factors
+  dplyr::mutate(DataConcern_text = factor(DataConcern_text, 
+                levels = c("Other", 
+                           "It devalues research data collection", 
+                           "Unfair for other researchers to benefit from my data collection", 
+                          "Others might criticise my data and/or research practices", 
+                           "Too much time or effort", 
+                           "I might lose control over how my data are being used",
+                           "I might not receive appropriate credit for my data collection", 
+                           "Others could use my data for another study that I intended to conduct in the future", 
+                           "Issues related to intellectual property", 
+                           "Issues related to privacy", 
+                           "Issues related to ethics", 
+                           "No concerns")))
+
+
 
 # create a character vector for the colours for each bar
 cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
           "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
           "lightskyblue3", "lightskyblue3", "lightskyblue3", "grey50")
 
+                    
 # build the bar chart
 title = sprintf("Concerns about open data (n = %d)", n_data_con)
-caption <- tb3$DataConcern_text %>% (function(x) str_wrap(x, width = 50))
 
 p <- ggplot(tb3) + 
-  aes(x = DataConcern, y = Percentage, label = DataConcern_text) +
+  aes(x = DataConcern_text, y = Percentage) +
   geom_bar(stat = "identity", colour = "black", fill = cols) +
   labs (x = element_blank(),
         y = "Percentage", 
@@ -1327,16 +1313,132 @@ p <- ggplot(tb3) +
   theme(plot.title = element_text(hjust = 0.5)) # centre the title
 p
 
+```
 
-### FUCK! I CAN'T FIGURE OUT HOW TO ARRANGE THIS ACCORDING TO DATACONCERN, BUT USE
-### THE LABELS FROM DATACONCERN_TEXT & now the order has changed!! ARGH.
+```{r data_concerns_bar_play, echo=FALSE, warning=TRUE, eval=FALSE}
+# build the bar chart
+
+# reorder the rows according to the DataConcern (because it has less text)
+tb3 <- tb2 %>% 
+  dplyr::mutate(DataConcern = factor(DataConcern, 
+                                     levels = c("DataConcern_other", 
+                                                "DataConcern_devalues",
+                                                "DataConcern_unfair", 
+                                                "DataConcern_criticise",
+                                                "DataConcern_effort", 
+                                                "DataConcern_control",
+                                                "DataConcern_credit",
+                                                "DataConcern_scoop",
+                                                "DataConcern_ip",
+                                                "DataConcern_privacy",
+                                                "DataConcern_ethics",
+                                                "DataConcern_none"))) %>% 
+  dplyr::mutate(DataConcern_text = factor(DataConcern_text)) #turn into factors
+
+
+https://raw.githubusercontent.com/janhove/janhove.github.io/master/RCode/sortLvls.R
+
+# HIS ORIGINAL CODE
+
+sortLvls.fnc <- function(oldFactor, levelOrder) {
+  if(!is.factor(oldFactor)) stop("The variable you want to reorder isn't a factor.")
+  
+  if(!is.numeric(levelOrder)) stop("'order' should be a numeric vector.")
+  
+  if(max(levelOrder) > length(levels(oldFactor))) stop("The largest number in 'order' can't be larger than the number of levels in the factor.")
+  
+  if(length(levelOrder) > length(levels(oldFactor))) stop("You can't have more elements in 'order' than there are levels in the factor.")
+  
+  if(length(levelOrder) == length(levels(oldFactor))) {
+    reorderedFactor <- factor(oldFactor, levels = levels(oldFactor)[levelOrder])
+  }
+  
+  if(length(levelOrder) < length(levels(oldFactor))) {
+    levelOrderAll <- c(levelOrder, (1:length(levels(oldFactor)))[-levelOrder])
+    reorderedFactor <- factor(oldFactor, levels = levels(oldFactor)[levelOrderAll])
+  }
+  
+  return(reorderedFactor)
+}
+
+### ME PLAYING WITH IT! IT WORKS, in theory, BUT IT STILL DOESN'T FORCE GGPLOT TO USE THE TEXT
+
+sortLvls.fnc <- function(oldFactor, levelOrderFctr) {
+  if(!is.factor(oldFactor)) stop("The variable you want to reorder isn't a factor.")
+  
+  if(!is.factor(levelOrderFctr)) stop("The level variable you want to use isn't a factor.")
+  
+  if(length(levelOrderFctr) == length(levels(oldFactor))) {
+    reorderedFactor <- factor(oldFactor, levels = levels(oldFactor)[levelOrderFctr])
+  }
+  
+  return(reorderedFactor)
+}
+
+tb3$DataConcern_text_order <- sortLvls.fnc(oldFactor = tb3$DataConcern_text, levelOrderFctr = tb3$DataConcern)
+
+# HIS ORIGINAL CODE
+
+sortLvlsByVar.fnc <- function(oldFactor, sortingVariable, ascending = TRUE) {
+  
+  require("dplyr")
+  require("magrittr")
+  
+  # Combine into data frame
+  df <- data.frame(oldFactor, sortingVariable)
+  
+  ###
+  ### If you want to sort the levels by, say, the median, sd etc. instead of the mean,
+  ### just change 'mean(sortingVariable)' below to, say, 'median(sortingVariable)'.
+  ###
+  
+  # Compute average of sortingVariable and arrange (ascending)
+  if (ascending == TRUE) {
+    df_av <- df %>% group_by(oldFactor) %>% summarise(meanSortingVariable = mean(sortingVariable)) %>% 
+      arrange(meanSortingVariable)
+  }
+  
+  # Compute average of sortingVariable and arrange (descending)
+  if (ascending == FALSE) {
+    df_av <- df %>% group_by(oldFactor) %>% summarise(meanSortingVariable = mean(sortingVariable)) %>% 
+      arrange(desc(meanSortingVariable))
+  }
+  
+  # Return factor with new level order
+  newFactor <- factor(oldFactor, levels = df_av$oldFactor)
+  return(newFactor)
+}
+
+caption <- tb3$DataConcern_text_order %>% (function(x) str_wrap(x, width = 50))
+
+
+# create a character vector for the colours for each bar
+cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
+          "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
+          "lightskyblue3", "lightskyblue3", "lightskyblue3", "grey50")
+
+            
+# build the bar chart
+title = sprintf("Concerns about open data (n = %d)", n_data_con)
+
+p <- ggplot(tb3) + 
+  aes(x = DataConcern, y = Percentage) +
+  geom_bar(stat = "identity", colour = "black", fill = cols) +
+  labs (x = element_blank(),
+        y = "Percentage", 
+        title = title) +
+  coord_flip(ylim = c(0,60)) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 50)) + #wrap the labels
+  theme_classic(base_size = 12) + 
+  theme(plot.title = element_text(hjust = 0.5)) # centre the title
+p
 
 ```
 
 ```{r skim df, eval=FALSE, include=FALSE}
-#These are chunks from the course I took, that I'm keeping now just for reference
 
-#As a quick first pass, we can use the 'skim()' function to get a simple overview of each variable:
+# These are chunks from the course I took, that I'm keeping now just for reference
+# As a quick first pass, we can use the 'skim()' function to get a simple overview of each variable:
 #skim(df)
 
 # Now learning about group_by which appears to be a wonderful development!

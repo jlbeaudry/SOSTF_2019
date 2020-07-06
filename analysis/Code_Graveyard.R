@@ -167,6 +167,16 @@ p
 
 ###################### EFFORTS TO SPLIT OUT ASSH VS STEM RESPONDENTS ######
 
+### Discipline
+
+#d4 <- assh %>% 
+#  dplyr::count(assh) %>% 
+#   mutate (Percentage = round (n/nrow(df)*100))
+
+#dplyr::arrange(d4) %>% 
+#knitr::kable(col.names = c("Disciplines", "Frequency", "Percentage"), caption = #sprintf("Discipline Groupings of Respondents (n = %d)",nrow(df))) %>% 
+#  kable_styling(bootstrap_options = "striped", full_width = F, position = 'center')
+
 #### OS Experience ####
 ```{r os_experience_pie_assh, echo = FALSE, eval = FALSE}
 
@@ -227,5 +237,118 @@ p_assh <- simple_pie_chart(the_data = d_assh, label_var = "PreRegImp",
                            colours,the_quantity = "percent")
 p_assh
 ```
+#### TRYING TO RENAME VALUES WITHIN VARIABLES
+
+# don't do this...old approach...
+# recode the data so the response options have proper labels
+# create a character vector with proper labels
+code_con_key <- c (CodeCon_criticise = "Others might criticise my materials/code", 
+                   CodeCon_diff_understand = "Others might find it difficult to understand my materials/code",
+                   CodeCon_assistance = "Others might ask for my assistance with their research",
+                   CodeCon_lose_control = "I might lose control over how they are used", 
+                   CodeCon_errors = "Others might find errors in my published work", 
+                   CodeCon_credit = "I might not receive appropriate credit",
+                   CodeCon_violate = "Reuse could violate epistemological framework", 
+                   CodeCon_ip = "Issues related to intellectual property", 
+                   CodeCon_no_con = "No concerns")
+
+#data_con_var <- metadata$NewVariable
+#data_con_text <- metadata$ItemText
+#a <- paste0(data_con_var, data_con_text, sep = " = ")
+#data_con_key <- str_c(data_con_var, sep = " = ", "data_con_text")
+
+#data_con_key <- 
+
+#DataConcern_long
 
 
+keys   <- metadata[[deparse(substitute(old))]]
+values <- metadata[[deparse(substitute(new))]]
+rename_at(df, vars(keys), ~ values)
+
+# recode the values with this character vector
+CodeCon_long$CodeConcern <- recode(CodeCon_long$CodeConcern, !!!code_con_key)
+
+DataConcern_long$DataConcern_text <- DataConcern_long$DataConcern
+DataConcern_long$DataConcern_text <- recode(DataConcern_long$DataConcern_text, !!!data_con_key)
+
+b <- DataConcern_long
+b$DataConcern_text <- factor(b$DataConcern_text)
+c <- metadata
+
+b$DataConcern_text <-c$ItemText[match(b$DataConcern_text, c$NewVariable)]
+
+
+meta_rename <-  function(df, metadata, old, new) {
+  
+  keys   <- metadata[[deparse(substitute(old))]]
+  values <- metadata[[deparse(substitute(new))]]
+  rename_at(df, vars(keys), ~ values)
+}
+
+# this works! (and no need to force it to factor, yet, but will likely need it later)
+DataConcern_long$DataConcern_text <- metadata$ItemText[match(DataConcern_long$DataConcern, metadata$NewVariable)]
+
+# but trying to do it in tidyverse
+
+b <- DataConcern_long
+c <- metadata
+
+#I'm sure I could turn this into a function, but I don't have the time now
+
+d <- full_join(b, c, by = c("DataConcern" = "NewVariable")) %>% 
+  rename ("DataConcern_text" = "ItemText")
+
+
+# need to figure out an easier way to rename the variables to use the item text
+data_con <- meta_rename(DataConcern_long, metadata, old = NewVariable, new = ItemText)
+
+
+#### DESPERATELY TRYING TO FIGURE OUT HOW TO REARRANGE THE OPEN DATA CONCERNS BY 
+  # ONE VARIABLE (DATACONCERN) WHILE USING ANOTHER VARIABLE FOR THE LABELS (DATACONCERN_TEXT)
+  # NO MATTER WHAT I DID, THE ORDER CHANGED WHEN I USED THE TEXT VARIABLE...
+  # I EVENTUALLY GAVE UP AND JUST ORDERED THE FACTOR ACCORDING TO THE TEXT VARIABLE
+
+# reorder the rows according to the DataConcern (because it has less text)
+tb3 <- tb2 %>% 
+  dplyr::mutate(DataConcern = factor(DataConcern, 
+                                     levels = c("DataConcern_other", 
+                                                "DataConcern_devalues",
+                                                "DataConcern_unfair", 
+                                                "DataConcern_criticise",
+                                                "DataConcern_effort", 
+                                                "DataConcern_control",
+                                                "DataConcern_credit",
+                                                "DataConcern_scoop",
+                                                "DataConcern_ip",
+                                                "DataConcern_privacy",
+                                                "DataConcern_ethics",
+                                                "DataConcern_none"))) %>% 
+  dplyr::mutate(DataConcern_text = factor(DataConcern_text)) #turn into factors
+
+tb5 <- tb2 %>% 
+  dplyr::mutate(DataConcern = factor(DataConcern)) %>% 
+  relevel(DataConcern, "DataConcern_none") %>% 
+  reorder()
+
+DataConcern_fct <- factor(tb2$DataConcern)
+relevel(tb2, DataConcern_fct, "DataConcern_none")
+
+con_short <- tb3$DataConcern
+con_text <- tb3$DataConcern_text
+plyr::rename(tb3$DataConcern, con_text)
+
+# ??? rename in dplyr??
+
+tb4 <- vars_select(names(tb3), DataConcern = DataConcern_text)
+
+con_short <- tb3$DataConcern
+con_text <- tb3$DataConcern_text
+plyr::rename(tb3$DataConcern, con_text)
+
+# ??? rename in dplyr??
+
+tb4 <- vars_select(names(tb3), DataConcern = DataConcern_text)
+
+# this caption actually works, but the order still changed
+caption2 <- tb3$DataConcern_text %>% (function(x) str_wrap(x, width = 50))

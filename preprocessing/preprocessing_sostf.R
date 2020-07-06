@@ -3,9 +3,10 @@ library(plyr)
 library(tidyverse)
 library(tools)
 
-####### READ IN DATA FILE ############
-  
-# modify Ling's 'read_qualtrics' function to remove 'janitor_names'
+####### FUNCTIONS ############
+#FROM MATHEW LING'S MISINFORMATION PACKAGE ON GITHUB
+
+# modify Mathew Ling's 'read_qualtrics' function to remove 'janitor_names'
 read_qualtrics <- function(file, legacy = TRUE) {
   a <- readr::read_csv(file)
   if (legacy == FALSE) {
@@ -15,6 +16,17 @@ read_qualtrics <- function(file, legacy = TRUE) {
   }
   a %>% readr::type_convert(trim_ws = TRUE)
 }
+
+# Mathew Ling's 'meta_rename' function 
+
+meta_rename <-  function(df, metadata, old, new) {
+  
+  keys   <- metadata[[deparse(substitute(old))]]
+  values <- metadata[[deparse(substitute(new))]]
+  rename_at(df, vars(keys), ~ values)
+}
+
+####### READ IN DATA FILE ############
 
 # laod data with the 'read_qualtrics' function
 
@@ -32,6 +44,10 @@ df_for <- here::here("survey", "data", "OS_Data_ID_Not_Legacy.csv") %>%
 
 df <- df %>% left_join(df_for, by = "ParticipantNumber")
 
+# load in metadata for concern variables
+metadata <- here::here("survey", "data", "os_metadata_concerns.csv") %>% 
+  read_csv(col_names = TRUE, skip_empty_rows = TRUE) %>% 
+  filter(!is.na(OldVariable))
 
 ############# CLEANING THE DATA #####################
 
@@ -92,7 +108,7 @@ df$FORcode_2_label <- toTitleCase(tolower(df$FORcode_2_label))
 df$FORcode_2_num <- as.numeric(df$FORcode_2_num)
 df$FORcode_4_num <- as.numeric(df$FORcode_4_num)
 
-  # then recode according to discipline 
+  # then recode according to discipline [CHECK OUT "CASE WHEN"]
 
 df <- df %>% 
   mutate (discipline = ifelse (FORcode_2_num %in% c('14','15','18'), "Business & Law",
@@ -104,6 +120,7 @@ df <- df %>%
                        ifelse (FORcode_2_num %in% '11', "Medical & Health Sciences", 
                        ifelse (FORcode_2_num %in% '17', "Psyc & Cog Sciences",
                        ifelse (FORcode_2_num %in% c('12', '99'), "Other", "Not Specified"))))))))))
+
 
 # View the mapping from FOR to discipline & see the number of folks in each FOR 
   # code group (and then ungroup again)
@@ -133,11 +150,15 @@ df$OverallExp_num <- factor(df$OverallExperience)
 
 df$PreRegImp_num_o <- factor(df$PreRegImp) #name as 'original' so we can reverse code it next
 
-df$PreregExp1_num <- factor(df$PreregExp1) 
+df$PreRegExp_num <- factor(df$PreregExp1) 
 
 df$CodeImp_num_o <- factor(df$CodeImp) #name as 'original' so we can reverse code it next
 
 df$CodeExp_num <- factor(df$CodeExp) 
+
+df$DataExp_num <- factor(df$OpenDataExp)
+
+df$DataImp_num_o <- factor(df$OpenDataImp) #name as 'original' so we can reverse code it next
 
 # reverse code `importance` variables so lower values = less importance
 
@@ -151,8 +172,13 @@ df$CodeImp_num <- df$CodeImp_num_o %>%
     c("1", "2", "3", "4"), 
     c("4", "3", "2", "1"))
 
+df$DataImp_num <- df$DataImp_num_o %>% 
+  mapvalues(
+    c("1", "2", "3", "4"), 
+    c("4", "3", "2", "1"))
 
-# recode preregistration concerns
+
+# recode preregistration concerns & make them factors
 df$PreRegCon_delay <- factor(df$PreregConcern_4)
 df$PreRegCon_look <- factor(df$PreregConcern_5)
 df$PreRegCon_prevent_exp <- factor(df$PreregConcern_6)
@@ -174,6 +200,11 @@ df$CodeCon_no_con <- factor(df$CodeConcern_12)
 df$CodeCon_violate <- factor(df$CodeConcern_13)
 df$CodeCon_ip <- factor(df$CodeConcern_14)
 
+# recode open data concerns (eventually all of the 'concerns' recoding will 
+  # be done via this function)
+
+df <- meta_rename(df, metadata, old = OldVariable, new = NewVariable)
+
 # relabel number with text labels for levels
 
 df$crisis <- df$crisis_num %>% 
@@ -193,7 +224,7 @@ df$PreRegImp <- df$PreRegImp_num %>%
        "Extremely important", "Somewhat important", "Somewhat unimportant", 
        "Not at all"))
 
-df$PreregExp1 <- df$PreregExp1_num %>% 
+df$PreRegExp <- df$PreRegExp_num %>% 
   mapvalues(
     c("1", "2", "3", "4"), 
     c("Unaware", "Aware, But Not Used", "Some Experience", "Reg Use"))
@@ -205,11 +236,22 @@ df$CodeImp <- df$CodeImp_num %>%
        "Extremely important", "Somewhat important", "Somewhat unimportant", 
        "Not at all"))
 
-df$CodeExp <- df$CodeExp %>%
+df$CodeExp <- df$CodeExp_num %>%
   mapvalues(
     c("1", "2", "3", "4"),
     c("Unaware", "Aware, But Not Used", "Some Use", "Regular Use"))
 
+df$DataImp <- df$DataImp_num %>% 
+  mapvalues(
+    c ("0", "4", "3", "2", "1"),
+    c ("Research publications in my field are not based on data", 
+       "Extremely important", "Somewhat important", "Somewhat unimportant", 
+       "Not at all"))
+
+df$DataExp <- df$DataExp_num %>%
+  mapvalues(
+    c("1", "2", "3", "4"),
+    c("Unaware", "Aware, But Not Used", "Some Use", "Regular Use"))
 
 
 ## RECODE ACADEMIC LEVELS ##
@@ -260,7 +302,8 @@ df <- df %>%
   # transform into factor
   df$AcLevel_Label <- factor(df$AcLevel_Label) 
   
-
+  
+  
 ################### WRITE DATA TO CSV #############
 
 # when done recoding, write the data to a new file

@@ -304,4 +304,51 @@ d <- full_join(b, c, by = c("DataConcern" = "NewVariable")) %>%
 data_con <- meta_rename(DataConcern_long, metadata, old = NewVariable, new = ItemText)
 
 
+#### DESPERATELY TRYING TO FIGURE OUT HOW TO REARRANGE THE OPEN DATA CONCERNS BY 
+  # ONE VARIABLE (DATACONCERN) WHILE USING ANOTHER VARIABLE FOR THE LABELS (DATACONCERN_TEXT)
+  # NO MATTER WHAT I DID, THE ORDER CHANGED WHEN I USED THE TEXT VARIABLE...
+  # I EVENTUALLY GAVE UP AND JUST ORDERED THE FACTOR ACCORDING TO THE TEXT VARIABLE
 
+# reorder the rows according to the DataConcern (because it has less text)
+tb3 <- tb2 %>% 
+  dplyr::mutate(DataConcern = factor(DataConcern, 
+                                     levels = c("DataConcern_other", 
+                                                "DataConcern_devalues",
+                                                "DataConcern_unfair", 
+                                                "DataConcern_criticise",
+                                                "DataConcern_effort", 
+                                                "DataConcern_control",
+                                                "DataConcern_credit",
+                                                "DataConcern_scoop",
+                                                "DataConcern_ip",
+                                                "DataConcern_privacy",
+                                                "DataConcern_ethics",
+                                                "DataConcern_none"))) %>% 
+  dplyr::mutate(DataConcern_text = factor(DataConcern_text)) #turn into factors
+
+tb5 <- tb2 %>% 
+  dplyr::mutate(DataConcern = factor(DataConcern)) %>% 
+  relevel(DataConcern, "DataConcern_none") %>% 
+  reorder()
+
+DataConcern_fct <- factor(tb2$DataConcern)
+relevel(tb2, DataConcern_fct, "DataConcern_none")
+
+con_short <- tb3$DataConcern
+con_text <- tb3$DataConcern_text
+plyr::rename(tb3$DataConcern, con_text)
+
+# ??? rename in dplyr??
+
+tb4 <- vars_select(names(tb3), DataConcern = DataConcern_text)
+
+con_short <- tb3$DataConcern
+con_text <- tb3$DataConcern_text
+plyr::rename(tb3$DataConcern, con_text)
+
+# ??? rename in dplyr??
+
+tb4 <- vars_select(names(tb3), DataConcern = DataConcern_text)
+
+# this caption actually works, but the order still changed
+caption2 <- tb3$DataConcern_text %>% (function(x) str_wrap(x, width = 50))

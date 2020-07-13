@@ -47,12 +47,12 @@ CodeUse_6,factor,CodeUse_peer,I have used other researchers' open materials and/
 ,,,,,,,,,,
 ,,,,,,,,,,
 ,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
+OpenDataUse_1,factor,DataUse_useOthers,"I have used open data from other sources (e.g., researchers, government, etc.) in my research",,,,,,,DataUse
+OpenDataUse_2,factor,DataUse_mine,I have made my research data open,,,,,,,DataUse
+OpenDataUse_3,factor,DataUse_peer,I have used open data when peer reviewing other researchers' work,,,,,,,DataUse
+OpenDataUse_4,factor,DataUse_reading,I have used open data when reading other researchers' work,,,,,,,DataUse
+OpenDataUse_5,factor,DataUse_other,Other,,,,,,,DataUse
+OpenDataUse_5_TEXT,factor,DataUse_text,Other: Text,,,,,,,DataUse
 ,,,,,,,,,,
 OpenDataConcern_1,factor,DataConcern_criticise,Other researchers might criticise my data and/or research practices,Others might criticise my data and/or research practices,,,,,,DataConcern
 OpenDataConcern_2,factor,DataConcern_ip,There could be issues related to intellectual property,Issues related to intellectual property,,,,,,DataConcern

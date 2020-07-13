@@ -45,6 +45,7 @@ library(ggbeeswarm)
 library(plotly)
 library(RColorBrewer)
 library(kableExtra)
+library(datapasta)
 ```
 
 ```{r function_defs, include=FALSE}
@@ -1754,8 +1755,8 @@ tb <- d %>%
   # variable to name the actual columns in the tables. Otherwise, skip this.
 
 d2 <- d %>% # create tibble with the Data Use counts
-  select(DataUse, DataUse_text)  %>% 
-      dplyr::count(DataUse) 
+  select(PrePubUse, PrePubUse_text)  %>% 
+      dplyr::count(PrePubUse) 
   #  mutate_if(is.character, ~factor(.))
 
 # join the two tables together
@@ -1788,43 +1789,42 @@ knitr::kable (col.names = c("Reported Use", "Frequency", "Percentage"),
 # html output = font_size = 14 # insert in kable styling
 ```
 
-<EM> NEEDS TO BE UPDATED </EM>
-##### Concerns about Prepublication Archives
+##### Concerns about Pre-publication Archiving
 
 ```{r prepub_concerns_data, echo=FALSE, warning=TRUE, eval = TRUE}
 
 # wrangle this data so it's in long form & only includes endorsements.
 
-DataConcern_long <- df %>% 
+PrePubConcern_long <- df %>% 
   select (c("ParticipantNumber", 
-            "DataConcern_criticise":"DataConcern_scoop",
+            "PrePubConcern_policy":"PrePubConcern_none",
             "FORcode_2_label")) %>%  
-  select(-"DataConcern_text") %>% 
-  pivot_longer(c("DataConcern_criticise":"DataConcern_scoop"),
-               names_to = "DataConcern", 
-               values_to = "DataConcern_Endorsement") %>% 
-  filter(DataConcern_Endorsement == "1")
+  select(-"PrePubConcern_text") %>% 
+  pivot_longer(c("PrePubConcern_policy":"PrePubConcern_none"),
+               names_to = "PrePubConcern", 
+               values_to = "PrePubConcern_Endorsement") %>% 
+  filter(PrePubConcern_Endorsement == "1")
 
 # recode the data so the response options have proper labels
 
 c <- metadata %>% 
-    filter(Scale == "DataConcern") %>% 
-    filter(NewVariable != "DataConcern_text") #remove this value from metadata
+    filter(Scale == "PrePubConcern") %>% 
+    filter(NewVariable != "PrePubConcern_text") #remove this value from metadata
 
-d <- full_join(DataConcern_long, c, by = c("DataConcern" = "NewVariable")) %>% 
-  rename ("DataConcern_text" = "ItemTextShort")
+d <- full_join(PrePubConcern_long, c, by = c("PrePubConcern" = "NewVariable")) %>% 
+  rename ("PrePubConcern_text" = "ItemTextShort")
 
 # getting a tibble for the counts
-c_data_con <- plyr::count(d$DataConcern)
+c_prepub_con <- plyr::count(d$PrePubConcern)
 
 # to figure out how many respondents shared concerns calculate unique number of participants
-n_data_con <- length(unique(d$ParticipantNumber))
+n_prepub_con <- length(unique(d$ParticipantNumber))
 
 # create a tibble with percentages (of respondents who answered this question) & 
 # then reorder them by descending percentages
 tb <- d %>% 
-  dplyr::count(DataConcern_text) %>% 
-  mutate(Percentage = round (n/n_data_con*100)) %>% 
+  dplyr::count(PrePubConcern_text) %>% 
+  mutate(Percentage = round (n/n_prepub_con*100)) %>% 
   dplyr::arrange(desc(n)) 
  # mutate_if(is.character, ~factor(.)) # make it a factor
 
@@ -1833,69 +1833,62 @@ tb <- d %>%
   # variable to name the actual columns in the tables. Otherwise, skip this.
 
 d2 <- d %>% # create tibble with the Data Concern counts
-  select(DataConcern, DataConcern_text)  %>% 
-      dplyr::count(DataConcern) 
+  select(PrePubConcern, PrePubConcern_text)  %>% 
+      dplyr::count(PrePubConcern) 
   #  mutate_if(is.character, ~factor(.))
 
 # join the two tables together
 tb2 <- left_join(x = tb, y = d2, by = "n") 
 ```
 
-<EM> NEEDS TO BE UPDATED </EM>
-
-We also asked respondents if they have any concerns about making their data open.
-After asking respondents to share their concerns in a free text format, we 
-provided a list of possible concerns that researchers could have about sharing 
-their data. Respondents were able to select as many concerns as they liked. 
-A total of `r n_data_con` respondents answered this question. Of those who respondended,
-`r tb2 [11,2]` (`r tb2 [11,3]`%) reported that they do not share any of the listed 
+We asked all respondents if they have any concerns about uploading a manuscript
+to a pre-publication archive before submitting it for peer review. After asking 
+respondents to share their concerns in a free text format, we provided a list of 
+possible concerns that researchers could have about engaging in this practice. 
+Respondents were able to select as many concerns as they liked. A total of 
+`r n_prepub_con` respondents answered this question. Of those who respondended,
+`r tb [6,2]` (`r tb [6,3]`%) reported that they do not share any of the listed 
 concerns. The following figure presents, of those who answered this question, 
 the percentage who selected each of the concerns.  
+
+<EM> NEEDS TO BE UPDATED </EM>
 
 ```{r prepub_concerns_bar, echo=FALSE, warning=TRUE, eval=TRUE}
 
 # build the bar chart
 
-# reorder the rows according to the DataConcern_text 
-tb3 <- tb2 %>% 
-  dplyr::mutate(DataConcern_text = factor(DataConcern_text, 
+# reorder the rows according to the PrePubConcern_text 
+tb2 <- tb %>% 
+  dplyr::mutate(PrePubConcern_text = factor(PrePubConcern_text, 
                 levels = c("Other", 
-                           "It devalues research data collection", 
-                           "Unfair for other researchers to benefit from my data collection", 
-                          "Others might criticise my data and/or research practices", 
-                           "Too much time or effort", 
-                           "I might lose control over how my data are being used",
-                           "I might not receive appropriate credit for my data collection", 
-                           "Others could use my data for another study that I intended to conduct in the future", 
-                           "Issues related to intellectual property", 
-                           "Issues related to privacy", 
-                           "Issues related to ethics", 
+                           "Others could see differences between the original conception and the ultimately published work",
+                           "Making my work available pre-publication might reduce citations of the ultimately published work",
+                           "Other people might copy my research and publish it before I do",
+                            "Non-peer-reviewed findings might add noise to the literature",
+                           "Some journals might not publish the uploaded manuscript",
                            "No concerns")))
 
-
-
 # create a character vector for the colours for each bar
-cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
-          "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
+cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", 
           "lightskyblue3", "lightskyblue3", "lightskyblue3", "grey50")
-
                     
 # build the bar chart
-title = sprintf("Concerns about open data (n = %d)", n_data_con)
+title = sprintf("Concerns about pre-publication archiving (n = %d)", n_prepub_con)
 
-p <- ggplot(tb3) + 
-  aes(x = DataConcern_text, y = Percentage) +
+p <- ggplot(tb2) + 
+  aes(x = PrePubConcern_text, y = Percentage) +
   geom_bar(stat = "identity", colour = "black", fill = cols) +
   labs (x = element_blank(),
         y = "Percentage", 
         title = title) +
-  coord_flip(ylim = c(0,60)) +
+  coord_flip(ylim = c(0,70)) +
   scale_x_discrete(labels = function(x) str_wrap(x, width = 50)) + #wrap the labels
   theme_classic(base_size = 12) + 
   theme(plot.title = element_text(hjust = 0.5)) # centre the title
 p
 
 ```
+
 
 
 ```{r skim df, eval=FALSE, include=FALSE}

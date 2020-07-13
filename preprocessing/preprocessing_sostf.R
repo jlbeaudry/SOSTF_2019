@@ -45,7 +45,7 @@ df_for <- here::here("survey", "data", "OS_Data_ID_Not_Legacy.csv") %>%
 df <- df %>% left_join(df_for, by = "ParticipantNumber")
 
 # load in metadata for concern variables
-metadata <- here::here("survey", "data", "os_metadata_concerns.csv") %>% 
+metadata <- here::here("survey", "data", "os_metadata_good.csv") %>% 
   read_csv(col_names = TRUE, skip_empty_rows = TRUE) %>% 
   filter(!is.na(OldVariable))
 
@@ -108,7 +108,8 @@ df$FORcode_2_label <- toTitleCase(tolower(df$FORcode_2_label))
 df$FORcode_2_num <- as.numeric(df$FORcode_2_num)
 df$FORcode_4_num <- as.numeric(df$FORcode_4_num)
 
-  # then recode according to discipline [CHECK OUT "CASE WHEN"]
+  # then recode according to discipline (can't use `case_when` because the RHS
+  # has more values than the LHS)
 
 df <- df %>% 
   mutate (discipline = ifelse (FORcode_2_num %in% c('14','15','18'), "Business & Law",

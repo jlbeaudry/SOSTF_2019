@@ -957,6 +957,7 @@ knitr::kable (col.names = c("Reported Experience", "Frequency", "Percentage"),
 
 ```
 ##### Use of Open Materials and/or Code
+
 ```{r code_count_use, echo=FALSE, warning=TRUE}
 
 # wrangle this data so it's in long form & only includes endorsements.
@@ -996,6 +997,10 @@ tb <- d %>%
   dplyr::arrange(desc(n)) 
  # mutate_if(is.character, ~factor(.)) # make it a factor
 
+# AH...I only need these next two steps if I'm actually able to figure out how 
+  # to use the Use variable to reorder the variable, while using the Use_text
+  # variable to name the actual columns in the tables. Otherwise, skip this.
+
 d2 <- d %>% # create tibble with the Code Use counts
   select(CodeUse, CodeUse_text)  %>% 
       dplyr::count(CodeUse) 
@@ -1029,8 +1034,6 @@ knitr::kable (col.names = c("Reported Use", "Frequency", "Percentage"),
                 latex_options = "hold_position")
 # html output = font_size = 14 # insert in kable styling
 ```
-
-<em> THIS NEEDS TO BE COMPLETED </em>
 
 ##### Concerns about Open Materials and/or Code
 
@@ -1277,10 +1280,84 @@ knitr::kable (col.names = c("Reported Experience", "Frequency", "Percentage"),
 
 ```
 
-For those participants who reported that they use open data 
-(that is, those who reported some use or regular use), we asked them for more 
-information about how they use open data. 'DATA USE' ...
-<em> THIS NEEDS TO BE COMPLETED IF WE WANT IT </em>
+##### Use of Open Data
+
+```{r data_count_use, echo=FALSE, warning=TRUE}
+
+# wrangle this data so it's in long form & only includes endorsements.
+
+DataUse_long <- df %>% 
+  select (c("ParticipantNumber", 
+            "DataUse_useOthers":"DataUse_text",
+            "FORcode_2_label")) %>%  
+  select(-"DataUse_text") %>% 
+  pivot_longer(c("DataUse_useOthers":"DataUse_other"),
+               names_to = "DataUse", 
+               values_to = "DataUse_endorsement") %>% 
+  filter(DataUse_endorsement == "1")
+
+# recode the data so the response options have proper labels
+  # there must be a way to only select the rows that "start with" a character string
+  # but for now this works
+
+c <- metadata %>% 
+    filter(Scale == "DataUse") %>% 
+    filter (NewVariable != "DataUse_text")
+
+d <- full_join(DataUse_long, c, by = c("DataUse" = "NewVariable")) %>% 
+  rename ("DataUse_text" = "ItemText")
+
+# getting a tibble for the counts
+c_data_use <- plyr::count(d$DataUse)
+
+# to figure out how many respondents shared concerns calculate unique number of participants
+n_data_use <- length(unique(d$ParticipantNumber))
+
+# create a tibble with percentages (of respondents who answered this question) & 
+# then reorder them by descending percentages
+tb <- d %>% 
+  dplyr::count(DataUse_text) %>% 
+  mutate(Percentage = round (n/n_data_use*100)) %>% 
+  dplyr::arrange(desc(n)) 
+ # mutate_if(is.character, ~factor(.)) # make it a factor
+
+# AH...I only need these next two steps if I'm actually able to figure out how 
+  # to use the Use variable to reorder the variable, while using the Use_text
+  # variable to name the actual columns in the tables. Otherwise, skip this.
+
+d2 <- d %>% # create tibble with the Data Use counts
+  select(DataUse, DataUse_text)  %>% 
+      dplyr::count(DataUse) 
+  #  mutate_if(is.character, ~factor(.))
+
+# join the two tables together
+tb2 <- left_join(x = tb, y = d2, by = "n") %>% 
+  dplyr::arrange(desc(n))
+
+
+
+```
+
+For those participants who reported that they use open data (that is, those who 
+reported some use or regular use), we asked them for more information about how 
+they have used open data in previous work. Respondents were allowed to select 
+as many uses as applied. Of these `r n_data_use` researchers, the most popular 
+response (`r tb[1,3]`%) was that they used open data from other sources in their 
+own research. Few researchers reported using open data when peer reviewing other 
+researchers'work (`r tb2[4,3]`%).
+
+```{r data_use_table, echo=FALSE, warning=TRUE}
+
+tb %>% 
+knitr::kable (col.names = c("Reported Use", "Frequency", "Percentage"), 
+              caption = sprintf("Reported Use of Open Data (n = %d)", n_data_use), 
+              align = 'lcc') %>% 
+   kable_styling(bootstrap_options = "striped", full_width = F, 
+                 position = 'center',
+                latex_options = "hold_position")
+# html output = font_size = 14 # insert in kable styling
+```
+
 
 ##### Concerns about Open Data
 
@@ -1320,6 +1397,10 @@ tb <- d %>%
   mutate(Percentage = round (n/n_data_con*100)) %>% 
   dplyr::arrange(desc(n)) 
  # mutate_if(is.character, ~factor(.)) # make it a factor
+
+# AH...I only need these next two steps if I'm actually able to figure out how 
+  # to use the `x` variable to reorder the variable, while using the `x_text`
+  # variable to name the actual columns in the tables. Otherwise, skip this.
 
 d2 <- d %>% # create tibble with the Data Concern counts
   select(DataConcern, DataConcern_text)  %>% 

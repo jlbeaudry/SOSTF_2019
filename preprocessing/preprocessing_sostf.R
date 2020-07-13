@@ -45,7 +45,7 @@ df_for <- here::here("survey", "data", "OS_Data_ID_Not_Legacy.csv") %>%
 df <- df %>% left_join(df_for, by = "ParticipantNumber")
 
 # load in metadata for concern variables
-metadata <- here::here("survey", "data", "os_metadata_concerns.csv") %>% 
+metadata <- here::here("survey", "data", "os_metadata_good.csv") %>% 
   read_csv(col_names = TRUE, skip_empty_rows = TRUE) %>% 
   filter(!is.na(OldVariable))
 
@@ -108,7 +108,8 @@ df$FORcode_2_label <- toTitleCase(tolower(df$FORcode_2_label))
 df$FORcode_2_num <- as.numeric(df$FORcode_2_num)
 df$FORcode_4_num <- as.numeric(df$FORcode_4_num)
 
-  # then recode according to discipline [CHECK OUT "CASE WHEN"]
+  # then recode according to discipline (can't use `case_when` because the RHS
+  # has more values than the LHS)
 
 df <- df %>% 
   mutate (discipline = ifelse (FORcode_2_num %in% c('14','15','18'), "Business & Law",
@@ -178,7 +179,8 @@ df$DataImp_num <- df$DataImp_num_o %>%
     c("4", "3", "2", "1"))
 
 
-# recode preregistration concerns & make them factors
+# recode preregistration concerns & make them factors [could simplify this with
+  # meta rename that I used with data concern]
 df$PreRegCon_delay <- factor(df$PreregConcern_4)
 df$PreRegCon_look <- factor(df$PreregConcern_5)
 df$PreRegCon_prevent_exp <- factor(df$PreregConcern_6)
@@ -188,7 +190,8 @@ df$PreRegCon_prevent_sig <- factor(df$PreregConcern_10)
 df$PreRegCon_diff_pub <- factor(df$PreregConcern_11)
 df$PreRegCon_no_con <- factor(df$PreregConcern_12)
 
-# recode open code concerns
+# recode open code concerns [could simplify this with
+# meta rename that I used with data concern]
 
 df$CodeCon_criticise <- factor(df$CodeConcern_4)
 df$CodeCon_diff_understand <- factor(df$CodeConcern_5)
@@ -316,6 +319,7 @@ write.csv(df, here::here("data", "data_sostf.csv"), row.names = FALSE)
 rm(df)
 rm(df_for)
 rm(read_qualtrics)
+rm(meta_rename)
 
 
 

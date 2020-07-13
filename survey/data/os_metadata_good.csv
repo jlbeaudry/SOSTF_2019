@@ -1,0 +1,69 @@
+﻿OldVariable,VariableType,NewVariable,ItemText,ItemTextShort,MinValue,MaxValue,Scoring,ReverseCode,ImportID,Scale
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+CodeUse_1,factor,CodeUse_useOthers,I have used other researchers' open materials and/or code in my research,,,,,,,CodeUse
+CodeUse_2,factor,CodeUse_mine,I have made my materials and/or code openly available,,,,,,,CodeUse
+CodeUse_3,factor,CodeUse_reading,I have used open materials and/or code when reading other researchers' work,,,,,,,CodeUse
+CodeUse_5,factor,CodeUse_other,Other,,,,,,,CodeUse
+CodeUse_5_TEXT,factor,CodeUse_text,Other: Text,,,,,,,CodeUse
+CodeUse_6,factor,CodeUse_peer,I have used other researchers' open materials and/or code when peer reviewing their work,,,,,,,CodeUse
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+,,,,,,,,,,
+OpenDataUse_1,factor,DataUse_useOthers,"I have used open data from other sources (e.g., researchers, government, etc.) in my research",,,,,,,DataUse
+OpenDataUse_2,factor,DataUse_mine,I have made my research data open,,,,,,,DataUse
+OpenDataUse_3,factor,DataUse_peer,I have used open data when peer reviewing other researchers' work,,,,,,,DataUse
+OpenDataUse_4,factor,DataUse_reading,I have used open data when reading other researchers' work,,,,,,,DataUse
+OpenDataUse_5,factor,DataUse_other,Other,,,,,,,DataUse
+OpenDataUse_5_TEXT,factor,DataUse_text,Other: Text,,,,,,,DataUse
+,,,,,,,,,,
+OpenDataConcern_1,factor,DataConcern_criticise,Other researchers might criticise my data and/or research practices,Others might criticise my data and/or research practices,,,,,,DataConcern
+OpenDataConcern_2,factor,DataConcern_ip,There could be issues related to intellectual property,Issues related to intellectual property,,,,,,DataConcern
+OpenDataConcern_3,factor,DataConcern_devalues,It devalues research data collection,It devalues research data collection,,,,,,DataConcern
+OpenDataConcern_5,factor,DataConcern_other,Other,Other,,,,,,DataConcern
+OpenDataConcern_5_TEXT,text,DataConcern_text,Other:-TEXT,Other: TEXT,,,,,,DataConcern
+OpenDataConcern_6,factor,DataConcern_none,I do not share any of these concerns,No concerns,,,,,,DataConcern
+OpenDataConcern_7,factor,DataConcern_effort,It will take too much time or effort to share research data,Too much time or effort,,,,,,DataConcern
+OpenDataConcern_8,factor,DataConcern_unfair,"I think it is unfair for researchers beyond the original team to benefit (e.g., through future publications, career advancement) from my data collection",Unfair for other researchers to benefit from my data collection,,,,,,DataConcern
+OpenDataConcern_9,factor,DataConcern_credit,I might not receive appropriate credit for my data collection,I might not receive appropriate credit for my data collection,,,,,,DataConcern
+OpenDataConcern_10,factor,DataConcern_ethics,There could be issues related to ethics,Issues related to ethics,,,,,,DataConcern
+OpenDataConcern_11,factor,DataConcern_privacy,There could be issues related to privacy,Issues related to privacy,,,,,,DataConcern
+OpenDataConcern_12,factor,DataConcern_control,I might lose control over how my data are being used,I might lose control over how my data are being used,,,,,,DataConcern
+OpenDataConcern_13,factor,DataConcern_scoop,Other researchers could use my data for another study that I intended to conduct in the future,Others could use my data for another study that I intended to conduct in the future,,,,,,DataConcern

@@ -165,6 +165,8 @@ df$PrePubImp_num_o <- factor(df$PrePubImp) #name as 'original' so we can reverse
 
 df$PrePubExp_num <- factor(df$PrePubExp) 
 
+df$OAprop_num_o <- factor(df$OAprop) #name as 'original' so we can reverse code it next
+
 # reverse code `importance` variables so lower values = less importance
 
 df$PreRegImp_num <- df$PreRegImp_num_o %>% 
@@ -186,6 +188,14 @@ df$PrePubImp_num <- df$PrePubImp_num_o %>%
   mapvalues(
     c("1", "2", "3", "4"), 
     c("4", "3", "2", "1"))
+
+# reverse code 'proportion' variables so lower values = less proportion
+
+df$OAprop_num <- df$OAprop_num_o %>% 
+  mapvalues(
+    c("1", "2", "3", "4", "0", "5"), 
+    c("4", "3", "2", "1", "0", "5"))
+
 
 # recode preregistration concerns & make them factors [could simplify this with
   # meta rename that I used with data concern]
@@ -274,6 +284,11 @@ df$PrePubExp <- df$PrePubExp_num %>%
   mapvalues(
     c("1", "2", "3", "4"), 
     c("Unaware", "Aware, But Not Used", "Some Experience", "Extensive Experience"))
+
+df$OAprop <- df$OAprop_num %>% 
+  mapvalues(
+    c("4", "3", "2", "1", "0", "5"), 
+    c("All", "Most", "Half", "Some", "None", "I don't know"))
 
 ## RECODE ACADEMIC LEVELS ##
 

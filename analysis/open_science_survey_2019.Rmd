@@ -199,7 +199,7 @@ meta_rename <-  function(df, metadata, old, new) {
 df <- read_csv (here::here("data", "data_sostf.csv"))
 
 # import the metadata.
-metadata <- here::here("survey", "data", "os_metadata_concerns.csv") %>% 
+metadata <- here::here("survey", "data", "os_metadata_good.csv") %>% 
   read_csv(col_names = TRUE, skip_empty_rows = TRUE) %>% 
   filter(!is.na(OldVariable)) %>% 
   select(-c(MinValue:ImportID)) #does not import the extraneous variables
@@ -1251,8 +1251,8 @@ We also asked participants about their experience with open data. Of the
 indicated that until now, they were unaware of open data; `r tb[1,2]` 
 (`r tb[1,3]`%) indicated that they were were aware of open data, but had not used
 it in their research; `r tb[2,2]` (`r tb[2,3]`%) indicated that they had some 
-experience with open data, but did not use them regularly; and `r tb_ex[3,2]` 
-(`r tb_ex[3,3]`%) indicated that they regularly use open data. 
+experience with open data, but did not use them regularly; and `r tb[3,2]` 
+(`r tb[3,3]`%) indicated that they regularly use open data. 
 
 ```{r data_exp_pie, echo = FALSE, warning = TRUE}
 
@@ -1267,7 +1267,7 @@ p
 
 ```{r data_exp_table, echo=FALSE, warning=TRUE}
 
-tb2 <- tb [c(4,1,2,3),] # fix the order of responses
+tb2 <- tb [c(4,1,2,3),] # fix the order of responses from 'unaware' to 'reg use'
 
 tb2 %>% 
 knitr::kable (col.names = c("Reported Experience", "Frequency", "Percentage"), 
@@ -1651,57 +1651,54 @@ knitr::kable (col.names = c("Perceived Importance", "Frequency", "Percentage"),
 ```
 
 
-##### Experience with Prepublication Archives
-
-<EM> NEEDS TO BE UPDATED </EM>
+##### Experience with Pre-publication Archiving
 
 ```{r prepub_count_exp, echo=FALSE, warning=TRUE}
 
 # filter rows with valid responses for this variable
-valid_data_exp <- filter(df,DataExp != "NA")
+valid_prepub_exp <- filter(df,PrePubExp != "NA")
 
 # calculate number of rows with a valid response for this variable
-nvalid_data_exp <- nrow(valid_data_exp)
+nvalid_prepub_exp <- nrow(valid_prepub_exp)
 
-tb <- valid_data_exp %>% 
-  dplyr::count(DataExp) %>%  
-    mutate(Percentage = round (n/nvalid_data_exp*100)) %>% 
+tb <- valid_prepub_exp %>% 
+  dplyr::count(PrePubExp) %>%  
+    mutate(Percentage = round (n/nvalid_prepub_exp*100)) %>% 
     dplyr::arrange(desc(n))
 
 ```
 
-<EM> NEEDS TO BE UPDATED </EM>
-
-We also asked participants about their experience with open data. Of the 
-`r sum(tb[2])` participants who answered this question, `r tb[4,2]` (`r tb[4,3]`%) 
-indicated that until now, they were unaware of open data; `r tb[1,2]` 
-(`r tb[1,3]`%) indicated that they were were aware of open data, but had not used
-it in their research; `r tb[2,2]` (`r tb[2,3]`%) indicated that they had some 
-experience with open data, but did not use them regularly; and `r tb_ex[3,2]` 
-(`r tb_ex[3,3]`%) indicated that they regularly use open data. 
-
-
-<EM> NEEDS TO BE UPDATED </EM>
+We also asked participants about their experience with pre-publication archiving. 
+Of the `r sum(tb[2])` participants who answered this question, `r tb[2,2]` 
+(`r tb[2,3]`%) indicated that until now, they were unaware of pre-publication 
+archiving; `r tb[1,2]` (`r tb[1,3]`%) indicated that they were were aware of pre-
+publication arhciving, but had not used it; `r tb[4,2]` (`r tb[4,3]`%) indicated 
+that they had some experience with pre-publication archiving; and `r tb[3,2]` 
+(`r tb[3,3]`%) indicated that they have extensive experience with pre-publication
+archiving. 
 
 ```{r prepub_exp_pie, echo = FALSE, warning = TRUE}
 
-title = "What is your experience with open data? (n = %d)"
+title = "What is your experience with pre-publication archiving? (n = %d)"
 
 #pie chart
 colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(df,label_var="DataExp",the_title = title, colours = colours, the_quantity="percent")
+p <- simple_pie_chart(df,
+                      label_var="PrePubExp",
+                      the_title = title, 
+                      colours = colours, 
+                      the_quantity="percent")
 p
 ```
-<EM> NEEDS TO BE UPDATED </EM>
 
 ```{r prepub_exp_table, echo=FALSE, warning=TRUE}
 
-tb2 <- tb [c(4,1,2,3),] # fix the order of responses
+tb2 <- tb [c(2,1,4,3),] # fix the order of responses from 'unaware' to 'ext exp'
 
 tb2 %>% 
 knitr::kable (col.names = c("Reported Experience", "Frequency", "Percentage"), 
-              caption = sprintf("Experience with Open Data (n = %d)",
-                                nvalid_data_exp), align = 'lcc') %>% 
+              caption = sprintf("Experience with Pre-publication Archiving (n = %d)",
+                                nvalid_prepub_exp), align = 'lcc') %>% 
    kable_styling(bootstrap_options = "striped", full_width = F, 
                  position = 'center',
                 latex_options = "hold_position")
@@ -1717,38 +1714,38 @@ knitr::kable (col.names = c("Reported Experience", "Frequency", "Percentage"),
 
 # wrangle this data so it's in long form & only includes endorsements.
 
-DataUse_long <- df %>% 
+PrePubUse_long <- df %>% 
   select (c("ParticipantNumber", 
-            "DataUse_useOthers":"DataUse_text",
+            "PrePubUse_upload":"PrePubUse_read",
             "FORcode_2_label")) %>%  
-  select(-"DataUse_text") %>% 
-  pivot_longer(c("DataUse_useOthers":"DataUse_other"),
-               names_to = "DataUse", 
-               values_to = "DataUse_endorsement") %>% 
-  filter(DataUse_endorsement == "1")
+  select(-"PrePubUse_text") %>% 
+  pivot_longer(c("PrePubUse_upload":"PrePubUse_read"),
+               names_to = "PrePubUse", 
+               values_to = "PrePubUse_endorsement") %>% 
+  filter(PrePubUse_endorsement == "1")
 
 # recode the data so the response options have proper labels
   # there must be a way to only select the rows that "start with" a character string
   # but for now this works
 
 c <- metadata %>% 
-    filter(Scale == "DataUse") %>% 
-    filter (NewVariable != "DataUse_text")
+    filter(Scale == "PrePubUse") %>% 
+    filter (NewVariable != "PrePubUse_text")
 
-d <- full_join(DataUse_long, c, by = c("DataUse" = "NewVariable")) %>% 
-  rename ("DataUse_text" = "ItemText")
+d <- full_join(PrePubUse_long, c, by = c("PrePubUse" = "NewVariable")) %>% 
+  rename ("PrePubUse_text" = "ItemText")
 
 # getting a tibble for the counts
-c_data_use <- plyr::count(d$DataUse)
+c_prepub_use <- plyr::count(d$PrePubUse)
 
 # to figure out how many respondents shared concerns calculate unique number of participants
-n_data_use <- length(unique(d$ParticipantNumber))
+n_prepub_use <- length(unique(d$ParticipantNumber))
 
 # create a tibble with percentages (of respondents who answered this question) & 
 # then reorder them by descending percentages
 tb <- d %>% 
-  dplyr::count(DataUse_text) %>% 
-  mutate(Percentage = round (n/n_data_use*100)) %>% 
+  dplyr::count(PrePubUse_text) %>% 
+  mutate(Percentage = round (n/n_prepub_use*100)) %>% 
   dplyr::arrange(desc(n)) 
  # mutate_if(is.character, ~factor(.)) # make it a factor
 
@@ -1769,21 +1766,21 @@ tb2 <- left_join(x = tb, y = d2, by = "n") %>%
 
 ```
 
-<EM> NEEDS TO BE UPDATED </EM>
-
-For those participants who reported that they use open data (that is, those who 
-reported some use or regular use), we asked them for more information about how 
-they have used open data in previous work. Respondents were allowed to select 
-as many uses as applied. Of these `r n_data_use` researchers, the most popular 
-response (`r tb[1,3]`%) was that they used open data from other sources in their 
-own research. Few researchers reported using open data when peer reviewing other 
-researchers'work (`r tb2[4,3]`%).
+For those participants who reported that they use pre-publication archiving (that
+is, those who reported some experience or extensive experience), we asked them 
+for more information about how they have used these archives. Respondents were 
+allowed to select as many uses as applied. Of these `r n_prepub_use` researchers, 
+the most popular response (`r tb[1,3]`%) was that they read an article from, 
+searched, or browsed a pre-publication archive. That is, they used other people's 
+work posted to pre-publication archives for their own purposes. The next most 
+common use by these researchers is to upload their own work to a pre-publication
+archive before submitting it to a journal (`r tb[2,3]`%).
 
 ```{r prepub_use_table, echo=FALSE, warning=TRUE}
 
 tb %>% 
 knitr::kable (col.names = c("Reported Use", "Frequency", "Percentage"), 
-              caption = sprintf("Reported Use of Open Data (n = %d)", n_data_use), 
+              caption = sprintf("Reported Use of Pre-publication Archiving (n = %d)", n_prepub_use), 
               align = 'lcc') %>% 
    kable_styling(bootstrap_options = "striped", full_width = F, 
                  position = 'center',

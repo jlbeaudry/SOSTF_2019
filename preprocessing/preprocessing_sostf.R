@@ -161,6 +161,10 @@ df$DataExp_num <- factor(df$OpenDataExp)
 
 df$DataImp_num_o <- factor(df$OpenDataImp) #name as 'original' so we can reverse code it next
 
+df$PrePubImp_num_o <- factor(df$PrePubImp) #name as 'original' so we can reverse code it next
+
+df$PrePubExp_num <- factor(df$PrePubExp) 
+
 # reverse code `importance` variables so lower values = less importance
 
 df$PreRegImp_num <- df$PreRegImp_num_o %>% 
@@ -178,6 +182,10 @@ df$DataImp_num <- df$DataImp_num_o %>%
     c("1", "2", "3", "4"), 
     c("4", "3", "2", "1"))
 
+df$PrePubImp_num <- df$PrePubImp_num_o %>% 
+  mapvalues(
+    c("1", "2", "3", "4"), 
+    c("4", "3", "2", "1"))
 
 # recode preregistration concerns & make them factors [could simplify this with
   # meta rename that I used with data concern]
@@ -256,6 +264,16 @@ df$DataExp <- df$DataExp_num %>%
     c("1", "2", "3", "4"),
     c("Unaware", "Aware, But Not Used", "Some Use", "Regular Use"))
 
+df$PrePubImp <- df$PrePubImp_num %>% 
+  mapvalues(
+    c ("4", "3", "2", "1"),
+    c ("Extremely important", "Somewhat important", "Somewhat unimportant", 
+       "Not at all"))
+
+df$PrePubExp <- df$PrePubExp_num %>% 
+  mapvalues(
+    c("1", "2", "3", "4"), 
+    c("Unaware", "Aware, But Not Used", "Some Experience", "Extensive Experience"))
 
 ## RECODE ACADEMIC LEVELS ##
 

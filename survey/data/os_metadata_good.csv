@@ -58,7 +58,7 @@ OpenDataConcern_1,factor,DataConcern_criticise,Other researchers might criticise
 OpenDataConcern_2,factor,DataConcern_ip,There could be issues related to intellectual property,Issues related to intellectual property,,,,,,DataConcern
 OpenDataConcern_3,factor,DataConcern_devalues,It devalues research data collection,It devalues research data collection,,,,,,DataConcern
 OpenDataConcern_5,factor,DataConcern_other,Other,Other,,,,,,DataConcern
-OpenDataConcern_5_TEXT,text,DataConcern_text,Other:-TEXT,Other: TEXT,,,,,,DataConcern
+OpenDataConcern_5_TEXT,text,DataConcern_text,Other: Text,Other: Text,,,,,,DataConcern
 OpenDataConcern_6,factor,DataConcern_none,I do not share any of these concerns,No concerns,,,,,,DataConcern
 OpenDataConcern_7,factor,DataConcern_effort,It will take too much time or effort to share research data,Too much time or effort,,,,,,DataConcern
 OpenDataConcern_8,factor,DataConcern_unfair,"I think it is unfair for researchers beyond the original team to benefit (e.g., through future publications, career advancement) from my data collection",Unfair for other researchers to benefit from my data collection,,,,,,DataConcern
@@ -67,3 +67,9 @@ OpenDataConcern_10,factor,DataConcern_ethics,There could be issues related to et
 OpenDataConcern_11,factor,DataConcern_privacy,There could be issues related to privacy,Issues related to privacy,,,,,,DataConcern
 OpenDataConcern_12,factor,DataConcern_control,I might lose control over how my data are being used,I might lose control over how my data are being used,,,,,,DataConcern
 OpenDataConcern_13,factor,DataConcern_scoop,Other researchers could use my data for another study that I intended to conduct in the future,Others could use my data for another study that I intended to conduct in the future,,,,,,DataConcern
+,,,,,,,,,,
+PrePubUse_4,factor,PrePubUse_upload,I have uploaded a manuscript to a pre-publication archive before submission to a journal,,,,,,,PrePubUse
+PrePubUse_5,factor,PrePubUse_other,Other,,,,,,,PrePubUse
+PrePubUse_5_TEXT,factor,PrePubUse_text,Other: Text,,,,,,,PrePubUse
+PrePubUse_9,factor,PrePubUse_cited,I have cited a manuscript from a pre-publication archive,,,,,,,PrePubUse
+PrePubUse_10,factor,PrePubUse_read,"I have read an article from, searched, or browsed a pre-publication archive",,,,,,,PrePubUse

@@ -352,3 +352,122 @@ tb4 <- vars_select(names(tb3), DataConcern = DataConcern_text)
 
 # this caption actually works, but the order still changed
 caption2 <- tb3$DataConcern_text %>% (function(x) str_wrap(x, width = 50))
+
+
+# STILL TRYING TO USE ONE DATA SET FOR THE PERCENTAGE & ONE FOR THE NAMES....
+
+# reorder the rows according to the DataConcern (because it has less text)
+tb3 <- tb2 %>% 
+  dplyr::mutate(DataConcern = factor(DataConcern, 
+                                     levels = c("DataConcern_other", 
+                                                "DataConcern_devalues",
+                                                "DataConcern_unfair", 
+                                                "DataConcern_criticise",
+                                                "DataConcern_effort", 
+                                                "DataConcern_control",
+                                                "DataConcern_credit",
+                                                "DataConcern_scoop",
+                                                "DataConcern_ip",
+                                                "DataConcern_privacy",
+                                                "DataConcern_ethics",
+                                                "DataConcern_none"))) %>% 
+  dplyr::mutate(DataConcern_text = factor(DataConcern_text)) #turn into factors
+
+
+https://raw.githubusercontent.com/janhove/janhove.github.io/master/RCode/sortLvls.R
+
+# HIS ORIGINAL CODE
+
+sortLvls.fnc <- function(oldFactor, levelOrder) {
+  if(!is.factor(oldFactor)) stop("The variable you want to reorder isn't a factor.")
+  
+  if(!is.numeric(levelOrder)) stop("'order' should be a numeric vector.")
+  
+  if(max(levelOrder) > length(levels(oldFactor))) stop("The largest number in 'order' can't be larger than the number of levels in the factor.")
+  
+  if(length(levelOrder) > length(levels(oldFactor))) stop("You can't have more elements in 'order' than there are levels in the factor.")
+  
+  if(length(levelOrder) == length(levels(oldFactor))) {
+    reorderedFactor <- factor(oldFactor, levels = levels(oldFactor)[levelOrder])
+  }
+  
+  if(length(levelOrder) < length(levels(oldFactor))) {
+    levelOrderAll <- c(levelOrder, (1:length(levels(oldFactor)))[-levelOrder])
+    reorderedFactor <- factor(oldFactor, levels = levels(oldFactor)[levelOrderAll])
+  }
+  
+  return(reorderedFactor)
+}
+
+### ME PLAYING WITH IT! IT WORKS, in theory, BUT IT STILL DOESN'T FORCE GGPLOT TO USE THE TEXT
+
+sortLvls.fnc <- function(oldFactor, levelOrderFctr) {
+  if(!is.factor(oldFactor)) stop("The variable you want to reorder isn't a factor.")
+  
+  if(!is.factor(levelOrderFctr)) stop("The level variable you want to use isn't a factor.")
+  
+  if(length(levelOrderFctr) == length(levels(oldFactor))) {
+    reorderedFactor <- factor(oldFactor, levels = levels(oldFactor)[levelOrderFctr])
+  }
+  
+  return(reorderedFactor)
+}
+
+tb3$DataConcern_text_order <- sortLvls.fnc(oldFactor = tb3$DataConcern_text, levelOrderFctr = tb3$DataConcern)
+
+# HIS ORIGINAL CODE
+
+sortLvlsByVar.fnc <- function(oldFactor, sortingVariable, ascending = TRUE) {
+  
+  require("dplyr")
+  require("magrittr")
+  
+  # Combine into data frame
+  df <- data.frame(oldFactor, sortingVariable)
+  
+  ###
+  ### If you want to sort the levels by, say, the median, sd etc. instead of the mean,
+  ### just change 'mean(sortingVariable)' below to, say, 'median(sortingVariable)'.
+  ###
+  
+  # Compute average of sortingVariable and arrange (ascending)
+  if (ascending == TRUE) {
+    df_av <- df %>% group_by(oldFactor) %>% summarise(meanSortingVariable = mean(sortingVariable)) %>% 
+      arrange(meanSortingVariable)
+  }
+  
+  # Compute average of sortingVariable and arrange (descending)
+  if (ascending == FALSE) {
+    df_av <- df %>% group_by(oldFactor) %>% summarise(meanSortingVariable = mean(sortingVariable)) %>% 
+      arrange(desc(meanSortingVariable))
+  }
+  
+  # Return factor with new level order
+  newFactor <- factor(oldFactor, levels = df_av$oldFactor)
+  return(newFactor)
+}
+
+caption <- tb3$DataConcern_text_order %>% (function(x) str_wrap(x, width = 50))
+
+
+# create a character vector for the colours for each bar
+cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
+          "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
+          "lightskyblue3", "lightskyblue3", "lightskyblue3", "grey50")
+
+
+# build the bar chart
+title = sprintf("Concerns about open data (n = %d)", n_data_con)
+
+p <- ggplot(tb3) + 
+  aes(x = DataConcern, y = Percentage) +
+  geom_bar(stat = "identity", colour = "black", fill = cols) +
+  labs (x = element_blank(),
+        y = "Percentage", 
+        title = title) +
+  coord_flip(ylim = c(0,60)) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 50)) + #wrap the labels
+  theme_classic(base_size = 12) + 
+  theme(plot.title = element_text(hjust = 0.5)) # centre the title
+p
+

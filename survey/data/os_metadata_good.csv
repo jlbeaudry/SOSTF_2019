@@ -1,51 +1,12 @@
 ﻿OldVariable,VariableType,NewVariable,ItemText,ItemTextShort,MinValue,MaxValue,Scoring,ReverseCode,ImportID,Scale
 ,,,,,,,,,,
 ,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
 CodeUse_1,factor,CodeUse_useOthers,I have used other researchers' open materials and/or code in my research,,,,,,,CodeUse
 CodeUse_2,factor,CodeUse_mine,I have made my materials and/or code openly available,,,,,,,CodeUse
 CodeUse_3,factor,CodeUse_reading,I have used open materials and/or code when reading other researchers' work,,,,,,,CodeUse
 CodeUse_5,factor,CodeUse_other,Other,,,,,,,CodeUse
 CodeUse_5_TEXT,factor,CodeUse_text,Other: Text,,,,,,,CodeUse
 CodeUse_6,factor,CodeUse_peer,I have used other researchers' open materials and/or code when peer reviewing their work,,,,,,,CodeUse
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
 ,,,,,,,,,,
 OpenDataUse_1,factor,DataUse_useOthers,"I have used open data from other sources (e.g., researchers, government, etc.) in my research",,,,,,,DataUse
 OpenDataUse_2,factor,DataUse_mine,I have made my research data open,,,,,,,DataUse
@@ -73,3 +34,12 @@ PrePubUse_5,factor,PrePubUse_other,Other,,,,,,,PrePubUse
 PrePubUse_5_TEXT,factor,PrePubUse_text,Other: Text,,,,,,,PrePubUse
 PrePubUse_9,factor,PrePubUse_cited,I have cited a manuscript from a pre-publication archive,,,,,,,PrePubUse
 PrePubUse_10,factor,PrePubUse_read,"I have read an article from, searched, or browsed a pre-publication archive",,,,,,,PrePubUse
+,,,,,,,,,,
+PrePubConcernList_4,factor,PrePubConcern_policy,Some journals might not publish findings that are uploaded to a pre-publication archive,Some journals might not publish the uploaded manuscript,,,,,,PrePubConcern
+PrePubConcernList_5,factor,PrePubConcern_scoop,Other people might copy my research and publish it before I do,Other people might copy my research and publish it before I do,,,,,,PrePubConcern
+PrePubConcernList_6,factor,PrePubConcern_noise,Non-peer-reviewed findings might add noise to the literature,Non-peer-reviewed findings might add noise to the literature,,,,,,PrePubConcern
+PrePubConcernList_7,factor,PrePubConcern_citations,Making my work available pre-publication might reduce the number of citations to the ultimately published work,Making my work available pre-publication might reduce citations of the ultimately published work,,,,,,PrePubConcern
+PrePubConcernList_8,factor,PrePubConcern_other,Other,Other,,,,,,PrePubConcern
+PrePubConcernList_8_TEXT,factor,PrePubConcern_text,Other: Text,Other: Text,,,,,,PrePubConcern
+PrePubConcernList_9,factor,PrePubConcern_compare,"Availability of the pre-publication manuscript might highlight differences (e.g., errors in analysis; revisions to hypotheses) between the original conception of the research and the ultimately published work",Others could see differences between the original conception and the ultimately published work,,,,,,PrePubConcern
+PrePubConcernList_11,factor,PrePubConcern_none,I do not share any of these concerns,No concerns,,,,,,PrePubConcern

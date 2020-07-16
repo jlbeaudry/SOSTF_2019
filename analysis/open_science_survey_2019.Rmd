@@ -725,53 +725,36 @@ knitr::kable (col.names = c("Reported Experience", "Frequency", "Percentage"),
 
 PreRegCon_long <- df %>% 
      select(c("ParticipantNumber", 
-              "PreRegCon_delay", 
-              "PreRegCon_look", 
-              "PreRegCon_prevent_exp", 
-              "PreRegCon_stifle_creativity", 
-              "PreRegCon_scooping", 
-              "PreRegCon_prevent_sig", 
-              "PreRegCon_diff_pub", 
-              "PreRegCon_no_con")) %>%  
-     pivot_longer(c("PreRegCon_delay", 
-                    "PreRegCon_look", 
-                    "PreRegCon_prevent_exp", 
-                    "PreRegCon_stifle_creativity", 
-                    "PreRegCon_scooping", 
-                    "PreRegCon_prevent_sig", 
-                    "PreRegCon_diff_pub", 
-                    "PreRegCon_no_con"), 
+              "PreRegCon_delay":"PreRegCon_none", 
+              "FORcode_2_label")) %>%  
+    select(-"PreRegCon_text") %>% 
+     pivot_longer(c("PreRegCon_delay":"PreRegCon_none"), 
      names_to = "PreRegConcern", 
      values_to = "PreReg_Endorsement") %>% 
   filter(PreReg_Endorsement == "1")  
 
 # recode the data so the response options have proper labels
-  # create a character vector with proper labels
-prereg_con_key <- c (PreRegCon_delay = "Delays data collection", 
-                     PreRegCon_look = "Need to look at data to analyse it",
-                     PreRegCon_prevent_exp = "Prevents exploratory research",
-                     PreRegCon_stifle_creativity = "Stifles creativity", 
-                     PreRegCon_scooping = "Risk of scooping", 
-                     PreRegCon_prevent_sig = "More difficult to find significant results",
-                     PreRegCon_diff_pub = "More difficult to publish in certain journals", 
-                     PreRegCon_no_con = "No concerns")
 
-  # recode the values with this character vector 
-PreRegCon_long$PreRegConcern <- recode(PreRegCon_long$PreRegConcern, !!!prereg_con_key)
+c <- metadata %>% 
+    filter(Scale == "PreRegConcern") %>% 
+    filter(NewVariable != "PreRegCon_text") #remove this value from metadata
+
+d <- full_join(PreRegCon_long, c, by = c("PreRegConcern" = "NewVariable")) %>% 
+  rename ("PreRegConcern_label" = "ItemTextShort")
 
 # getting a tibble for the counts
-c_prereg_con <- plyr::count(PreRegCon_long$PreRegConcern)
+c_prereg_con <- plyr::count(d$PreRegConcern)
 
 # to figure out how many respondents shared concerns calculate unique number of participants
-n_prereg_con <- length(unique(PreRegCon_long$ParticipantNumber))
+n_prereg_con <- length(unique(d$ParticipantNumber))
 
 # create a tibble with percentages (of respondents who answered this question) & 
-  # then reorder them by descending percentages
+# then reorder them by descending percentages
 
-tb <- PreRegCon_long %>% 
-  dplyr::count(PreRegConcern) %>% 
+tb <- d %>% 
+  dplyr::count(PreRegConcern_label) %>% 
   mutate(Percentage = round (n/n_prereg_con*100)) %>% 
-  dplyr::arrange(desc(n))
+  dplyr::arrange(desc(n)) 
 
 ```
 
@@ -790,19 +773,20 @@ each of the concerns.
 
 # reorder the response options from lowest to highest, with concerns last
 tb2 <- tb %>% 
-  dplyr::mutate(PreRegConcern = factor (PreRegConcern, 
-                                levels = c("More difficult to find significant results", 
+  dplyr::mutate(PreRegConcern_label = factor (PreRegConcern_label, 
+                                levels = c("Other",
+                                           "More difficult to find significant results", 
                                            "More difficult to publish in certain journals", 
                                            "Delays data collection", 
                                            "Stifles creativity",  
                                            "Prevents exploratory research", 
                                            "Need to look at data to analyse it", 
                                            "Risk of scooping", 
-                                           "No concerns")))
+                                           "I do not share any of these concerns")))
 
 # create a character vector for the colours for each bar
 cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
-          "lightskyblue3", "lightskyblue3", "lightskyblue3", "grey50")
+          "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", "grey50")
 
 # build the bar chart
 title = sprintf("Concerns about preregistering studies\n (n = %d)", n_prereg_con)
@@ -812,7 +796,7 @@ title = sprintf("Concerns about preregistering studies\n (n = %d)", n_prereg_con
   # (or I could use stat = "identity" with 'geom_bar')
 
 p <- ggplot(tb2) + 
-  aes(x = PreRegConcern, y = Percentage) +
+  aes(x = PreRegConcern_label, y = Percentage) +
    geom_bar(stat = "identity", colour = "black", fill = cols) +
     labs (x = element_blank(),
       y = "Percentage", 
@@ -982,7 +966,7 @@ c <- metadata %>%
     filter (NewVariable != "CodeUse_text")
 
 d <- full_join(CodeUse_long, c, by = c("CodeUse" = "NewVariable")) %>% 
-  rename ("CodeUse_text" = "ItemText")
+  rename ("CodeUse_label" = "ItemText")
 
 # getting a tibble for the counts
 c_code_use <- plyr::count(d$CodeUse)
@@ -993,17 +977,17 @@ n_code_use <- length(unique(d$ParticipantNumber))
 # create a tibble with percentages (of respondents who answered this question) & 
 # then reorder them by descending percentages
 tb <- d %>% 
-  dplyr::count(CodeUse_text) %>% 
+  dplyr::count(CodeUse_label) %>% 
   mutate(Percentage = round (n/n_code_use*100)) %>% 
   dplyr::arrange(desc(n)) 
  # mutate_if(is.character, ~factor(.)) # make it a factor
 
 # AH...I only need these next two steps if I'm actually able to figure out how 
-  # to use the Use variable to reorder the variable, while using the Use_text
+  # to use the Use variable to reorder the variable, while using the Use_label
   # variable to name the actual columns in the tables. Otherwise, skip this.
 
 d2 <- d %>% # create tibble with the Code Use counts
-  select(CodeUse, CodeUse_text)  %>% 
+  select(CodeUse, CodeUse_label)  %>% 
       dplyr::count(CodeUse) 
   #  mutate_if(is.character, ~factor(.))
 
@@ -1077,7 +1061,7 @@ code_con_key <- c (CodeCon_criticise = "Others might criticise my materials/code
                      CodeCon_credit = "I might not receive appropriate credit",
                      CodeCon_violate = "Reuse could violate epistemological framework", 
                      CodeCon_ip = "Issues related to intellectual property", 
-                     CodeCon_no_con = "No concerns")
+                     CodeCon_no_con = "I do not share any of these concerns")
  
  # recode the values with this character vector
 CodeCon_long$CodeConcern <- recode(CodeCon_long$CodeConcern, !!!code_con_key)
@@ -1121,7 +1105,7 @@ tb2 <- tb %>%
                          "I might lose control over how they are used", 
                          "I might not receive appropriate credit", 
                          "Issues related to intellectual property", 
-                         "No concerns")))
+                         "I do not share any of these concerns")))
   # I don't get it. tb & tb2 look the same in the tibble, but the order is completely
   # different when they are graphed..
 
@@ -1306,7 +1290,7 @@ c <- metadata %>%
     filter (NewVariable != "DataUse_text")
 
 d <- full_join(DataUse_long, c, by = c("DataUse" = "NewVariable")) %>% 
-  rename ("DataUse_text" = "ItemText")
+  rename ("DataUse_label" = "ItemText")
 
 # getting a tibble for the counts
 c_data_use <- plyr::count(d$DataUse)
@@ -1317,17 +1301,17 @@ n_data_use <- length(unique(d$ParticipantNumber))
 # create a tibble with percentages (of respondents who answered this question) & 
 # then reorder them by descending percentages
 tb <- d %>% 
-  dplyr::count(DataUse_text) %>% 
+  dplyr::count(DataUse_label) %>% 
   mutate(Percentage = round (n/n_data_use*100)) %>% 
   dplyr::arrange(desc(n)) 
  # mutate_if(is.character, ~factor(.)) # make it a factor
 
 # AH...I only need these next two steps if I'm actually able to figure out how 
-  # to use the Use variable to reorder the variable, while using the Use_text
+  # to use the Use variable to reorder the variable, while using the Use_label
   # variable to name the actual columns in the tables. Otherwise, skip this.
 
 d2 <- d %>% # create tibble with the Data Use counts
-  select(DataUse, DataUse_text)  %>% 
+  select(DataUse, DataUse_label)  %>% 
       dplyr::count(DataUse) 
   #  mutate_if(is.character, ~factor(.))
 
@@ -1382,7 +1366,7 @@ c <- metadata %>%
     filter(NewVariable != "DataConcern_text") #remove this value from metadata
 
 d <- full_join(DataConcern_long, c, by = c("DataConcern" = "NewVariable")) %>% 
-  rename ("DataConcern_text" = "ItemTextShort")
+  rename ("DataConcern_label" = "ItemTextShort")
 
 # getting a tibble for the counts
 c_data_con <- plyr::count(d$DataConcern)
@@ -1393,17 +1377,17 @@ n_data_con <- length(unique(d$ParticipantNumber))
 # create a tibble with percentages (of respondents who answered this question) & 
 # then reorder them by descending percentages
 tb <- d %>% 
-  dplyr::count(DataConcern_text) %>% 
+  dplyr::count(DataConcern_label) %>% 
   mutate(Percentage = round (n/n_data_con*100)) %>% 
   dplyr::arrange(desc(n)) 
  # mutate_if(is.character, ~factor(.)) # make it a factor
 
 # AH...I only need these next two steps if I'm actually able to figure out how 
-  # to use the `x` variable to reorder the variable, while using the `x_text`
+  # to use the `x` variable to reorder the variable, while using the `x_label`
   # variable to name the actual columns in the tables. Otherwise, skip this.
 
 d2 <- d %>% # create tibble with the Data Concern counts
-  select(DataConcern, DataConcern_text)  %>% 
+  select(DataConcern, DataConcern_label)  %>% 
       dplyr::count(DataConcern) 
   #  mutate_if(is.character, ~factor(.))
 
@@ -1424,9 +1408,9 @@ the percentage who selected each of the concerns.
 
 # build the bar chart
 
-# reorder the rows according to the DataConcern_text 
+# reorder the rows according to the DataConcern_label 
 tb3 <- tb2 %>% 
-  dplyr::mutate(DataConcern_text = factor(DataConcern_text, 
+  dplyr::mutate(DataConcern_label = factor(DataConcern_label, 
                 levels = c("Other", 
                            "It devalues research data collection", 
                            "Unfair for other researchers to benefit from my data collection", 
@@ -1438,7 +1422,7 @@ tb3 <- tb2 %>%
                            "Issues related to intellectual property", 
                            "Issues related to privacy", 
                            "Issues related to ethics", 
-                           "No concerns")))
+                           "I do not share any of these concerns")))
 
 
 
@@ -1452,7 +1436,7 @@ cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3",
 title = sprintf("Concerns about open data (n = %d)", n_data_con)
 
 p <- ggplot(tb3) + 
-  aes(x = DataConcern_text, y = Percentage) +
+  aes(x = DataConcern_label, y = Percentage) +
   geom_bar(stat = "identity", colour = "black", fill = cols) +
   labs (x = element_blank(),
         y = "Percentage", 
@@ -1610,7 +1594,7 @@ c <- metadata %>%
     filter (NewVariable != "PrePubUse_text")
 
 d <- full_join(PrePubUse_long, c, by = c("PrePubUse" = "NewVariable")) %>% 
-  rename ("PrePubUse_text" = "ItemText")
+  rename ("PrePubUse_label" = "ItemText")
 
 # getting a tibble for the counts
 c_prepub_use <- plyr::count(d$PrePubUse)
@@ -1621,17 +1605,17 @@ n_prepub_use <- length(unique(d$ParticipantNumber))
 # create a tibble with percentages (of respondents who answered this question) & 
 # then reorder them by descending percentages
 tb <- d %>% 
-  dplyr::count(PrePubUse_text) %>% 
+  dplyr::count(PrePubUse_label) %>% 
   mutate(Percentage = round (n/n_prepub_use*100)) %>% 
   dplyr::arrange(desc(n)) 
  # mutate_if(is.character, ~factor(.)) # make it a factor
 
 # AH...I only need these next two steps if I'm actually able to figure out how 
-  # to use the Use variable to reorder the variable, while using the Use_text
+  # to use the Use variable to reorder the variable, while using the Use_label
   # variable to name the actual columns in the tables. Otherwise, skip this.
 
 d2 <- d %>% # create tibble with the Data Use counts
-  select(PrePubUse, PrePubUse_text)  %>% 
+  select(PrePubUse, PrePubUse_label)  %>% 
       dplyr::count(PrePubUse) 
   #  mutate_if(is.character, ~factor(.))
 
@@ -1686,7 +1670,7 @@ c <- metadata %>%
     filter(NewVariable != "PrePubConcern_text") #remove this value from metadata
 
 d <- full_join(PrePubConcern_long, c, by = c("PrePubConcern" = "NewVariable")) %>% 
-  rename ("PrePubConcern_text" = "ItemTextShort")
+  rename ("PrePubConcern_label" = "ItemTextShort")
 
 # getting a tibble for the counts
 c_prepub_con <- plyr::count(d$PrePubConcern)
@@ -1697,17 +1681,17 @@ n_prepub_con <- length(unique(d$ParticipantNumber))
 # create a tibble with percentages (of respondents who answered this question) & 
 # then reorder them by descending percentages
 tb <- d %>% 
-  dplyr::count(PrePubConcern_text) %>% 
+  dplyr::count(PrePubConcern_label) %>% 
   mutate(Percentage = round (n/n_prepub_con*100)) %>% 
   dplyr::arrange(desc(n)) 
  # mutate_if(is.character, ~factor(.)) # make it a factor
 
 # AH...I only need these next two steps if I'm actually able to figure out how 
-  # to use the `x` variable to reorder the variable, while using the `x_text`
+  # to use the `x` variable to reorder the variable, while using the `x_label`
   # variable to name the actual columns in the tables. Otherwise, skip this.
 
 d2 <- d %>% # create tibble with the Data Concern counts
-  select(PrePubConcern, PrePubConcern_text)  %>% 
+  select(PrePubConcern, PrePubConcern_label)  %>% 
       dplyr::count(PrePubConcern) 
   #  mutate_if(is.character, ~factor(.))
 
@@ -1729,16 +1713,16 @@ the percentage who selected each of the concerns.
 
 # build the bar chart
 
-# reorder the rows according to the PrePubConcern_text 
+# reorder the rows according to the PrePubConcern_label 
 tb2 <- tb %>% 
-  dplyr::mutate(PrePubConcern_text = factor(PrePubConcern_text, 
+  dplyr::mutate(PrePubConcern_label = factor(PrePubConcern_label, 
                 levels = c("Other", 
                            "Others could see differences between the original conception and the ultimately published work",
                            "Making my work available pre-publication might reduce citations of the ultimately published work",
                            "Other people might copy my research and publish it before I do",
                             "Non-peer-reviewed findings might add noise to the literature",
                            "Some journals might not publish the uploaded manuscript",
-                           "No concerns")))
+                           "I do not share any of these concerns")))
 
 # create a character vector for the colours for each bar
 cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", 
@@ -1748,7 +1732,7 @@ cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3",
 title = sprintf("Concerns about pre-publication archiving (n = %d)", n_prepub_con)
 
 p <- ggplot(tb2) + 
-  aes(x = PrePubConcern_text, y = Percentage) +
+  aes(x = PrePubConcern_label, y = Percentage) +
   geom_bar(stat = "identity", colour = "black", fill = cols) +
   labs (x = element_blank(),
         y = "Percentage", 
@@ -1873,7 +1857,7 @@ c <- metadata %>%
     filter(NewVariable != "PrePubConcern_text") #remove this value from metadata
 
 d <- full_join(PrePubConcern_long, c, by = c("PrePubConcern" = "NewVariable")) %>% 
-  rename ("PrePubConcern_text" = "ItemTextShort")
+  rename ("PrePubConcern_label" = "ItemTextShort")
 
 # getting a tibble for the counts
 c_prepub_con <- plyr::count(d$PrePubConcern)
@@ -1884,17 +1868,17 @@ n_prepub_con <- length(unique(d$ParticipantNumber))
 # create a tibble with percentages (of respondents who answered this question) & 
 # then reorder them by descending percentages
 tb <- d %>% 
-  dplyr::count(PrePubConcern_text) %>% 
+  dplyr::count(PrePubConcern_label) %>% 
   mutate(Percentage = round (n/n_prepub_con*100)) %>% 
   dplyr::arrange(desc(n)) 
  # mutate_if(is.character, ~factor(.)) # make it a factor
 
 # AH...I only need these next two steps if I'm actually able to figure out how 
-  # to use the `x` variable to reorder the variable, while using the `x_text`
+  # to use the `x` variable to reorder the variable, while using the `x_label`
   # variable to name the actual columns in the tables. Otherwise, skip this.
 
 d2 <- d %>% # create tibble with the Data Concern counts
-  select(PrePubConcern, PrePubConcern_text)  %>% 
+  select(PrePubConcern, PrePubConcern_label)  %>% 
       dplyr::count(PrePubConcern) 
   #  mutate_if(is.character, ~factor(.))
 
@@ -1920,16 +1904,16 @@ the percentage who selected each of the concerns.
 
 # build the bar chart
 
-# reorder the rows according to the PrePubConcern_text 
+# reorder the rows according to the PrePubConcern_label 
 tb2 <- tb %>% 
-  dplyr::mutate(PrePubConcern_text = factor(PrePubConcern_text, 
+  dplyr::mutate(PrePubConcern_label = factor(PrePubConcern_label, 
                 levels = c("Other", 
                            "Others could see differences between the original conception and the ultimately published work",
                            "Making my work available pre-publication might reduce citations of the ultimately published work",
                            "Other people might copy my research and publish it before I do",
                             "Non-peer-reviewed findings might add noise to the literature",
                            "Some journals might not publish the uploaded manuscript",
-                           "No concerns")))
+                           "I do not share any of these concerns")))
 
 # create a character vector for the colours for each bar
 cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", 
@@ -1939,7 +1923,7 @@ cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3",
 title = sprintf("Concerns about pre-publication archiving (n = %d)", n_prepub_con)
 
 p <- ggplot(tb2) + 
-  aes(x = PrePubConcern_text, y = Percentage) +
+  aes(x = PrePubConcern_label, y = Percentage) +
   geom_bar(stat = "identity", colour = "black", fill = cols) +
   labs (x = element_blank(),
         y = "Percentage", 

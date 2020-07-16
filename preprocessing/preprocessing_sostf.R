@@ -196,33 +196,8 @@ df$OAprop_num <- df$OAprop_num_o %>%
     c("1", "2", "3", "4", "0", "5"), 
     c("4", "3", "2", "1", "0", "5"))
 
-
-# recode preregistration concerns & make them factors [could simplify this with
-  # meta rename that I used with data concern]
-df$PreRegCon_delay <- factor(df$PreregConcern_4)
-df$PreRegCon_look <- factor(df$PreregConcern_5)
-df$PreRegCon_prevent_exp <- factor(df$PreregConcern_6)
-df$PreRegCon_stifle_creativity <- factor(df$PreregConcern_7)
-df$PreRegCon_scooping <- factor(df$PreregConcern_8)
-df$PreRegCon_prevent_sig <- factor(df$PreregConcern_10)
-df$PreRegCon_diff_pub <- factor(df$PreregConcern_11)
-df$PreRegCon_no_con <- factor(df$PreregConcern_12)
-
-# recode open code concerns [could simplify this with
-# meta rename that I used with data concern]
-
-df$CodeCon_criticise <- factor(df$CodeConcern_4)
-df$CodeCon_diff_understand <- factor(df$CodeConcern_5)
-df$CodeCon_assistance <- factor(df$CodeConcern_6)
-df$CodeCon_lose_control <- factor(df$CodeConcern_7)
-df$CodeCon_errors <- factor(df$CodeConcern_8)
-df$CodeCon_credit <- factor(df$CodeConcern_9)
-df$CodeCon_no_con <- factor(df$CodeConcern_12)
-df$CodeCon_violate <- factor(df$CodeConcern_13)
-df$CodeCon_ip <- factor(df$CodeConcern_14)
-
-# recode open data concerns (eventually all of the 'concerns' recoding will 
-  # be done via this function)
+# recode Concerns variables (for Preregistration, Code, Data, Pre-publication 
+  # archiving) and Use variables (for Code, Data, Pre-publication archiving)
 
 df <- meta_rename(df, metadata, old = OldVariable, new = NewVariable)
 

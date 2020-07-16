@@ -525,3 +525,20 @@ code_con_key <- c (CodeCon_criticise = "Others might criticise my materials/code
 
 # recode the values with this character vector
 CodeCon_long$CodeConcern <- recode(CodeCon_long$CodeConcern, !!!code_con_key)
+
+
+
+# OLD WAY OF RECODING ACADEMIC LEVELS USING IFELSE STATEMENTS
+  # replaced with `case_when`
+
+df <- mutate (df, AcLevel_Label = ifelse (AcLevel_1 %in% '1', "Professor",
+                                          ifelse (AcLevel_2 %in% '1', "Associate Professor", 
+                                          ifelse (AcLevel_3 %in% '1', "Senior Lecturer",
+                                          ifelse (AcLevel_4 %in% '1', "Lecturer", 
+                                          ifelse (AcLevel_5 %in% '1', "Postdoc",
+                                          ifelse (AcLevel_6 %in% '1', "PhD Student", 
+                                          ifelse (AcLevel_7 %in% '1', "Masters Student",
+                                          ifelse (AcLevel_9 %in% '1', "Research Assistant", 
+                                          ifelse (AcLevel_10 %in% '1', "Other", 
+                                          ifelse (AcLevel_12 %in% '1', "Senior Research Fellow",
+                                          ifelse (AcLevel_13 %in% '1', "Research Fellow", "NA"))))))))))))

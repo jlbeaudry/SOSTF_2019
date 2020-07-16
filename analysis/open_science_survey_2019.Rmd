@@ -1716,90 +1716,52 @@ p
 
 #### Open Access Publishing
 
-<EM> NEEDS TO BE UPDATED </EM>
-
-The next section of the survey related to the use of pre-publication archiving. 
-For our purposes, we explained that pre-publication archiving is also known as 
-preprint archiving, and refers to making a manuscript openly available <em><b>
-before </em></b> it undergoes peer review in an academic journal or other outlet.
-Generally, this is achieved by uploading the manuscript to an archive such as arXiv
-(physics, maths), bioRxiv (biology), SocArxiv (sociology), etc.
+The next section of the survey addressed Open Access publishing. We first explained
+the two different kinds of open access publishing: (1) paying an open access fee 
+to make the final version of your published article open access, and (2) deposit 
+the final accepted version of your manuscript (peer-reviewed but not 
+journal-formatted) in an open access repository (e.g., Swinburne Research Bank
+or bioRxiv). 
 
 ##### Proportion of Publications that are Open Access 
-
-<EM> NEEDS TO BE UPDATED </EM>
 
 ```{r oa_prop_count, echo=FALSE, warning=TRUE}
 
 # filter rows with valid responses for this variable
-valid_prepub_exp <- filter(df,PrePubExp != "NA")
+valid_OAprop <- filter(df,OAprop != "NA")
 
 # calculate number of rows with a valid response for this variable
-nvalid_prepub_exp <- nrow(valid_prepub_exp)
+nvalid_OAprop <- nrow(valid_OAprop)
 
-tb <- valid_prepub_exp %>% 
-  dplyr::count(PrePubExp) %>%  
-    mutate(Percentage = round (n/nvalid_prepub_exp*100)) %>% 
+tb <- valid_OAprop %>% 
+  dplyr::count(OAprop) %>%  
+    mutate(Percentage = round (n/nvalid_OAprop*100)) %>% 
     dplyr::arrange(desc(n))
 
 ```
 
-<EM> NEEDS TO BE UPDATED </EM>
-
-We also asked participants about their experience with pre-publication archiving. 
-Of the `r sum(tb[2])` participants who answered this question, `r tb[2,2]` 
-(`r tb[2,3]`%) indicated that until now, they were unaware of pre-publication 
-archiving; `r tb[1,2]` (`r tb[1,3]`%) indicated that they were were aware of pre-
-publication arhciving, but had not used it; `r tb[4,2]` (`r tb[4,3]`%) indicated 
-that they had some experience with pre-publication archiving; and `r tb[3,2]` 
-(`r tb[3,3]`%) indicated that they have extensive experience with pre-publication
-archiving. 
-
-<EM> NEEDS TO BE UPDATED </EM>
-
-```{r oa_prop_pie, echo = FALSE, warning = TRUE}
-
-title = "What is your experience with pre-publication archiving? (n = %d)"
-
-#pie chart
-colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(df,
-                      label_var="PrePubExp",
-                      the_title = title, 
-                      colours = colours, 
-                      the_quantity="percent")
-p
-```
-
-<EM> NEEDS TO BE UPDATED </EM>
+We asked participants to indicate approximately what proportion of their 
+publications from the last 5 years are open access. Of the `r sum(tb[2])` 
+participants who answered this question, the most common responses were that 
+some (`r tb[1,2]`; `r tb[1,3]`%) or none (`r tb[2,2]`; `r tb[2,3]`%) of their 
+publications were open access. A small proportion (`r tb[3,2]`; `r tb[3,3]`%) 
+indicated that they did not know what proportion were open access. The following
+table provides the breakdown of responses.
 
 ```{r oa_prop_table, echo=FALSE, warning=TRUE}
 
-tb2 <- tb [c(2,1,4,3),] # fix the order of responses from 'unaware' to 'ext exp'
+tb2 <- tb [c(3,2,1,5,4,6),] # fix the order of responses from 'i don't know' to 'all'
 
 tb2 %>% 
-knitr::kable (col.names = c("Reported Experience", "Frequency", "Percentage"), 
-              caption = sprintf("Experience with Pre-publication Archiving (n = %d)",
-                                nvalid_prepub_exp), align = 'lcc') %>% 
+knitr::kable (col.names = c("Response", "Frequency", "Percentage"), 
+              caption = sprintf("Proportion of Publications that are Open Access (n = %d)",
+                                nvalid_OAprop), align = 'lcc') %>% 
    kable_styling(bootstrap_options = "striped", full_width = F, 
                  position = 'center',
                 latex_options = "hold_position")
 # html output = font_size = 14 # insert in kable styling
 
 ```
-
-
-<EM> NEEDS TO BE UPDATED </EM>
-
-For those participants who reported that they use pre-publication archiving (that
-is, those who reported some experience or extensive experience), we asked them 
-for more information about how they have used these archives. Respondents were 
-allowed to select as many uses as applied. Of these `r n_prepub_use` researchers, 
-the most popular response (`r tb[1,3]`%) was that they read an article from, 
-searched, or browsed a pre-publication archive. That is, they used other people's 
-work posted to pre-publication archives for their own purposes. The next most 
-common use by these researchers is to upload their own work to a pre-publication
-archive before submitting it to a journal (`r tb[2,3]`%).
 
 ##### Open Access Fees
 

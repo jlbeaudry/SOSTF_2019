@@ -509,3 +509,19 @@ prereg_con_key <- c (PreRegCon_delay = "Delays data collection",
 
 # recode the values with this character vector 
 PreRegCon_long$PreRegConcern <- recode(PreRegCon_long$PreRegConcern, !!!prereg_con_key)
+
+# same code but for code concerns
+# recode the data so the response options have proper labels
+# create a character vector with proper labels
+code_con_key <- c (CodeCon_criticise = "Others might criticise my materials/code", 
+                   CodeCon_diff_understand = "Others might find it difficult to understand my materials/code",
+                   CodeCon_assistance = "Others might ask for my assistance with their research",
+                   CodeCon_lose_control = "I might lose control over how they are used", 
+                   CodeCon_errors = "Others might find errors in my published work", 
+                   CodeCon_credit = "I might not receive appropriate credit",
+                   CodeCon_violate = "Reuse could violate epistemological framework", 
+                   CodeCon_ip = "Issues related to intellectual property", 
+                   CodeCon_no_con = "I do not share any of these concerns")
+
+# recode the values with this character vector
+CodeCon_long$CodeConcern <- recode(CodeCon_long$CodeConcern, !!!code_con_key)

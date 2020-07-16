@@ -774,7 +774,7 @@ each of the concerns.
 # reorder the response options from lowest to highest, with concerns last
 tb2 <- tb %>% 
   dplyr::mutate(PreRegConcern_label = factor (PreRegConcern_label, 
-                                levels = c("Other",
+                                levels = c("Other concern",
                                            "More difficult to find significant results", 
                                            "More difficult to publish in certain journals", 
                                            "Delays data collection", 
@@ -1027,55 +1027,35 @@ knitr::kable (col.names = c("Reported Use", "Frequency", "Percentage"),
 # wrangle this data so it's in long form & only includes endorsements.
 
 CodeCon_long <- df %>% 
-  select (c("ParticipantNumber", 
-            "CodeCon_criticise", 
-            "CodeCon_diff_understand", 
-            "CodeCon_assistance", 
-            "CodeCon_lose_control", 
-            "CodeCon_errors", 
-            "CodeCon_credit", 
-            "CodeCon_no_con", 
-            "CodeCon_violate", 
-            "CodeCon_ip", 
-            "FORcode_2_label")) %>%  
-  pivot_longer(c("CodeCon_criticise", 
-                 "CodeCon_diff_understand", 
-                 "CodeCon_assistance", 
-                 "CodeCon_lose_control", 
-                 "CodeCon_errors", 
-                 "CodeCon_credit", 
-                 "CodeCon_no_con", 
-                 "CodeCon_violate", 
-                 "CodeCon_ip"), 
-               names_to = "CodeConcern", 
-               values_to = "CodeCon_Endorsement") %>% 
-  filter(CodeCon_Endorsement == "1")
+     select(c("ParticipantNumber", 
+              "CodeCon_criticise":"CodeCon_ip", 
+              "FORcode_2_label")) %>%  
+    select(-"CodeCon_text") %>% 
+     pivot_longer(c("CodeCon_criticise":"CodeCon_ip"), 
+     names_to = "CodeConcern", 
+     values_to = "CodeCon_Endorsement") %>% 
+  filter(CodeCon_Endorsement == "1")  
+
 
 # recode the data so the response options have proper labels
-  # create a character vector with proper labels
-code_con_key <- c (CodeCon_criticise = "Others might criticise my materials/code", 
-                     CodeCon_diff_understand = "Others might find it difficult to understand my materials/code",
-                     CodeCon_assistance = "Others might ask for my assistance with their research",
-                     CodeCon_lose_control = "I might lose control over how they are used", 
-                     CodeCon_errors = "Others might find errors in my published work", 
-                     CodeCon_credit = "I might not receive appropriate credit",
-                     CodeCon_violate = "Reuse could violate epistemological framework", 
-                     CodeCon_ip = "Issues related to intellectual property", 
-                     CodeCon_no_con = "I do not share any of these concerns")
- 
- # recode the values with this character vector
-CodeCon_long$CodeConcern <- recode(CodeCon_long$CodeConcern, !!!code_con_key)
+
+c <- metadata %>% 
+    filter(Scale == "CodeConcern") %>% 
+    filter(NewVariable != "CodeCon_text") #remove this value from metadata
+
+d <- full_join(CodeCon_long, c, by = c("CodeConcern" = "NewVariable")) %>% 
+  rename ("CodeConcern_label" = "ItemTextShort")
 
 # getting a tibble for the counts
-c_code_con <- plyr::count(CodeCon_long$CodeConcern)
+c_code_con <- plyr::count(d$CodeConcern)
 
 # to figure out how many respondents shared concerns calculate unique number of participants
-n_code_con <- length(unique(CodeCon_long$ParticipantNumber))
+n_code_con <- length(unique(d$ParticipantNumber))
 
 # create a tibble with percentages (of respondents who answered this question) & 
 # then reorder them by descending percentages
-tb <- CodeCon_long %>% 
-  dplyr::count(CodeConcern) %>% 
+tb <- d %>% 
+  dplyr::count(CodeConcern_label) %>% 
   mutate(Percentage = round (n/n_code_con*100)) %>% 
   dplyr::arrange(desc(n))
 
@@ -1096,22 +1076,22 @@ the percentage who selected each of the concerns.
 
 # reorder the response options from lowest to highest, with concerns last
 tb2 <- tb %>% 
-  dplyr::mutate(CodeConcern = factor (CodeConcern, 
-                levels = c("Others might find errors in my published work", 
+  dplyr::mutate(CodeConcern_label = factor (CodeConcern_label, 
+                levels = c("Other concern",
+                         "Others might find errors in my published work", 
                          "Reuse could violate epistemological framework", 
-                         "Others might ask for my assistance with their research", 
+                         "Others might ask me to provide assistance with their research", 
                          "Others might criticise my materials/code", 
                         "Others might find it difficult to understand my materials/code", 
                          "I might lose control over how they are used", 
                          "I might not receive appropriate credit", 
                          "Issues related to intellectual property", 
                          "I do not share any of these concerns")))
-  # I don't get it. tb & tb2 look the same in the tibble, but the order is completely
-  # different when they are graphed..
 
 # create a character vector for the colours for each bar
 cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
-          "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", "grey50")
+          "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
+          "lightskyblue3", "grey50")
 
 # build the bar chart
 title = sprintf("Concerns about open materials\n and/or code (n = %d)", n_code_con)
@@ -1121,7 +1101,7 @@ title = sprintf("Concerns about open materials\n and/or code (n = %d)", n_code_c
   # could use stat = "identity" with 'geom_bar')
 
 p <- ggplot(tb2) + 
-  aes(x = CodeConcern, y = Percentage) +
+  aes(x = CodeConcern_label, y = Percentage) +
   geom_bar(stat = "identity", colour = "black", fill = cols) +
   labs (x = element_blank(),
         y = "Percentage", 
@@ -1411,7 +1391,7 @@ the percentage who selected each of the concerns.
 # reorder the rows according to the DataConcern_label 
 tb3 <- tb2 %>% 
   dplyr::mutate(DataConcern_label = factor(DataConcern_label, 
-                levels = c("Other", 
+                levels = c("Other concern", 
                            "It devalues research data collection", 
                            "Unfair for other researchers to benefit from my data collection", 
                           "Others might criticise my data and/or research practices", 
@@ -1686,17 +1666,6 @@ tb <- d %>%
   dplyr::arrange(desc(n)) 
  # mutate_if(is.character, ~factor(.)) # make it a factor
 
-# AH...I only need these next two steps if I'm actually able to figure out how 
-  # to use the `x` variable to reorder the variable, while using the `x_label`
-  # variable to name the actual columns in the tables. Otherwise, skip this.
-
-d2 <- d %>% # create tibble with the Data Concern counts
-  select(PrePubConcern, PrePubConcern_label)  %>% 
-      dplyr::count(PrePubConcern) 
-  #  mutate_if(is.character, ~factor(.))
-
-# join the two tables together
-tb2 <- left_join(x = tb, y = d2, by = "n") 
 ```
 
 We asked all respondents if they have any concerns about uploading a manuscript
@@ -1716,7 +1685,7 @@ the percentage who selected each of the concerns.
 # reorder the rows according to the PrePubConcern_label 
 tb2 <- tb %>% 
   dplyr::mutate(PrePubConcern_label = factor(PrePubConcern_label, 
-                levels = c("Other", 
+                levels = c("Other concern", 
                            "Others could see differences between the original conception and the ultimately published work",
                            "Making my work available pre-publication might reduce citations of the ultimately published work",
                            "Other people might copy my research and publish it before I do",
@@ -1729,7 +1698,7 @@ cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3",
           "lightskyblue3", "lightskyblue3", "lightskyblue3", "grey50")
                     
 # build the bar chart
-title = sprintf("Concerns about pre-publication archiving (n = %d)", n_prepub_con)
+title = sprintf("Concerns about pre-publication archiving\n (n = %d)", n_prepub_con)
 
 p <- ggplot(tb2) + 
   aes(x = PrePubConcern_label, y = Percentage) +
@@ -1907,7 +1876,7 @@ the percentage who selected each of the concerns.
 # reorder the rows according to the PrePubConcern_label 
 tb2 <- tb %>% 
   dplyr::mutate(PrePubConcern_label = factor(PrePubConcern_label, 
-                levels = c("Other", 
+                levels = c("Other concern", 
                            "Others could see differences between the original conception and the ultimately published work",
                            "Making my work available pre-publication might reduce citations of the ultimately published work",
                            "Other people might copy my research and publish it before I do",

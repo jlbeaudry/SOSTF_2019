@@ -12,6 +12,7 @@ df$crisis <- factor(df$crisis) %>%
 #str(df, list.len = ncol(df))  #allows me to see the column types for all variables
 #&prevents it from being truncated
 
+# mutate_if(is.character, ~factor(.)) # make it a factor
 
 # figuring out the Academic Levels variables
 
@@ -352,3 +353,245 @@ tb4 <- vars_select(names(tb3), DataConcern = DataConcern_text)
 
 # this caption actually works, but the order still changed
 caption2 <- tb3$DataConcern_text %>% (function(x) str_wrap(x, width = 50))
+
+
+# STILL TRYING TO USE ONE DATA SET FOR THE PERCENTAGE & ONE FOR THE NAMES....
+
+# reorder the rows according to the DataConcern (because it has less text)
+tb3 <- tb2 %>% 
+  dplyr::mutate(DataConcern = factor(DataConcern, 
+                                     levels = c("DataConcern_other", 
+                                                "DataConcern_devalues",
+                                                "DataConcern_unfair", 
+                                                "DataConcern_criticise",
+                                                "DataConcern_effort", 
+                                                "DataConcern_control",
+                                                "DataConcern_credit",
+                                                "DataConcern_scoop",
+                                                "DataConcern_ip",
+                                                "DataConcern_privacy",
+                                                "DataConcern_ethics",
+                                                "DataConcern_none"))) %>% 
+  dplyr::mutate(DataConcern_text = factor(DataConcern_text)) #turn into factors
+
+
+https://raw.githubusercontent.com/janhove/janhove.github.io/master/RCode/sortLvls.R
+
+# HIS ORIGINAL CODE
+
+sortLvls.fnc <- function(oldFactor, levelOrder) {
+  if(!is.factor(oldFactor)) stop("The variable you want to reorder isn't a factor.")
+  
+  if(!is.numeric(levelOrder)) stop("'order' should be a numeric vector.")
+  
+  if(max(levelOrder) > length(levels(oldFactor))) stop("The largest number in 'order' can't be larger than the number of levels in the factor.")
+  
+  if(length(levelOrder) > length(levels(oldFactor))) stop("You can't have more elements in 'order' than there are levels in the factor.")
+  
+  if(length(levelOrder) == length(levels(oldFactor))) {
+    reorderedFactor <- factor(oldFactor, levels = levels(oldFactor)[levelOrder])
+  }
+  
+  if(length(levelOrder) < length(levels(oldFactor))) {
+    levelOrderAll <- c(levelOrder, (1:length(levels(oldFactor)))[-levelOrder])
+    reorderedFactor <- factor(oldFactor, levels = levels(oldFactor)[levelOrderAll])
+  }
+  
+  return(reorderedFactor)
+}
+
+### ME PLAYING WITH IT! IT WORKS, in theory, BUT IT STILL DOESN'T FORCE GGPLOT TO USE THE TEXT
+
+sortLvls.fnc <- function(oldFactor, levelOrderFctr) {
+  if(!is.factor(oldFactor)) stop("The variable you want to reorder isn't a factor.")
+  
+  if(!is.factor(levelOrderFctr)) stop("The level variable you want to use isn't a factor.")
+  
+  if(length(levelOrderFctr) == length(levels(oldFactor))) {
+    reorderedFactor <- factor(oldFactor, levels = levels(oldFactor)[levelOrderFctr])
+  }
+  
+  return(reorderedFactor)
+}
+
+tb3$DataConcern_text_order <- sortLvls.fnc(oldFactor = tb3$DataConcern_text, levelOrderFctr = tb3$DataConcern)
+
+# HIS ORIGINAL CODE
+
+sortLvlsByVar.fnc <- function(oldFactor, sortingVariable, ascending = TRUE) {
+  
+  require("dplyr")
+  require("magrittr")
+  
+  # Combine into data frame
+  df <- data.frame(oldFactor, sortingVariable)
+  
+  ###
+  ### If you want to sort the levels by, say, the median, sd etc. instead of the mean,
+  ### just change 'mean(sortingVariable)' below to, say, 'median(sortingVariable)'.
+  ###
+  
+  # Compute average of sortingVariable and arrange (ascending)
+  if (ascending == TRUE) {
+    df_av <- df %>% group_by(oldFactor) %>% summarise(meanSortingVariable = mean(sortingVariable)) %>% 
+      arrange(meanSortingVariable)
+  }
+  
+  # Compute average of sortingVariable and arrange (descending)
+  if (ascending == FALSE) {
+    df_av <- df %>% group_by(oldFactor) %>% summarise(meanSortingVariable = mean(sortingVariable)) %>% 
+      arrange(desc(meanSortingVariable))
+  }
+  
+  # Return factor with new level order
+  newFactor <- factor(oldFactor, levels = df_av$oldFactor)
+  return(newFactor)
+}
+
+caption <- tb3$DataConcern_text_order %>% (function(x) str_wrap(x, width = 50))
+
+
+# create a character vector for the colours for each bar
+cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
+          "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
+          "lightskyblue3", "lightskyblue3", "lightskyblue3", "grey50")
+
+
+# build the bar chart
+title = sprintf("Concerns about open data (n = %d)", n_data_con)
+
+p <- ggplot(tb3) + 
+  aes(x = DataConcern, y = Percentage) +
+  geom_bar(stat = "identity", colour = "black", fill = cols) +
+  labs (x = element_blank(),
+        y = "Percentage", 
+        title = title) +
+  coord_flip(ylim = c(0,60)) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 50)) + #wrap the labels
+  theme_classic(base_size = 12) + 
+  theme(plot.title = element_text(hjust = 0.5)) # centre the title
+p
+
+# RECODING (now done with meta rename)
+
+# recode preregistration concerns & make them factors [could simplify this with
+# meta rename that I used with data concern]
+df$PreRegCon_delay <- factor(df$PreregConcern_4)
+df$PreRegCon_look <- factor(df$PreregConcern_5)
+df$PreRegCon_prevent_exp <- factor(df$PreregConcern_6)
+df$PreRegCon_stifle_creativity <- factor(df$PreregConcern_7)
+df$PreRegCon_scooping <- factor(df$PreregConcern_8)
+df$PreRegCon_prevent_sig <- factor(df$PreregConcern_10)
+df$PreRegCon_diff_pub <- factor(df$PreregConcern_11)
+df$PreRegCon_no_con <- factor(df$PreregConcern_12)
+
+# recode open code concerns [could simplify this with
+# meta rename that I used with data concern]
+
+df$CodeCon_criticise <- factor(df$CodeConcern_4)
+df$CodeCon_diff_understand <- factor(df$CodeConcern_5)
+df$CodeCon_assistance <- factor(df$CodeConcern_6)
+df$CodeCon_lose_control <- factor(df$CodeConcern_7)
+df$CodeCon_errors <- factor(df$CodeConcern_8)
+df$CodeCon_credit <- factor(df$CodeConcern_9)
+df$CodeCon_no_con <- factor(df$CodeConcern_12)
+df$CodeCon_violate <- factor(df$CodeConcern_13)
+df$CodeCon_ip <- factor(df$CodeConcern_14)
+
+# use character vector to change labels
+prereg_con_key <- c (PreRegCon_delay = "Delays data collection", 
+                     PreRegCon_look = "Need to look at data to analyse it",
+                     PreRegCon_prevent_exp = "Prevents exploratory research",
+                     PreRegCon_stifle_creativity = "Stifles creativity", 
+                     PreRegCon_scooping = "Risk of scooping", 
+                     PreRegCon_prevent_sig = "More difficult to find significant results",
+                     PreRegCon_diff_pub = "More difficult to publish in certain journals", 
+                     PreRegCon_no_con = "No concerns")
+
+# recode the values with this character vector 
+PreRegCon_long$PreRegConcern <- recode(PreRegCon_long$PreRegConcern, !!!prereg_con_key)
+
+# same code but for code concerns
+# recode the data so the response options have proper labels
+# create a character vector with proper labels
+code_con_key <- c (CodeCon_criticise = "Others might criticise my materials/code", 
+                   CodeCon_diff_understand = "Others might find it difficult to understand my materials/code",
+                   CodeCon_assistance = "Others might ask for my assistance with their research",
+                   CodeCon_lose_control = "I might lose control over how they are used", 
+                   CodeCon_errors = "Others might find errors in my published work", 
+                   CodeCon_credit = "I might not receive appropriate credit",
+                   CodeCon_violate = "Reuse could violate epistemological framework", 
+                   CodeCon_ip = "Issues related to intellectual property", 
+                   CodeCon_no_con = "I do not share any of these concerns")
+
+# recode the values with this character vector
+CodeCon_long$CodeConcern <- recode(CodeCon_long$CodeConcern, !!!code_con_key)
+
+
+
+# OLD WAY OF RECODING ACADEMIC LEVELS USING IFELSE STATEMENTS
+  # replaced with `case_when`
+
+df <- mutate (df, AcLevel_Label = ifelse (AcLevel_1 %in% '1', "Professor",
+                                          ifelse (AcLevel_2 %in% '1', "Associate Professor", 
+                                          ifelse (AcLevel_3 %in% '1', "Senior Lecturer",
+                                          ifelse (AcLevel_4 %in% '1', "Lecturer", 
+                                          ifelse (AcLevel_5 %in% '1', "Postdoc",
+                                          ifelse (AcLevel_6 %in% '1', "PhD Student", 
+                                          ifelse (AcLevel_7 %in% '1', "Masters Student",
+                                          ifelse (AcLevel_9 %in% '1', "Research Assistant", 
+                                          ifelse (AcLevel_10 %in% '1', "Other", 
+                                          ifelse (AcLevel_12 %in% '1', "Senior Research Fellow",
+                                          ifelse (AcLevel_13 %in% '1', "Research Fellow", "NA"))))))))))))
+
+# Trying to get rid of rows that have NAs in all relevant columns..
+
+https://blog.exploratory.io/applying-filter-condition-to-multiple-columns-together-with-filter-at-filter-if-commands-379281ac0a3b
+
+  # shockingly this code actually works, except it gets rid of ALL rows with NAs 
+  # anywhere, rather than only those rows with NAs in every single row....
+
+df_imp_ex <- df_imp %>% filter_at(vars(ends_with("Imp")), all_vars(!is.na(.)))
+# the solution is to use any_vars! Keeps the rows as long as the values of at 
+  # least one of the columns satisfies the condition! 
+
+df_imp_ex <- df_imp %>% filter_at(vars(ends_with("Imp")), any_vars(!is.na(.)))
+
+
+# CONVOLUTED WAY OF BUILDING THE TIBBLES FOR STACKED BARS
+
+# try creating tibbles for each variable that I can join? 
+# filter out irrelevant responses, but keep NAs for now
+
+# filter(!is.na(PreRegImp))
+
+# PreRegImp
+
+a <- df %>% 
+  select(c("ParticipantNumber", "PreRegImp", "FORcode_2_label")) %>% 
+  filter(PreRegImp != "Researchers in my discipline do not conduct research studies") %>% 
+  mutate_if(is.character, ~factor(.))
+
+# CodeImp
+
+b <- df %>% 
+  select(c("ParticipantNumber", "CodeImp", "FORcode_2_label")) %>% 
+  filter(CodeImp != "Researchers in my discipline do not use materials and/or code") %>% 
+  mutate_if(is.character, ~factor(.))
+
+# DataImp
+
+c <- df %>% 
+  select(c("ParticipantNumber", "DataImp", "FORcode_2_label")) %>% 
+  filter(DataImp != "Research publications in my field are not based on data") %>% 
+  mutate_if(is.character, ~factor(.))
+
+# PrePubImp
+
+d <- df %>% 
+  select(c("ParticipantNumber", "PrePubImp", "FORcode_2_label")) %>% 
+  mutate_if(is.character, ~factor(.))
+
+# join the tibbles together
+
+df_imp <- a %>% full_join(b) %>% full_join(c) %>% full_join(d)

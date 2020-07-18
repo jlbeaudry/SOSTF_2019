@@ -165,6 +165,8 @@ df$PrePubImp_num_o <- factor(df$PrePubImp) #name as 'original' so we can reverse
 
 df$PrePubExp_num <- factor(df$PrePubExp) 
 
+df$OAprop_num_o <- factor(df$OAprop) #name as 'original' so we can reverse code it next
+
 # reverse code `importance` variables so lower values = less importance
 
 df$PreRegImp_num <- df$PreRegImp_num_o %>% 
@@ -187,32 +189,15 @@ df$PrePubImp_num <- df$PrePubImp_num_o %>%
     c("1", "2", "3", "4"), 
     c("4", "3", "2", "1"))
 
-# recode preregistration concerns & make them factors [could simplify this with
-  # meta rename that I used with data concern]
-df$PreRegCon_delay <- factor(df$PreregConcern_4)
-df$PreRegCon_look <- factor(df$PreregConcern_5)
-df$PreRegCon_prevent_exp <- factor(df$PreregConcern_6)
-df$PreRegCon_stifle_creativity <- factor(df$PreregConcern_7)
-df$PreRegCon_scooping <- factor(df$PreregConcern_8)
-df$PreRegCon_prevent_sig <- factor(df$PreregConcern_10)
-df$PreRegCon_diff_pub <- factor(df$PreregConcern_11)
-df$PreRegCon_no_con <- factor(df$PreregConcern_12)
+# reverse code 'proportion' variables so lower values = less proportion
 
-# recode open code concerns [could simplify this with
-# meta rename that I used with data concern]
+df$OAprop_num <- df$OAprop_num_o %>% 
+  mapvalues(
+    c("1", "2", "3", "4", "0", "5"), 
+    c("4", "3", "2", "1", "0", "5"))
 
-df$CodeCon_criticise <- factor(df$CodeConcern_4)
-df$CodeCon_diff_understand <- factor(df$CodeConcern_5)
-df$CodeCon_assistance <- factor(df$CodeConcern_6)
-df$CodeCon_lose_control <- factor(df$CodeConcern_7)
-df$CodeCon_errors <- factor(df$CodeConcern_8)
-df$CodeCon_credit <- factor(df$CodeConcern_9)
-df$CodeCon_no_con <- factor(df$CodeConcern_12)
-df$CodeCon_violate <- factor(df$CodeConcern_13)
-df$CodeCon_ip <- factor(df$CodeConcern_14)
-
-# recode open data concerns (eventually all of the 'concerns' recoding will 
-  # be done via this function)
+# recode Concerns variables (for Preregistration, Code, Data, Pre-publication 
+  # archiving) and Use variables (for Code, Data, Pre-publication archiving)
 
 df <- meta_rename(df, metadata, old = OldVariable, new = NewVariable)
 
@@ -275,6 +260,11 @@ df$PrePubExp <- df$PrePubExp_num %>%
     c("1", "2", "3", "4"), 
     c("Unaware", "Aware, But Not Used", "Some Experience", "Extensive Experience"))
 
+df$OAprop <- df$OAprop_num %>% 
+  mapvalues(
+    c("4", "3", "2", "1", "0", "5"), 
+    c("All", "Most", "Half", "Some", "None", "I don't know"))
+
 ## RECODE ACADEMIC LEVELS ##
 
 # notes re: how I dealt with folks who selected more than one option from Academic Levels.
@@ -307,23 +297,21 @@ df <- df %>%
   # based on their first response within the survey to resolve the multiple responses.
   
   
-  df <- mutate (df, AcLevel_Label = ifelse (AcLevel_1 %in% '1', "Professor",
-                                    ifelse (AcLevel_2 %in% '1', "Associate Professor", 
-                                    ifelse (AcLevel_3 %in% '1', "Senior Lecturer",
-                                    ifelse (AcLevel_4 %in% '1', "Lecturer", 
-                                    ifelse (AcLevel_5 %in% '1', "Postdoc",
-                                    ifelse (AcLevel_6 %in% '1', "PhD Student", 
-                                    ifelse (AcLevel_7 %in% '1', "Masters Student",
-                                    ifelse (AcLevel_9 %in% '1', "Research Assistant", 
-                                    ifelse (AcLevel_10 %in% '1', "Other", 
-                                    ifelse (AcLevel_12 %in% '1', "Senior Research Fellow",
-                                    ifelse (AcLevel_13 %in% '1', "Research Fellow", "NA"))))))))))))
-
+df <- mutate(df, AcLevel_Label = case_when (AcLevel_1 == '1' ~ "Professor", 
+                                             AcLevel_2 == '1' ~ "Associate Professor", 
+                                             AcLevel_3 == '1' ~ "Senior Lecturer",
+                                             AcLevel_4 == '1' ~ "Lecturer", 
+                                             AcLevel_5 == '1' ~ "Postdoc",
+                                             AcLevel_6 == '1' ~ "PhD Student", 
+                                             AcLevel_7 == '1' ~ "Masters Student",
+                                             AcLevel_9 == '1' ~ "Research Assistant",
+                                             AcLevel_10 == '1' ~ "Other", 
+                                             AcLevel_12 == '1' ~ "Senior Research Fellow",
+                                             AcLevel_13 == '1' ~ "Research Fellow",
+                                             TRUE ~ "NA"))
   
   # transform into factor
   df$AcLevel_Label <- factor(df$AcLevel_Label) 
-  
-  
   
 ################### WRITE DATA TO CSV #############
 

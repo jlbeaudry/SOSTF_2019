@@ -1697,6 +1697,7 @@ tb2 <- tb %>%
 cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", 
           "lightskyblue3", "lightskyblue3", "lightskyblue3", "grey50")
                     
+
 # build the bar chart
 title = sprintf("Concerns about pre-publication archiving\n (n = %d)", n_prepub_con)
 
@@ -1765,97 +1766,77 @@ knitr::kable (col.names = c("Response", "Frequency", "Percentage"),
 
 ##### Open Access Fees
 
-<EM> NEEDS TO BE UPDATED </EM>
-
 ```{r oa_fees_data, echo=FALSE, warning=TRUE, eval = TRUE}
 
 # wrangle this data so it's in long form & only includes endorsements.
 
-PrePubConcern_long <- df %>% 
+OAfees_long <- df %>% 
   select (c("ParticipantNumber", 
-            "PrePubConcern_policy":"PrePubConcern_none",
+            "OAfees_free":"OAfees_hdr",
             "FORcode_2_label")) %>%  
-  select(-"PrePubConcern_text") %>% 
-  pivot_longer(c("PrePubConcern_policy":"PrePubConcern_none"),
-               names_to = "PrePubConcern", 
-               values_to = "PrePubConcern_Endorsement") %>% 
-  filter(PrePubConcern_Endorsement == "1")
+  select(-"OAfees_text") %>% 
+  pivot_longer(c("OAfees_free":"OAfees_hdr"),
+               names_to = "OAfees", 
+               values_to = "OAfees_Endorsement") %>% 
+  filter(OAfees_Endorsement == "1")
 
 # recode the data so the response options have proper labels
 
 c <- metadata %>% 
-    filter(Scale == "PrePubConcern") %>% 
-    filter(NewVariable != "PrePubConcern_text") #remove this value from metadata
+    filter(Scale == "OAfees") %>% 
+    filter(NewVariable != "OAfees_text") #remove this value from metadata
 
-d <- full_join(PrePubConcern_long, c, by = c("PrePubConcern" = "NewVariable")) %>% 
-  rename ("PrePubConcern_label" = "ItemTextShort")
+d <- full_join(OAfees_long, c, by = c("OAfees" = "NewVariable")) %>% 
+  rename ("OAfees_label" = "ItemText")
 
 # getting a tibble for the counts
-c_prepub_con <- plyr::count(d$PrePubConcern)
+c_oafees <- plyr::count(d$OAfees)
 
 # to figure out how many respondents shared concerns calculate unique number of participants
-n_prepub_con <- length(unique(d$ParticipantNumber))
+n_oafees <- length(unique(d$ParticipantNumber))
 
 # create a tibble with percentages (of respondents who answered this question) & 
 # then reorder them by descending percentages
 tb <- d %>% 
-  dplyr::count(PrePubConcern_label) %>% 
-  mutate(Percentage = round (n/n_prepub_con*100)) %>% 
+  dplyr::count(OAfees_label) %>% 
+  mutate(Percentage = round (n/n_oafees*100)) %>% 
   dplyr::arrange(desc(n)) 
- # mutate_if(is.character, ~factor(.)) # make it a factor
 
-# AH...I only need these next two steps if I'm actually able to figure out how 
-  # to use the `x` variable to reorder the variable, while using the `x_label`
-  # variable to name the actual columns in the tables. Otherwise, skip this.
-
-d2 <- d %>% # create tibble with the Data Concern counts
-  select(PrePubConcern, PrePubConcern_label)  %>% 
-      dplyr::count(PrePubConcern) 
-  #  mutate_if(is.character, ~factor(.))
-
-# join the two tables together
-tb2 <- left_join(x = tb, y = d2, by = "n") 
 ```
 
-<EM> NEEDS TO BE UPDATED </EM>
+We asked all respondents, except those who said that none of their publications 
+in the last 5 years were open access, how they paid for article 
+processing charges that many journals charge for open access publishing. We 
+provided a list of possible payment approaches and respondents were able to 
+select as many concerns as they liked. A total of `r n_oafees` respondents 
+answered this question. The following table presents, of those who answered this 
+question, the percentage who used each of the different payment approaches.  
 
-We asked all respondents if they have any concerns about uploading a manuscript
-to a pre-publication archive before submitting it for peer review. After asking 
-respondents to share their concerns in a free text format, we provided a list of 
-possible concerns that researchers could have about engaging in this practice. 
-Respondents were able to select as many concerns as they liked. A total of 
-`r n_prepub_con` respondents answered this question. Of those who respondended,
-`r tb [6,2]` (`r tb [6,3]`%) reported that they do not share any of the listed 
-concerns. The following figure presents, of those who answered this question, 
-the percentage who selected each of the concerns.  
-
-<EM> NEEDS TO BE UPDATED </EM>
-
-```{r oa_fees_bar, echo=FALSE, warning=TRUE, eval=TRUE}
+```{r oa_fees_bar, eval=TRUE, echo=FALSE, warning=TRUE}
 
 # build the bar chart
 
 # reorder the rows according to the PrePubConcern_label 
 tb2 <- tb %>% 
-  dplyr::mutate(PrePubConcern_label = factor(PrePubConcern_label, 
-                levels = c("Other concern", 
-                           "Others could see differences between the original conception and the ultimately published work",
-                           "Making my work available pre-publication might reduce citations of the ultimately published work",
-                           "Other people might copy my research and publish it before I do",
-                            "Non-peer-reviewed findings might add noise to the literature",
-                           "Some journals might not publish the uploaded manuscript",
-                           "I do not share any of these concerns")))
+  dplyr::mutate(OAfees_label = factor(OAfees_label, 
+                levels = c("My HDR student paid the fees with their research funding", 
+                           "I paid the fees with my personal money",
+                            "I could not afford to pay the fees and withdrew the manuscript", 
+                            "My school/faculty paid the fees",
+                            "I received a fee waiver from the journal",
+                            "Other method",   
+                            "A non-Swinburne collaborator paid the fees",
+                            "My centre/department paid the fees",
+                            "I paid the fees from my own research income",
+                            "My open access publications did not involve fees")))
 
-# create a character vector for the colours for each bar
-cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", 
-          "lightskyblue3", "lightskyblue3", "lightskyblue3", "grey50")
                     
 # build the bar chart
-title = sprintf("Concerns about pre-publication archiving (n = %d)", n_prepub_con)
+title = sprintf("How did you pay any Open Access\n publishing fees? (n = %d)", n_oafees)
 
 p <- ggplot(tb2) + 
-  aes(x = PrePubConcern_label, y = Percentage) +
-  geom_bar(stat = "identity", colour = "black", fill = cols) +
+  aes(x = OAfees_label, y = Percentage) +
+  geom_bar(stat = "identity", colour = "black", fill = "lightskyblue3") +
   labs (x = element_blank(),
         y = "Percentage", 
         title = title) +
@@ -1867,6 +1848,211 @@ p
 
 ```
 
+#### STACKED BAR ATTEMPTS
+
+This gives a solid picture of the overall situation in terms of perceived importance.
+
+##### Importance of Practices
+
+```{r stacked_imp_data, eval=TRUE, include=FALSE}
+## Figure out what the data needs to look like...
+
+# try creating tibbles for each variable that I can join? 
+ # filter out irrelevant responses, but keep NAs for now
+  # for some reason this only works on the character vector NOT factors
+
+# PreReg
+
+a <- df %>% 
+  select(c("ParticipantNumber", "PreRegImp", "FORcode_2_label")) %>% 
+  filter(PreRegImp != "Researchers in my discipline do not conduct research studies") %>% 
+    mutate_if(is.character, ~factor(.))
+
+# CodeImp
+
+b <- df %>% 
+  select(c("ParticipantNumber", "CodeImp", "FORcode_2_label")) %>% 
+  filter(CodeImp != "Researchers in my discipline do not use materials and/or code") %>% 
+  mutate_if(is.character, ~factor(.))
+
+# DataImp
+
+c <- df %>% 
+  select(c("ParticipantNumber", "DataImp", "FORcode_2_label")) %>% 
+  filter(DataImp != "Research publications in my field are not based on data") %>% 
+    mutate_if(is.character, ~factor(.))
+
+# PrePubImp
+
+d <- df %>% 
+  select(c("ParticipantNumber", "PrePubImp", "FORcode_2_label")) %>% 
+  mutate_if(is.character, ~factor(.))
+
+# join the tibbles together
+
+df_imp <- a %>% full_join(b) %>% full_join(c) %>% full_join(d)
+
+# only keep those responses from folks who answered at least one of the questions
+
+valid_df_imp <- df_imp %>% 
+  filter_at(vars(ends_with("Imp")), any_vars(!is.na(.)))
+
+# now I need to make this long
+
+imp_long <- valid_df_imp %>% 
+  pivot_longer(c(ends_with("Imp")),
+               names_to = "Practice", 
+               values_to = "Importance") %>% 
+    mutate_if(is.character, ~factor(.))
+
+total_n <- length(unique(imp_long$ParticipantNumber))
+
+tb <- imp_long %>% 
+  group_by(Practice) %>% 
+  dplyr::count(Importance) %>% 
+  mutate(Percentage = round (n/(total_n)*100))
+
+# if I make the na explicit, I can't use grey for the NA value in the 
+  # brewer scale, so just stick with this...
+
+# tb$Importance <- forcats::fct_explicit_na(tb$Importance, na_level = "N/A")
+
+```
+
+```{r stacked_imp_bar, eval=TRUE, warning=TRUE, echo=FALSE}
+# Relevel my importance factors
+
+tb$Importance <- factor (tb$Importance, levels = c("Extremely important",
+                                           "Somewhat important", 
+                                           "Somewhat unimportant",
+                                           "Not at all"))
+tb$Practice <- factor (tb$Practice, levels = c("PrePubImp", 
+                                               "DataImp", 
+                                               "CodeImp", 
+                                               "PreRegImp"))
+
+# plot the graph
+
+title = sprintf("Perceived importance of open science\n practices (n = %d)", total_n)
+
+p <- ggplot(tb, aes(fill = Importance, y = Percentage, x = Practice)) +
+  geom_bar(position="fill", stat="identity", colour = "black") +
+  scale_fill_brewer(palette = "Blues", na.value = "grey50", direction = -1) +
+  labs (x = element_blank(),
+        y = "Percentage", 
+        title = title) +
+    theme_classic(base_size = 12) +
+    theme(plot.title = element_text(hjust = 0.5)) + 
+  coord_flip() +
+  scale_x_discrete(labels = c("Pre-publication\n Archiving", "Open Data", "Open\n Materials/Code", "Preregistration")) +
+  scale_y_continuous(labels = c("0", "25", "50", "75", "100"))
+
+p
+```
+
+##### Experience with Practices
+
+This shows the overall situation in terms of reported experience with the various practices.
+
+```{r stacked_exp_data, eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
+
+## Figure out what the data needs to look like...
+
+# try creating tibbles for each variable that I can join? 
+ # filter out irrelevant responses, but keep NAs for now
+  # for some reason this only works on the character vector NOT factors
+
+# PreReg
+
+a <- df %>% 
+  select(c("ParticipantNumber", "PreRegExp", "FORcode_2_label")) %>% 
+  filter(PreRegExp != "Researchers in my discipline do not conduct research studies") %>% 
+    mutate_if(is.character, ~factor(.))
+
+# CodeExp
+
+b <- df %>% 
+  select(c("ParticipantNumber", "CodeExp", "FORcode_2_label")) %>% 
+  filter(CodeExp != "Researchers in my discipline do not use materials and/or code") %>% 
+  mutate_if(is.character, ~factor(.))
+
+# DataExp
+
+c <- df %>% 
+  select(c("ParticipantNumber", "DataExp", "FORcode_2_label")) %>% 
+  filter(DataExp != "Research publications in my field are not based on data") %>% 
+    mutate_if(is.character, ~factor(.))
+
+# PrePubExp
+
+d <- df %>% 
+  select(c("ParticipantNumber", "PrePubExp", "FORcode_2_label")) %>% 
+  mutate_if(is.character, ~factor(.))
+
+# join the tibbles together
+
+df_exp <- a %>% full_join(b) %>% full_join(c) %>% full_join(d)
+
+# only keep those responses from folks who answered at least one of the questions
+
+valid_df_exp <- df_exp %>% 
+  filter_at(vars(ends_with("Exp")), any_vars(!is.na(.)))
+
+# now I need to make this long
+
+exp_long <- valid_df_exp %>% 
+  pivot_longer(c(ends_with("Exp")),
+               names_to = "Practice", 
+               values_to = "Experience") %>% 
+    mutate_if(is.character, ~factor(.))
+
+total_n <- length(unique(exp_long$ParticipantNumber))
+
+tb <- exp_long %>% 
+  group_by(Practice) %>% 
+  dplyr::count(Experience) %>% 
+  mutate(Percentage = round (n/(total_n)*100))
+
+```
+
+```{r stacked_exp_bar, eval=TRUE, warning=TRUE, echo=FALSE}
+# Relevel my Experience factors
+
+# Different labels used for various practices, so I need to relabel
+
+tb <- tb %>%  dplyr::mutate(Experience = fct_recode (Experience, 
+                            "Extensive Experience" = "Regular Use",
+                            "Extensive Experience" = "Reg Use",
+                            "Some Experience" = "Some Use"))
+
+tb$Experience <- factor (tb$Experience, levels = c("Extensive Experience",
+                                           "Some Experience", 
+                                           "Aware, But Not Used",
+                                           "Unaware"))
+tb$Practice <- factor (tb$Practice, levels = c("PrePubExp", 
+                                               "DataExp", 
+                                               "CodeExp", 
+                                               "PreRegExp"))
+
+# plot the graph
+
+title = sprintf("Reported experience with open science\n practices (n = %d)", total_n)
+
+p <- ggplot(tb, aes(fill = Experience, y = Percentage, x = Practice)) +
+  geom_bar(position="fill", stat="identity", colour = "black") +
+  scale_fill_brewer(palette = "Blues", na.value = "grey50", direction = -1, 
+                    labels =c("Extensive experience","Some experience", "Aware, but not used", "Unaware", "N/A")) +
+  labs (x = element_blank(),
+        y = "Percentage", 
+        title = title) +
+    theme_classic(base_size = 12) +
+    theme(plot.title = element_text(hjust = 0.5)) + 
+  coord_flip() +
+  scale_x_discrete(labels = c("Pre-publication\n Archiving", "Open Data", "Open\n Materials/Code", "Preregistration")) +
+  scale_y_continuous(labels = c("0", "25", "50", "75", "100"))
+  
+p
+```
 
 
 ```{r skim df, eval=FALSE, include=FALSE}

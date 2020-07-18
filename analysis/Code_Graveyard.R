@@ -12,6 +12,7 @@ df$crisis <- factor(df$crisis) %>%
 #str(df, list.len = ncol(df))  #allows me to see the column types for all variables
 #&prevents it from being truncated
 
+# mutate_if(is.character, ~factor(.)) # make it a factor
 
 # figuring out the Academic Levels variables
 
@@ -542,3 +543,55 @@ df <- mutate (df, AcLevel_Label = ifelse (AcLevel_1 %in% '1', "Professor",
                                           ifelse (AcLevel_10 %in% '1', "Other", 
                                           ifelse (AcLevel_12 %in% '1', "Senior Research Fellow",
                                           ifelse (AcLevel_13 %in% '1', "Research Fellow", "NA"))))))))))))
+
+# Trying to get rid of rows that have NAs in all relevant columns..
+
+https://blog.exploratory.io/applying-filter-condition-to-multiple-columns-together-with-filter-at-filter-if-commands-379281ac0a3b
+
+  # shockingly this code actually works, except it gets rid of ALL rows with NAs 
+  # anywhere, rather than only those rows with NAs in every single row....
+
+df_imp_ex <- df_imp %>% filter_at(vars(ends_with("Imp")), all_vars(!is.na(.)))
+# the solution is to use any_vars! Keeps the rows as long as the values of at 
+  # least one of the columns satisfies the condition! 
+
+df_imp_ex <- df_imp %>% filter_at(vars(ends_with("Imp")), any_vars(!is.na(.)))
+
+
+# CONVOLUTED WAY OF BUILDING THE TIBBLES FOR STACKED BARS
+
+# try creating tibbles for each variable that I can join? 
+# filter out irrelevant responses, but keep NAs for now
+
+# filter(!is.na(PreRegImp))
+
+# PreRegImp
+
+a <- df %>% 
+  select(c("ParticipantNumber", "PreRegImp", "FORcode_2_label")) %>% 
+  filter(PreRegImp != "Researchers in my discipline do not conduct research studies") %>% 
+  mutate_if(is.character, ~factor(.))
+
+# CodeImp
+
+b <- df %>% 
+  select(c("ParticipantNumber", "CodeImp", "FORcode_2_label")) %>% 
+  filter(CodeImp != "Researchers in my discipline do not use materials and/or code") %>% 
+  mutate_if(is.character, ~factor(.))
+
+# DataImp
+
+c <- df %>% 
+  select(c("ParticipantNumber", "DataImp", "FORcode_2_label")) %>% 
+  filter(DataImp != "Research publications in my field are not based on data") %>% 
+  mutate_if(is.character, ~factor(.))
+
+# PrePubImp
+
+d <- df %>% 
+  select(c("ParticipantNumber", "PrePubImp", "FORcode_2_label")) %>% 
+  mutate_if(is.character, ~factor(.))
+
+# join the tibbles together
+
+df_imp <- a %>% full_join(b) %>% full_join(c) %>% full_join(d)

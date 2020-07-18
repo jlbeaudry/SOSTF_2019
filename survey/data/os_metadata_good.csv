@@ -1,67 +1,79 @@
-﻿OldVariable,VariableType,NewVariable,ItemText,ItemTextShort,MinValue,MaxValue,Scoring,ReverseCode,ImportID,Scale,,,,,
-,,,,,,,,,,,,,,,
-PreregConcern_4,factor,PreRegCon_delay,It might delay data collection,Delays data collection,,,,,,PreRegConcern,,,,,
-PreregConcern_5,factor,PreRegCon_look,I need to look at my data before I can decide how to best analyse it,Need to look at data to analyse it,,,,,,PreRegConcern,,,,,
-PreregConcern_6,factor,PreRegCon_prevent_exp,Preregistration prevents exploratory research,Prevents exploratory research,,,,,,PreRegConcern,,,,,
-PreregConcern_7,factor,PreRegCon_stifle_creativity,Preregistration stifles research creativity or flexibility,Stifles creativity,,,,,,PreRegConcern,,,,,
-PreregConcern_8,factor,PreRegCon_scooping,Preregistration might lead to other people taking my research idea and implementing my plan,Risk of scooping,,,,,,PreRegConcern,,,,,
-PreregConcern_9,factor,PreRegCon_other,Other concern,Other concern,,,,,,PreRegConcern,,,,,
-PreregConcern_9_TEXT,factor,PreRegCon_text,Other: Text,Other: Text,,,,,,PreRegConcern,,,,,
-PreregConcern_10,factor,PreRegCon_prevent_sig,Preregistration might make it more difficult to find statistically significant results,More difficult to find significant results,,,,,,PreRegConcern,,,,,
-PreregConcern_11,factor,PreRegCon_diff_pub,Preregistration might make it more difficult to publish in certain journals,More difficult to publish in certain journals,,,,,,PreRegConcern,,,,,
-PreregConcern_12,factor,PreRegCon_none,I do not share any of these concerns,I do not share any of these concerns,,,,,,PreRegConcern,,,,,
-,,,,,,,,,,,,,,,
-CodeUse_1,factor,CodeUse_useOthers,I have used other researchers' open materials and/or code in my research,,,,,,,CodeUse,,,,,
-CodeUse_2,factor,CodeUse_mine,I have made my materials and/or code openly available,,,,,,,CodeUse,,,,,
-CodeUse_3,factor,CodeUse_reading,I have used open materials and/or code when reading other researchers' work,,,,,,,CodeUse,,,,,
-CodeUse_5,factor,CodeUse_other,Other use,,,,,,,CodeUse,,,,,
-CodeUse_5_TEXT,factor,CodeUse_text,Other: Text,,,,,,,CodeUse,,,,,
-CodeUse_6,factor,CodeUse_peer,I have used other researchers' open materials and/or code when peer reviewing their work,,,,,,,CodeUse,,,,,
-,,,,,,,,,,,,,,,
-CodeConcern_4,factor,CodeCon_criticise,Other researchers might criticise my materials and/or code,Others might criticise my materials/code,,,,,,CodeConcern,,,,,
-CodeConcern_5,factor,CodeCon_diff_understand,Others might find it difficult to understand my materials and/or code,Others might find it difficult to understand my materials/code,,,,,,CodeConcern,,,,,
-CodeConcern_6,factor,CodeCon_assistance,Sharing these materials and/or code could result in others asking me to provide assistance for their research,Others might ask me to provide assistance with their research,,,,,,CodeConcern,,,,,
-CodeConcern_7,factor,CodeCon_lose_control,I might lose control over how my materials and/or code are being used,I might lose control over how they are used,,,,,,CodeConcern,,,,,
-CodeConcern_8,factor,CodeCon_errors,Other researchers might find errors in my published work,Others might find errors in my published work,,,,,,CodeConcern,,,,,
-CodeConcern_9,factor,CodeCon_credit,I might not receive appropriate credit for developing the materials and/or code if I make them openly available,I might not receive appropriate credit,,,,,,CodeConcern,,,,,
-CodeConcern_10,factor,CodeCon_other,Other concern,Other concern,,,,,,CodeConcern,,,,,
-CodeConcern_10_TEXT,factor,CodeCon_text,Other: Text,Other: Text,,,,,,CodeConcern,,,,,
-CodeConcern_12,factor,CodeCon_none,I do not share any of these concerns,I do not share any of these concerns,,,,,,CodeConcern,,,,,
-CodeConcern_13,factor,CodeCon_violate,Reuse of my materials and/or code could violate the epistemological framework of my research,Reuse could violate epistemological framework,,,,,,CodeConcern,,,,,
-CodeConcern_14,factor,CodeCon_ip,There could be issues related to intellectual property,Issues related to intellectual property,,,,,,CodeConcern,,,,,
-,,,,,,,,,,,,,,,df$PreRegCon_delay
-OpenDataUse_1,factor,DataUse_useOthers,"I have used open data from other sources (e.g., researchers, government, etc.) in my research",,,,,,,DataUse,,,,,df$PreRegCon_look <- factor(df$PreregConcern_5)
-OpenDataUse_2,factor,DataUse_mine,I have made my research data open,,,,,,,DataUse,,,,,df$PreRegCon_prevent_exp <- factor(df$PreregConcern_6)
-OpenDataUse_3,factor,DataUse_peer,I have used open data when peer reviewing other researchers' work,,,,,,,DataUse,,,,,df$PreRegCon_stifle_creativity <- factor(df$PreregConcern_7)
-OpenDataUse_4,factor,DataUse_reading,I have used open data when reading other researchers' work,,,,,,,DataUse,,,,,df$PreRegCon_scooping <- factor(df$PreregConcern_8)
-OpenDataUse_5,factor,DataUse_other,Other use,,,,,,,DataUse,,,,,df$PreRegCon_prevent_sig <- factor(df$PreregConcern_10)
-OpenDataUse_5_TEXT,factor,DataUse_text,Other: Text,,,,,,,DataUse,,,,,df$PreRegCon_diff_pub <- factor(df$PreregConcern_11)
-,,,,,,,,,,,,,,,df$PreRegCon_no_con <- factor(df$PreregConcern_12)
-OpenDataConcern_1,factor,DataConcern_criticise,Other researchers might criticise my data and/or research practices,Others might criticise my data and/or research practices,,,,,,DataConcern,,,,,
-OpenDataConcern_2,factor,DataConcern_ip,There could be issues related to intellectual property,Issues related to intellectual property,,,,,,DataConcern,,,,,
-OpenDataConcern_3,factor,DataConcern_devalues,It devalues research data collection,It devalues research data collection,,,,,,DataConcern,,,,,
-OpenDataConcern_5,factor,DataConcern_other,Other concern,Other concern,,,,,,DataConcern,,,,,
-OpenDataConcern_5_TEXT,text,DataConcern_text,Other: Text,Other: Text,,,,,,DataConcern,,,,,
-OpenDataConcern_6,factor,DataConcern_none,I do not share any of these concerns,I do not share any of these concerns,,,,,,DataConcern,,,,,
-OpenDataConcern_7,factor,DataConcern_effort,It will take too much time or effort to share research data,Too much time or effort,,,,,,DataConcern,,,,,
-OpenDataConcern_8,factor,DataConcern_unfair,"I think it is unfair for researchers beyond the original team to benefit (e.g., through future publications, career advancement) from my data collection",Unfair for other researchers to benefit from my data collection,,,,,,DataConcern,,,,,
-OpenDataConcern_9,factor,DataConcern_credit,I might not receive appropriate credit for my data collection,I might not receive appropriate credit for my data collection,,,,,,DataConcern,,,,,
-OpenDataConcern_10,factor,DataConcern_ethics,There could be issues related to ethics,Issues related to ethics,,,,,,DataConcern,,,,,
-OpenDataConcern_11,factor,DataConcern_privacy,There could be issues related to privacy,Issues related to privacy,,,,,,DataConcern,,,,,
-OpenDataConcern_12,factor,DataConcern_control,I might lose control over how my data are being used,I might lose control over how my data are being used,,,,,,DataConcern,,,,,
-OpenDataConcern_13,factor,DataConcern_scoop,Other researchers could use my data for another study that I intended to conduct in the future,Others could use my data for another study that I intended to conduct in the future,,,,,,DataConcern,,,,,
-,,,,,,,,,,,,,,,
-PrePubUse_4,factor,PrePubUse_upload,I have uploaded a manuscript to a pre-publication archive before submission to a journal,,,,,,,PrePubUse,,,,,
-PrePubUse_5,factor,PrePubUse_other,Other use,,,,,,,PrePubUse,,,,,
-PrePubUse_5_TEXT,factor,PrePubUse_text,Other: Text,,,,,,,PrePubUse,,,,,
-PrePubUse_9,factor,PrePubUse_cited,I have cited a manuscript from a pre-publication archive,,,,,,,PrePubUse,,,,,
-PrePubUse_10,factor,PrePubUse_read,"I have read an article from, searched, or browsed a pre-publication archive",,,,,,,PrePubUse,,,,,
-,,,,,,,,,,,,,,,
-PrePubConcernList_4,factor,PrePubConcern_policy,Some journals might not publish findings that are uploaded to a pre-publication archive,Some journals might not publish the uploaded manuscript,,,,,,PrePubConcern,,,,,
-PrePubConcernList_5,factor,PrePubConcern_scoop,Other people might copy my research and publish it before I do,Other people might copy my research and publish it before I do,,,,,,PrePubConcern,,,,,
-PrePubConcernList_6,factor,PrePubConcern_noise,Non-peer-reviewed findings might add noise to the literature,Non-peer-reviewed findings might add noise to the literature,,,,,,PrePubConcern,,,,,
-PrePubConcernList_7,factor,PrePubConcern_citations,Making my work available pre-publication might reduce the number of citations to the ultimately published work,Making my work available pre-publication might reduce citations of the ultimately published work,,,,,,PrePubConcern,,,,,
-PrePubConcernList_8,factor,PrePubConcern_other,Other concern,Other concern,,,,,,PrePubConcern,,,,,
-PrePubConcernList_8_TEXT,factor,PrePubConcern_text,Other: Text,Other: Text,,,,,,PrePubConcern,,,,,
-PrePubConcernList_9,factor,PrePubConcern_compare,"Availability of the pre-publication manuscript might highlight differences (e.g., errors in analysis; revisions to hypotheses) between the original conception of the research and the ultimately published work",Others could see differences between the original conception and the ultimately published work,,,,,,PrePubConcern,,,,,
-PrePubConcernList_11,factor,PrePubConcern_none,I do not share any of these concerns,I do not share any of these concerns,,,,,,PrePubConcern,,,,,
+﻿OldVariable,VariableType,NewVariable,ItemText,ItemTextShort,MinValue,MaxValue,Scoring,ReverseCode,ImportID,Scale
+,,,,,,,,,,
+PreregConcern_4,factor,PreRegCon_delay,It might delay data collection,Delays data collection,,,,,,PreRegConcern
+PreregConcern_5,factor,PreRegCon_look,I need to look at my data before I can decide how to best analyse it,Need to look at data to analyse it,,,,,,PreRegConcern
+PreregConcern_6,factor,PreRegCon_prevent_exp,Preregistration prevents exploratory research,Prevents exploratory research,,,,,,PreRegConcern
+PreregConcern_7,factor,PreRegCon_stifle_creativity,Preregistration stifles research creativity or flexibility,Stifles creativity,,,,,,PreRegConcern
+PreregConcern_8,factor,PreRegCon_scooping,Preregistration might lead to other people taking my research idea and implementing my plan,Risk of scooping,,,,,,PreRegConcern
+PreregConcern_9,factor,PreRegCon_other,Other concern,Other concern,,,,,,PreRegConcern
+PreregConcern_9_TEXT,factor,PreRegCon_text,Other: Text,Other: Text,,,,,,PreRegConcern
+PreregConcern_10,factor,PreRegCon_prevent_sig,Preregistration might make it more difficult to find statistically significant results,More difficult to find significant results,,,,,,PreRegConcern
+PreregConcern_11,factor,PreRegCon_diff_pub,Preregistration might make it more difficult to publish in certain journals,More difficult to publish in certain journals,,,,,,PreRegConcern
+PreregConcern_12,factor,PreRegCon_none,I do not share any of these concerns,I do not share any of these concerns,,,,,,PreRegConcern
+,,,,,,,,,,
+CodeUse_1,factor,CodeUse_useOthers,I have used other researchers' open materials and/or code in my research,,,,,,,CodeUse
+CodeUse_2,factor,CodeUse_mine,I have made my materials and/or code openly available,,,,,,,CodeUse
+CodeUse_3,factor,CodeUse_reading,I have used open materials and/or code when reading other researchers' work,,,,,,,CodeUse
+CodeUse_5,factor,CodeUse_other,Other use,,,,,,,CodeUse
+CodeUse_5_TEXT,factor,CodeUse_text,Other: Text,,,,,,,CodeUse
+CodeUse_6,factor,CodeUse_peer,I have used other researchers' open materials and/or code when peer reviewing their work,,,,,,,CodeUse
+,,,,,,,,,,
+CodeConcern_4,factor,CodeCon_criticise,Other researchers might criticise my materials and/or code,Others might criticise my materials/code,,,,,,CodeConcern
+CodeConcern_5,factor,CodeCon_diff_understand,Others might find it difficult to understand my materials and/or code,Others might find it difficult to understand my materials/code,,,,,,CodeConcern
+CodeConcern_6,factor,CodeCon_assistance,Sharing these materials and/or code could result in others asking me to provide assistance for their research,Others might ask me to provide assistance with their research,,,,,,CodeConcern
+CodeConcern_7,factor,CodeCon_lose_control,I might lose control over how my materials and/or code are being used,I might lose control over how they are used,,,,,,CodeConcern
+CodeConcern_8,factor,CodeCon_errors,Other researchers might find errors in my published work,Others might find errors in my published work,,,,,,CodeConcern
+CodeConcern_9,factor,CodeCon_credit,I might not receive appropriate credit for developing the materials and/or code if I make them openly available,I might not receive appropriate credit,,,,,,CodeConcern
+CodeConcern_10,factor,CodeCon_other,Other concern,Other concern,,,,,,CodeConcern
+CodeConcern_10_TEXT,factor,CodeCon_text,Other: Text,Other: Text,,,,,,CodeConcern
+CodeConcern_12,factor,CodeCon_none,I do not share any of these concerns,I do not share any of these concerns,,,,,,CodeConcern
+CodeConcern_13,factor,CodeCon_violate,Reuse of my materials and/or code could violate the epistemological framework of my research,Reuse could violate epistemological framework,,,,,,CodeConcern
+CodeConcern_14,factor,CodeCon_ip,There could be issues related to intellectual property,Issues related to intellectual property,,,,,,CodeConcern
+,,,,,,,,,,
+OpenDataUse_1,factor,DataUse_useOthers,"I have used open data from other sources (e.g., researchers, government, etc.) in my research",,,,,,,DataUse
+OpenDataUse_2,factor,DataUse_mine,I have made my research data open,,,,,,,DataUse
+OpenDataUse_3,factor,DataUse_peer,I have used open data when peer reviewing other researchers' work,,,,,,,DataUse
+OpenDataUse_4,factor,DataUse_reading,I have used open data when reading other researchers' work,,,,,,,DataUse
+OpenDataUse_5,factor,DataUse_other,Other use,,,,,,,DataUse
+OpenDataUse_5_TEXT,factor,DataUse_text,Other: Text,,,,,,,DataUse
+,,,,,,,,,,
+OpenDataConcern_1,factor,DataConcern_criticise,Other researchers might criticise my data and/or research practices,Others might criticise my data and/or research practices,,,,,,DataConcern
+OpenDataConcern_2,factor,DataConcern_ip,There could be issues related to intellectual property,Issues related to intellectual property,,,,,,DataConcern
+OpenDataConcern_3,factor,DataConcern_devalues,It devalues research data collection,It devalues research data collection,,,,,,DataConcern
+OpenDataConcern_5,factor,DataConcern_other,Other concern,Other concern,,,,,,DataConcern
+OpenDataConcern_5_TEXT,text,DataConcern_text,Other: Text,Other: Text,,,,,,DataConcern
+OpenDataConcern_6,factor,DataConcern_none,I do not share any of these concerns,I do not share any of these concerns,,,,,,DataConcern
+OpenDataConcern_7,factor,DataConcern_effort,It will take too much time or effort to share research data,Too much time or effort,,,,,,DataConcern
+OpenDataConcern_8,factor,DataConcern_unfair,"I think it is unfair for researchers beyond the original team to benefit (e.g., through future publications, career advancement) from my data collection",Unfair for other researchers to benefit from my data collection,,,,,,DataConcern
+OpenDataConcern_9,factor,DataConcern_credit,I might not receive appropriate credit for my data collection,I might not receive appropriate credit for my data collection,,,,,,DataConcern
+OpenDataConcern_10,factor,DataConcern_ethics,There could be issues related to ethics,Issues related to ethics,,,,,,DataConcern
+OpenDataConcern_11,factor,DataConcern_privacy,There could be issues related to privacy,Issues related to privacy,,,,,,DataConcern
+OpenDataConcern_12,factor,DataConcern_control,I might lose control over how my data are being used,I might lose control over how my data are being used,,,,,,DataConcern
+OpenDataConcern_13,factor,DataConcern_scoop,Other researchers could use my data for another study that I intended to conduct in the future,Others could use my data for another study that I intended to conduct in the future,,,,,,DataConcern
+,,,,,,,,,,
+PrePubUse_4,factor,PrePubUse_upload,I have uploaded a manuscript to a pre-publication archive before submission to a journal,,,,,,,PrePubUse
+PrePubUse_5,factor,PrePubUse_other,Other use,,,,,,,PrePubUse
+PrePubUse_5_TEXT,factor,PrePubUse_text,Other: Text,,,,,,,PrePubUse
+PrePubUse_9,factor,PrePubUse_cited,I have cited a manuscript from a pre-publication archive,,,,,,,PrePubUse
+PrePubUse_10,factor,PrePubUse_read,"I have read an article from, searched, or browsed a pre-publication archive",,,,,,,PrePubUse
+,,,,,,,,,,
+PrePubConcernList_4,factor,PrePubConcern_policy,Some journals might not publish findings that are uploaded to a pre-publication archive,Some journals might not publish the uploaded manuscript,,,,,,PrePubConcern
+PrePubConcernList_5,factor,PrePubConcern_scoop,Other people might copy my research and publish it before I do,Other people might copy my research and publish it before I do,,,,,,PrePubConcern
+PrePubConcernList_6,factor,PrePubConcern_noise,Non-peer-reviewed findings might add noise to the literature,Non-peer-reviewed findings might add noise to the literature,,,,,,PrePubConcern
+PrePubConcernList_7,factor,PrePubConcern_citations,Making my work available pre-publication might reduce the number of citations to the ultimately published work,Making my work available pre-publication might reduce citations of the ultimately published work,,,,,,PrePubConcern
+PrePubConcernList_8,factor,PrePubConcern_other,Other concern,Other concern,,,,,,PrePubConcern
+PrePubConcernList_8_TEXT,factor,PrePubConcern_text,Other: Text,Other: Text,,,,,,PrePubConcern
+PrePubConcernList_9,factor,PrePubConcern_compare,"Availability of the pre-publication manuscript might highlight differences (e.g., errors in analysis; revisions to hypotheses) between the original conception of the research and the ultimately published work",Others could see differences between the original conception and the ultimately published work,,,,,,PrePubConcern
+PrePubConcernList_11,factor,PrePubConcern_none,I do not share any of these concerns,I do not share any of these concerns,,,,,,PrePubConcern
+,,,,,,,,,,
+OAfees_1,factor,OAfees_free,My open access publications did not involve fees,,,,,,,OAfees
+OAfees_2,factor,OAfees_research_income,I paid the fees from my own research income,,,,,,,OAfees
+OAfees_3,factor,OAfees_centre,My centre/department paid the fees,,,,,,,OAfees
+OAfees_4,factor,OAfees_school,My school/faculty paid the fees,,,,,,,OAfees
+OAfees_5,factor,OAfees_collab,A non-Swinburne collaborator paid the fees,,,,,,,OAfees
+OAfees_6,factor,OAfees_own_money,I paid the fees with my personal money,,,,,,,OAfees
+OAfees_7,factor,OAfees_other,Other method,,,,,,,OAfees
+OAfees_7_TEXT,factor,OAfees_text,Other: Text,,,,,,,OAfees
+OAfees_8,factor,OAfees_withdrew,I could not afford to pay the fees and withdrew the manuscript,,,,,,,OAfees
+OAfees_10,factor,OAfees_waiver,I received a fee waiver from the journal,,,,,,,OAfees
+OAfees_11,factor,OAfees_hdr,My HDR student paid the fees with their research funding,,,,,,,OAfees

@@ -77,3 +77,14 @@ OAfees_7_TEXT,factor,OAfees_text,Other: Text,,,,,,,OAfees
 OAfees_8,factor,OAfees_withdrew,I could not afford to pay the fees and withdrew the manuscript,,,,,,,OAfees
 OAfees_10,factor,OAfees_waiver,I received a fee waiver from the journal,,,,,,,OAfees
 OAfees_11,factor,OAfees_hdr,My HDR student paid the fees with their research funding,,,,,,,OAfees
+,,,,,,,,,,
+OSmost_1,factor,OSmost_data,Open data,,,,,,,OSmost
+OSmost_2,factor,OSmost_code,Open materials/code,,,,,,,OSmost
+OSmost_3,factor,OSmost_prepub,Pre-publication archiving,,,,,,,OSmost
+OSmost_4,factor,OSmost_prereg,Study preregistration,,,,,,,OSmost
+OSmost_5,factor,OSmost_none,None,,,,,,,OSmost
+OSmost_6,factor,OSmost_OA,Open access publishing,,,,,,,OSmost
+OSmost_7,factor,OSmost_unknown,I don't know about the open science practices of researchers in my field,,,,,,,OSmost
+OSmost_9,factor,OSmost_other,Other,,,,,,,OSmost
+OSmost_9_TEXT,factor,OSmost_text,Other: Text,,,,,,,OSmost
+OSmost_10,factor,OSmost_repo,Open access archiving in a repository,,,,,,,OSmost

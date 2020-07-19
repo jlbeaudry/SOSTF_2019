@@ -576,6 +576,213 @@ knitr::kable(col.names = c("Reported Experience", "Frequency", "Percentage"),
 
 ```
 
+#### Complete Picture of Perceived Importance and Reported Experience
+
+This gives a solid picture of the overall situation in terms of perceived importance.
+
+##### Importance of Practices
+
+```{r stacked_imp_data, eval=TRUE, include=FALSE}
+## Figure out what the data needs to look like...
+
+# try creating tibbles for each variable that I can join? 
+ # filter out irrelevant responses, but keep NAs for now
+  # for some reason this only works on the character vector NOT factors
+
+# PreReg
+
+a <- df %>% 
+  select(c("ParticipantNumber", "PreRegImp", "FORcode_2_label")) %>% 
+  filter(PreRegImp != "Researchers in my discipline do not conduct research studies") %>% 
+    mutate_if(is.character, ~factor(.))
+
+# CodeImp
+
+b <- df %>% 
+  select(c("ParticipantNumber", "CodeImp", "FORcode_2_label")) %>% 
+  filter(CodeImp != "Researchers in my discipline do not use materials and/or code") %>% 
+  mutate_if(is.character, ~factor(.))
+
+# DataImp
+
+c <- df %>% 
+  select(c("ParticipantNumber", "DataImp", "FORcode_2_label")) %>% 
+  filter(DataImp != "Research publications in my field are not based on data") %>% 
+    mutate_if(is.character, ~factor(.))
+
+# PrePubImp
+
+d <- df %>% 
+  select(c("ParticipantNumber", "PrePubImp", "FORcode_2_label")) %>% 
+  mutate_if(is.character, ~factor(.))
+
+# join the tibbles together
+
+df_imp <- a %>% full_join(b) %>% full_join(c) %>% full_join(d)
+
+# only keep those responses from folks who answered at least one of the questions
+
+valid_df_imp <- df_imp %>% 
+  filter_at(vars(ends_with("Imp")), any_vars(!is.na(.)))
+
+# now I need to make this long
+
+imp_long <- valid_df_imp %>% 
+  pivot_longer(c(ends_with("Imp")),
+               names_to = "Practice", 
+               values_to = "Importance") %>% 
+    mutate_if(is.character, ~factor(.))
+
+total_n <- length(unique(imp_long$ParticipantNumber))
+
+tb <- imp_long %>% 
+  group_by(Practice) %>% 
+  dplyr::count(Importance) %>% 
+  mutate(Percentage = round (n/(total_n)*100))
+
+# if I make the na explicit, I can't use grey for the NA value in the 
+  # brewer scale, so just stick with this...
+
+# tb$Importance <- forcats::fct_explicit_na(tb$Importance, na_level = "N/A")
+
+```
+
+```{r stacked_imp_bar, eval=TRUE, warning=TRUE, echo=FALSE}
+# Relevel my importance factors
+
+tb$Importance <- factor (tb$Importance, levels = c("Extremely important",
+                                           "Somewhat important", 
+                                           "Somewhat unimportant",
+                                           "Not at all"))
+tb$Practice <- factor (tb$Practice, levels = c("PrePubImp", 
+                                               "DataImp", 
+                                               "CodeImp", 
+                                               "PreRegImp"))
+
+# plot the graph
+
+title = sprintf("Perceived importance of open science\n practices (n = %d)", total_n)
+
+p <- ggplot(tb, aes(fill = Importance, y = Percentage, x = Practice)) +
+  geom_bar(position="fill", stat="identity", colour = "black") +
+  scale_fill_brewer(palette = "Blues", na.value = "grey50", direction = -1) +
+  labs (x = element_blank(),
+        y = "Percentage", 
+        title = title) +
+    theme_classic(base_size = 12) +
+    theme(plot.title = element_text(hjust = 0.5)) + 
+  coord_flip() +
+  scale_x_discrete(labels = c("Pre-publication\n Archiving", "Open Data", "Open\n Materials/Code", "Preregistration")) +
+  scale_y_continuous(labels = c("0", "25", "50", "75", "100"))
+
+p
+```
+
+##### Experience with Practices
+
+This shows the overall situation in terms of reported experience with the various practices.
+
+```{r stacked_exp_data, eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
+
+## Figure out what the data needs to look like...
+
+# try creating tibbles for each variable that I can join? 
+ # filter out irrelevant responses, but keep NAs for now
+  # for some reason this only works on the character vector NOT factors
+
+# PreReg
+
+a <- df %>% 
+  select(c("ParticipantNumber", "PreRegExp", "FORcode_2_label")) %>% 
+  filter(PreRegExp != "Researchers in my discipline do not conduct research studies") %>% 
+    mutate_if(is.character, ~factor(.))
+
+# CodeExp
+
+b <- df %>% 
+  select(c("ParticipantNumber", "CodeExp", "FORcode_2_label")) %>% 
+  filter(CodeExp != "Researchers in my discipline do not use materials and/or code") %>% 
+  mutate_if(is.character, ~factor(.))
+
+# DataExp
+
+c <- df %>% 
+  select(c("ParticipantNumber", "DataExp", "FORcode_2_label")) %>% 
+  filter(DataExp != "Research publications in my field are not based on data") %>% 
+    mutate_if(is.character, ~factor(.))
+
+# PrePubExp
+
+d <- df %>% 
+  select(c("ParticipantNumber", "PrePubExp", "FORcode_2_label")) %>% 
+  mutate_if(is.character, ~factor(.))
+
+# join the tibbles together
+
+df_exp <- a %>% full_join(b) %>% full_join(c) %>% full_join(d)
+
+# only keep those responses from folks who answered at least one of the questions
+
+valid_df_exp <- df_exp %>% 
+  filter_at(vars(ends_with("Exp")), any_vars(!is.na(.)))
+
+# now I need to make this long
+
+exp_long <- valid_df_exp %>% 
+  pivot_longer(c(ends_with("Exp")),
+               names_to = "Practice", 
+               values_to = "Experience") %>% 
+    mutate_if(is.character, ~factor(.))
+
+total_n <- length(unique(exp_long$ParticipantNumber))
+
+tb <- exp_long %>% 
+  group_by(Practice) %>% 
+  dplyr::count(Experience) %>% 
+  mutate(Percentage = round (n/(total_n)*100))
+
+```
+
+```{r stacked_exp_bar, eval=TRUE, warning=TRUE, echo=FALSE}
+# Relevel my Experience factors
+
+# Different labels used for various practices, so I need to relabel
+
+tb <- tb %>%  dplyr::mutate(Experience = fct_recode (Experience, 
+                            "Extensive Experience" = "Regular Use",
+                            "Extensive Experience" = "Reg Use",
+                            "Some Experience" = "Some Use"))
+
+tb$Experience <- factor (tb$Experience, levels = c("Extensive Experience",
+                                           "Some Experience", 
+                                           "Aware, But Not Used",
+                                           "Unaware"))
+tb$Practice <- factor (tb$Practice, levels = c("PrePubExp", 
+                                               "DataExp", 
+                                               "CodeExp", 
+                                               "PreRegExp"))
+
+# plot the graph
+
+title = sprintf("Reported experience with open science\n practices (n = %d)", total_n)
+
+p <- ggplot(tb, aes(fill = Experience, y = Percentage, x = Practice)) +
+  geom_bar(position="fill", stat="identity", colour = "black") +
+  scale_fill_brewer(palette = "Blues", na.value = "grey50", direction = -1, 
+                    labels =c("Extensive experience","Some experience", "Aware, but not used", "Unaware", "N/A")) +
+  labs (x = element_blank(),
+        y = "Percentage", 
+        title = title) +
+    theme_classic(base_size = 12) +
+    theme(plot.title = element_text(hjust = 0.5)) + 
+  coord_flip() +
+  scale_x_discrete(labels = c("Pre-publication\n Archiving", "Open Data", "Open\n Materials/Code", "Preregistration")) +
+  scale_y_continuous(labels = c("0", "25", "50", "75", "100"))
+  
+p
+```
+
+
 ### Experience with different types of open science practices
    
 Next, we break down the results according to their experience with specific types 
@@ -1848,213 +2055,98 @@ p
 
 ```
 
-#### STACKED BAR ATTEMPTS
+#### Most Common Open Science Practices in Their Field
 
-This gives a solid picture of the overall situation in terms of perceived importance.
+```{r os_most_data, eval=TRUE, echo=FALSE}
 
-##### Importance of Practices
+OSmost_long <- df %>% 
+  select (c("ParticipantNumber", 
+            "OSmost_data":"OSmost_repo",
+            "FORcode_2_label")) %>%  
+  select(-"OSmost_text") %>% 
+  pivot_longer(c("OSmost_data":"OSmost_repo"),
+               names_to = "OSmost", 
+               values_to = "OSmost_Endorsement") %>% 
+  filter(OSmost_Endorsement == "1") 
 
-```{r stacked_imp_data, eval=TRUE, include=FALSE}
-## Figure out what the data needs to look like...
 
-# try creating tibbles for each variable that I can join? 
- # filter out irrelevant responses, but keep NAs for now
-  # for some reason this only works on the character vector NOT factors
+# recode the data so the response options have proper labels
 
-# PreReg
+c <- metadata %>% 
+    filter(Scale == "OSmost") %>% 
+    filter(NewVariable != "OSmost_text") #remove this value from metadata
 
-a <- df %>% 
-  select(c("ParticipantNumber", "PreRegImp", "FORcode_2_label")) %>% 
-  filter(PreRegImp != "Researchers in my discipline do not conduct research studies") %>% 
-    mutate_if(is.character, ~factor(.))
+d <- full_join(OSmost_long, c, by = c("OSmost" = "NewVariable")) %>% 
+  rename ("OSmost_label" = "ItemText")
 
-# CodeImp
+# getting a tibble for the counts
+c_osmost <- plyr::count(d$OSmost_label)
 
-b <- df %>% 
-  select(c("ParticipantNumber", "CodeImp", "FORcode_2_label")) %>% 
-  filter(CodeImp != "Researchers in my discipline do not use materials and/or code") %>% 
-  mutate_if(is.character, ~factor(.))
+# to figure out how many respondents shared concerns calculate unique number of participants
+n_osmost <- length(unique(d$ParticipantNumber))
 
-# DataImp
-
-c <- df %>% 
-  select(c("ParticipantNumber", "DataImp", "FORcode_2_label")) %>% 
-  filter(DataImp != "Research publications in my field are not based on data") %>% 
-    mutate_if(is.character, ~factor(.))
-
-# PrePubImp
-
-d <- df %>% 
-  select(c("ParticipantNumber", "PrePubImp", "FORcode_2_label")) %>% 
-  mutate_if(is.character, ~factor(.))
-
-# join the tibbles together
-
-df_imp <- a %>% full_join(b) %>% full_join(c) %>% full_join(d)
-
-# only keep those responses from folks who answered at least one of the questions
-
-valid_df_imp <- df_imp %>% 
-  filter_at(vars(ends_with("Imp")), any_vars(!is.na(.)))
-
-# now I need to make this long
-
-imp_long <- valid_df_imp %>% 
-  pivot_longer(c(ends_with("Imp")),
-               names_to = "Practice", 
-               values_to = "Importance") %>% 
-    mutate_if(is.character, ~factor(.))
-
-total_n <- length(unique(imp_long$ParticipantNumber))
-
-tb <- imp_long %>% 
-  group_by(Practice) %>% 
-  dplyr::count(Importance) %>% 
-  mutate(Percentage = round (n/(total_n)*100))
-
-# if I make the na explicit, I can't use grey for the NA value in the 
-  # brewer scale, so just stick with this...
-
-# tb$Importance <- forcats::fct_explicit_na(tb$Importance, na_level = "N/A")
+# create a tibble with percentages (of respondents who answered this question) & 
+# then reorder them by descending percentages
+tb <- d %>% 
+  dplyr::count(OSmost_label) %>% 
+  mutate(Percentage = round (n/n_osmost*100)) %>% 
+  dplyr::arrange(desc(n)) 
+ # mutate_if(is.character, ~factor(.)) # make it a factor
 
 ```
 
-```{r stacked_imp_bar, eval=TRUE, warning=TRUE, echo=FALSE}
-# Relevel my importance factors
+We asked respondents which of the following open science practices (if any) were
+commonly used in their field. They could tick all that applied. The graph below
+represents the percentage of the `r n_osmost` respondents who selected each response.
+Given that information about some of these open science practices are publicly available
+and often associted with the published product (e.g., the final paper 
+regularly includes links to repository storing data, materials, and/or code, as 
+well as a link to the preregistration, if relevant), it is surprising that nearly
+a fifth of respondents indicated that they did not know about the open science 
+practices of researchers in their field. 
 
-tb$Importance <- factor (tb$Importance, levels = c("Extremely important",
-                                           "Somewhat important", 
-                                           "Somewhat unimportant",
-                                           "Not at all"))
-tb$Practice <- factor (tb$Practice, levels = c("PrePubImp", 
-                                               "DataImp", 
-                                               "CodeImp", 
-                                               "PreRegImp"))
+```{r os_most_bar, echo=FALSE, warning=TRUE, eval=TRUE}
 
-# plot the graph
+# build the bar chart
 
-title = sprintf("Perceived importance of open science\n practices (n = %d)", total_n)
+# reorder the rows according to the _label 
 
-p <- ggplot(tb, aes(fill = Importance, y = Percentage, x = Practice)) +
-  geom_bar(position="fill", stat="identity", colour = "black") +
-  scale_fill_brewer(palette = "Blues", na.value = "grey50", direction = -1) +
+tb2 <- tb %>% 
+  dplyr::mutate(OSmost_label = factor(OSmost_label, 
+                levels = c("None",
+                           "Other",
+                          "Study preregistration",
+                           "Pre-publication archiving",
+                           "Open materials/code",
+                           "Open data",
+                           "Open access archiving in a repository",
+                           "Open access publishing",
+                           "I don't know about the open science practices of researchers in my field")))
+                
+# create a character vector for the colours for each bar
+cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", 
+          "lightskyblue3", "lightskyblue3", "lightskyblue3", 
+          "lightskyblue3", "lightskyblue3", "grey50")
+                    
+
+# build the bar chart
+title = sprintf("Most common practices in\n respondent's field (n = %d)", n_osmost)
+
+p <- ggplot(tb2) + 
+  aes(x = OSmost_label, y = Percentage) +
+  geom_bar(stat = "identity", colour = "black", fill = cols) +
   labs (x = element_blank(),
         y = "Percentage", 
         title = title) +
-    theme_classic(base_size = 12) +
-    theme(plot.title = element_text(hjust = 0.5)) + 
-  coord_flip() +
-  scale_x_discrete(labels = c("Pre-publication\n Archiving", "Open Data", "Open\n Materials/Code", "Preregistration")) +
-  scale_y_continuous(labels = c("0", "25", "50", "75", "100"))
-
+  coord_flip(ylim = c(0,70)) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 50)) + #wrap the labels
+  theme_classic(base_size = 12) + 
+  theme(plot.title = element_text(hjust = 0.5)) # centre the title
 p
-```
-
-##### Experience with Practices
-
-This shows the overall situation in terms of reported experience with the various practices.
-
-```{r stacked_exp_data, eval=TRUE, echo=FALSE, message=FALSE, warning=FALSE}
-
-## Figure out what the data needs to look like...
-
-# try creating tibbles for each variable that I can join? 
- # filter out irrelevant responses, but keep NAs for now
-  # for some reason this only works on the character vector NOT factors
-
-# PreReg
-
-a <- df %>% 
-  select(c("ParticipantNumber", "PreRegExp", "FORcode_2_label")) %>% 
-  filter(PreRegExp != "Researchers in my discipline do not conduct research studies") %>% 
-    mutate_if(is.character, ~factor(.))
-
-# CodeExp
-
-b <- df %>% 
-  select(c("ParticipantNumber", "CodeExp", "FORcode_2_label")) %>% 
-  filter(CodeExp != "Researchers in my discipline do not use materials and/or code") %>% 
-  mutate_if(is.character, ~factor(.))
-
-# DataExp
-
-c <- df %>% 
-  select(c("ParticipantNumber", "DataExp", "FORcode_2_label")) %>% 
-  filter(DataExp != "Research publications in my field are not based on data") %>% 
-    mutate_if(is.character, ~factor(.))
-
-# PrePubExp
-
-d <- df %>% 
-  select(c("ParticipantNumber", "PrePubExp", "FORcode_2_label")) %>% 
-  mutate_if(is.character, ~factor(.))
-
-# join the tibbles together
-
-df_exp <- a %>% full_join(b) %>% full_join(c) %>% full_join(d)
-
-# only keep those responses from folks who answered at least one of the questions
-
-valid_df_exp <- df_exp %>% 
-  filter_at(vars(ends_with("Exp")), any_vars(!is.na(.)))
-
-# now I need to make this long
-
-exp_long <- valid_df_exp %>% 
-  pivot_longer(c(ends_with("Exp")),
-               names_to = "Practice", 
-               values_to = "Experience") %>% 
-    mutate_if(is.character, ~factor(.))
-
-total_n <- length(unique(exp_long$ParticipantNumber))
-
-tb <- exp_long %>% 
-  group_by(Practice) %>% 
-  dplyr::count(Experience) %>% 
-  mutate(Percentage = round (n/(total_n)*100))
 
 ```
 
-```{r stacked_exp_bar, eval=TRUE, warning=TRUE, echo=FALSE}
-# Relevel my Experience factors
-
-# Different labels used for various practices, so I need to relabel
-
-tb <- tb %>%  dplyr::mutate(Experience = fct_recode (Experience, 
-                            "Extensive Experience" = "Regular Use",
-                            "Extensive Experience" = "Reg Use",
-                            "Some Experience" = "Some Use"))
-
-tb$Experience <- factor (tb$Experience, levels = c("Extensive Experience",
-                                           "Some Experience", 
-                                           "Aware, But Not Used",
-                                           "Unaware"))
-tb$Practice <- factor (tb$Practice, levels = c("PrePubExp", 
-                                               "DataExp", 
-                                               "CodeExp", 
-                                               "PreRegExp"))
-
-# plot the graph
-
-title = sprintf("Reported experience with open science\n practices (n = %d)", total_n)
-
-p <- ggplot(tb, aes(fill = Experience, y = Percentage, x = Practice)) +
-  geom_bar(position="fill", stat="identity", colour = "black") +
-  scale_fill_brewer(palette = "Blues", na.value = "grey50", direction = -1, 
-                    labels =c("Extensive experience","Some experience", "Aware, but not used", "Unaware", "N/A")) +
-  labs (x = element_blank(),
-        y = "Percentage", 
-        title = title) +
-    theme_classic(base_size = 12) +
-    theme(plot.title = element_text(hjust = 0.5)) + 
-  coord_flip() +
-  scale_x_discrete(labels = c("Pre-publication\n Archiving", "Open Data", "Open\n Materials/Code", "Preregistration")) +
-  scale_y_continuous(labels = c("0", "25", "50", "75", "100"))
-  
-p
-```
-
-
+# The End
 ```{r skim df, eval=FALSE, include=FALSE}
 
 # These are chunks from the course I took, that I'm keeping now just for reference

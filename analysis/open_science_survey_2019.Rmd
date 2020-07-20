@@ -42,6 +42,7 @@ library(plyr)
 library(tidyverse)
 #library(skimr)
 library(ggbeeswarm)
+#library(ggrepel) use this if I'm going to add labels
 library(plotly)
 library(RColorBrewer)
 library(kableExtra)
@@ -782,6 +783,108 @@ p <- ggplot(tb, aes(fill = Experience, y = Percentage, x = Practice)) +
 p
 ```
 
+#### Barriers to Open Science Practices
+
+```{r os_barriers_data, eval=TRUE, echo=FALSE, warning=TRUE}
+
+# wrangle this data so it's in long form & only includes endorsements.
+
+OSBarrier_long <- df %>% 
+     select(c("ParticipantNumber", 
+              "OSBarrier_noOAFunding":"OSBarrier_noExpertise", 
+              "FORcode_2_label")) %>%  
+    select(-"OSBarrier_text") %>% 
+     pivot_longer(c("OSBarrier_noOAFunding":"OSBarrier_noExpertise"), 
+     names_to = "OSBarrier", 
+     values_to = "OSBarrier_Endorsement") %>% 
+  filter(OSBarrier_Endorsement == "1")  
+
+# recode the data so the response options have proper labels
+
+c <- metadata %>% 
+    filter(Scale == "OSBarrier") %>% 
+    filter(NewVariable != "OSBarrier_text") #remove this value from metadata
+
+d <- full_join(OSBarrier_long, c, by = c("OSBarrier" = "NewVariable")) %>% 
+  rename ("OSBarrier_label" = "ItemTextShort")
+
+# getting a tibble for the counts
+c_osbarrier <- plyr::count(d$OSBarrier)
+
+# to figure out how many respondents shared concerns calculate unique number of participants
+n_osbarrier <- length(unique(d$ParticipantNumber))
+
+# create a tibble with percentages (of respondents who answered this question) & 
+# then reorder them by descending percentages
+tb <- d %>% 
+  dplyr::count(OSBarrier_label) %>% 
+  mutate(Percentage = round (n/n_osbarrier*100)) %>% 
+  dplyr::arrange(desc(n))
+
+```
+
+We provided the respondents with a list of possible barriers to the uptake of
+scientific practices. We asked them to endorse any statement that they agree is 
+a barrier in their field. The graph below shows the percentage of the 
+`r n_osbarrier` respondents who selected each response.
+
+```{r os_barrier_bar, echo=FALSE, eval=TRUE, fig.height = 6, fig.width=10}
+
+# it's a really big graph, so I'm setting the figure height in the r chunk
+# reorder the response options from lowest to highest, with no barriers last
+
+tb2 <- tb %>% 
+  dplyr::mutate(OSBarrier_label = factor (OSBarrier_label,
+                                levels = c("Other", #TOP TO BE BOTTOM
+                                "The OS community is intimidating",
+                                "Researchers don't want to be told how to do their research",
+                               "Researchers are discouraged from engaging in OS by colleagues",
+                               "HDR students are discouraged from engaging in OS by thesis supervisors",
+                               "Lack of interest from researchers",
+                               "Lack of supporting infrastructure (e.g., open data platforms)",
+                               "Lack of expertise to engage in OS (e.g., assignment of metadata)", 
+                               "Lack of mandates from funders, institutions or other regulators",
+                               "Lack of time to learn OS",
+                               "Lack of time to engage in OS",
+                               "Lack of information about OS",
+                               "Lack of recognition in my field about the value of OS",
+                               "Lack of professional staff that provide support for OS",
+                               "Lack of training required to implement OS",
+                               "Lack of institutional credit for engaging in OS",
+                               "Lack of research funding to support OS",
+                               "Lack of funding for open access publishing",
+                                "I do not perceive any barriers"))) #BOTTOM TO BE TOP
+
+
+# create a character vector for the colours for each bar
+cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
+          "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
+          "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
+          "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
+          "lightskyblue3", "lightskyblue3", "grey50")
+
+# build the bar chart
+title = sprintf("Barriers to uptake of open science\n in your field (n = %d)", n_osbarrier)
+
+# plot the reordered data and colours. Because the data is in a tibble rather than 
+  # a dataframe with counts, I could use 'geom_col' rather than 'geom_bar' 
+  # (or I could use stat = "identity" with 'geom_bar')
+
+p <- ggplot(tb2) + 
+  aes(x = OSBarrier_label, y = Percentage) +
+   geom_bar(stat = "identity", colour = "black", fill = cols) +
+    labs (x = element_blank(),
+      y = "Percentage", 
+        title = title) +
+  coord_flip(ylim = c(0,80)) +
+  theme_classic(base_size = 12) + 
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 75)) + #wrap the labels
+  theme(plot.title = element_text(hjust = 0.5)) 
+p
+
+
+
+```
 
 ### Experience with different types of open science practices
    
@@ -1008,6 +1111,7 @@ p <- ggplot(tb2) +
     labs (x = element_blank(),
       y = "Percentage", 
         title = title) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 50)) + #wrap the labels
   coord_flip(ylim = c(0,60)) +
   theme_classic(base_size = 12) + 
   theme(plot.title = element_text(hjust = 0.5)) 

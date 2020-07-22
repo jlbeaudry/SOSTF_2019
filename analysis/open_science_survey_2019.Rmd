@@ -679,6 +679,34 @@ p <- ggplot(tb, aes(fill = Importance, y = Percentage, x = Practice)) +
 p
 ```
 
+
+```{r stacked_imp_table, eval=FALSE,echo=FALSE}
+
+# Relevel my importance factors
+tb$Importance <- factor (tb$Importance, levels = c("Extremely important",
+                                           "Somewhat important", 
+                                           "Somewhat unimportant",
+                                           "Not at all"))
+tb$Practice <- factor (tb$Practice, levels = c("PrePubImp", 
+                                               "DataImp", 
+                                               "CodeImp", 
+                                               "PreRegImp"))
+
+
+tb %>% 
+knitr::kable (col.names = c("Practice", "Perceived Importance", "Frequency",
+                            "Percentage"), 
+              caption = 
+                sprintf("Perceived Importance of Open Science Practices <br> (n = %d)",
+                                total_n), 
+              align = 'lcc') %>% 
+   kable_styling(bootstrap_options = "striped", full_width = F, 
+                 position = 'center',
+                latex_options = "hold_position")
+# html output = font_size = 14 # insert in kable styling
+
+```
+
 ##### Experience with Practices
 
 This shows the overall situation in terms of reported experience with the various practices.
@@ -938,7 +966,7 @@ indicated that it was somewhat important; `r tb_ex[4,2]` (`r tb_ex[4,3]`)% indic
 that preregistration was somewhat unimportant; and `r tb_ex[2,2]` (`r tb_ex[2,3]`%)
 indicated that it was not at all important for their field. 
 
-```{r prereg_imp_ex_pie, echo = FALSE, warning = TRUE}
+```{r prereg_imp_ex_pie, echo = FALSE, warning = TRUE, eval=FALSE}
 
 title = "Perceived Importance of Preregistration (n = %d)"
 
@@ -992,7 +1020,7 @@ were aware of study preregistration, but had not used it; `r tb[3,2]` (`r tb[3,3
 had some experience with it, but did not regularly preregister their studies; and 
 `r tb[4,2]` (`r tb[4,3]`%) regularly preregister their studies. 
 
-```{r prereg_exp_pie, echo = FALSE, warning = TRUE}
+```{r prereg_exp_pie, echo = FALSE, warning = TRUE, eval = FALSE}
 
 title = "What is your experience with preregistration? (n = %d)"
 
@@ -1034,7 +1062,7 @@ knitr::kable (col.names = c("Reported Experience", "Frequency", "Percentage"),
 # wrangle the concern data so it's in long form & only includes endorsements.
 
 PreRegCon_long <- df %>% 
-     select(c("ParticipantNumber", 
+     select(c("ParticipantNumber", "AcLevel_Label",
               "PreRegCon_delay":"PreRegCon_none", 
               "FORcode_2_label")) %>%  
     select(-"PreRegCon_text") %>% 
@@ -1167,7 +1195,7 @@ and `r tb_ex[4,3]`% indicated that open materials and/or code were not at all
 important for their field. 
 
 
-```{r code_imp_ex_pie, echo = FALSE, warning = TRUE}
+```{r code_imp_ex_pie, echo = FALSE, warning = TRUE, eval = FALSE}
 
 title = "Perceived importance of open materials and/or code (n = %d)"
 
@@ -1227,7 +1255,7 @@ materials and/or code, but had not used it in their own research; `r tb[3,2]`
 use them regularly; and `r tb[4,2]` (`r tb[4,3]`%) regularly use open materials
 and/or code. 
 
-```{r code_exp_pie, echo = FALSE, warning = TRUE}
+```{r code_exp_pie, echo = FALSE, warning = TRUE, eval=FALSE}
 
 title = "What is your experience with open materials and/or code (n = %d)"
 
@@ -1259,7 +1287,7 @@ knitr::kable (col.names = c("Reported Experience", "Frequency", "Percentage"),
 # wrangle this data so it's in long form & only includes endorsements.
 
 CodeUse_long <- df %>% 
-  select (c("ParticipantNumber", 
+  select (c("ParticipantNumber", "AcLevel_Label",
             "CodeUse_useOthers":"CodeUse_peer",
             "FORcode_2_label")) %>%  
   select(-"CodeUse_text") %>% 
@@ -1471,7 +1499,7 @@ that open data were `r tolower(tb_ex[1,1])` for their field; `r tb_ex[2,2]`
 and `r tb_ex[4,2]` (`r tb_ex[4,3]`%) indicated that open data were `r tolower(tb_ex[4,1])` 
 important for their field. 
 
-```{r data_imp_ex_pie, echo = FALSE, warning = TRUE}
+```{r data_imp_ex_pie, echo = FALSE, warning = TRUE, eval=FALSE}
 
 title = "Perceived importance of open data (n = %d)"
 
@@ -1512,6 +1540,13 @@ knitr::kable (col.names = c("Perceived Importance", "Frequency", "Percentage"),
 # filter rows with valid responses for this variable
 valid_data_exp <- filter(df,DataExp != "NA")
 
+# FIGURING OUT WHICH PARTICIPANTS SAID THE VARIOUS RESPONSES
+
+# dataexp <- df %>% 
+  # filter(DataExp == "Aware, But Not Used") %>% 
+  # select(ParticipantNumber, DataExp, DataConcernsList)
+# write.csv(test, here::here("data", "DataExp.csv"), row.names = TRUE)
+
 # calculate number of rows with a valid response for this variable
 nvalid_data_exp <- nrow(valid_data_exp)
 
@@ -1530,7 +1565,7 @@ it in their research; `r tb[2,2]` (`r tb[2,3]`%) indicated that they had some
 experience with open data, but did not use them regularly; and `r tb[3,2]` 
 (`r tb[3,3]`%) indicated that they regularly use open data. 
 
-```{r data_exp_pie, echo = FALSE, warning = TRUE}
+```{r data_exp_pie, echo = FALSE, warning = TRUE, eval=FALSE}
 
 title = "What is your experience with open data? (n = %d)"
 
@@ -1563,7 +1598,7 @@ knitr::kable (col.names = c("Reported Experience", "Frequency", "Percentage"),
 # wrangle this data so it's in long form & only includes endorsements.
 
 DataUse_long <- df %>% 
-  select (c("ParticipantNumber", 
+  select (c("ParticipantNumber", "AcLevel_Label",
             "DataUse_useOthers":"DataUse_text",
             "FORcode_2_label")) %>%  
   select(-"DataUse_text") %>% 
@@ -1641,7 +1676,7 @@ knitr::kable (col.names = c("Reported Use", "Frequency", "Percentage"),
 # wrangle this data so it's in long form & only includes endorsements.
 
 DataConcern_long <- df %>% 
-  select (c("ParticipantNumber", 
+  select (c("ParticipantNumber", "AcLevel_Label",
             "DataConcern_criticise":"DataConcern_scoop",
             "FORcode_2_label")) %>%  
   select(-"DataConcern_text") %>% 
@@ -1776,7 +1811,7 @@ that pre-publication archiving was `r tolower(tb[4,1])` for their field;
 and `r tb[3,2]` (`r tb[3,3]`%) indicated that pre-publication archiving was 
 `r tolower(tb[3,1])` important for their field. 
 
-```{r prepub_imp_ex_pie, echo = FALSE, warning = TRUE}
+```{r prepub_imp_ex_pie, echo = FALSE, warning = TRUE, eval=FALSE}
 
 title = "Perceived importance of pre-publication archiving (n = %d)"
 
@@ -1831,7 +1866,7 @@ that they had some experience with pre-publication archiving; and `r tb[3,2]`
 (`r tb[3,3]`%) indicated that they have extensive experience with pre-publication
 archiving. 
 
-```{r prepub_exp_pie, echo = FALSE, warning = TRUE}
+```{r prepub_exp_pie, echo = FALSE, warning = TRUE, eval=FALSE}
 
 title = "What is your experience with pre-publication archiving? (n = %d)"
 
@@ -1867,7 +1902,7 @@ knitr::kable (col.names = c("Reported Experience", "Frequency", "Percentage"),
 # wrangle this data so it's in long form & only includes endorsements.
 
 PrePubUse_long <- df %>% 
-  select (c("ParticipantNumber", 
+  select (c("ParticipantNumber", "AcLevel_Label",
             "PrePubUse_upload":"PrePubUse_read",
             "FORcode_2_label")) %>%  
   select(-"PrePubUse_text") %>% 
@@ -1945,7 +1980,7 @@ knitr::kable (col.names = c("Reported Use", "Frequency", "Percentage"),
 # wrangle this data so it's in long form & only includes endorsements.
 
 PrePubConcern_long <- df %>% 
-  select (c("ParticipantNumber", 
+  select (c("ParticipantNumber", "AcLevel_Label",
             "PrePubConcern_policy":"PrePubConcern_none",
             "FORcode_2_label")) %>%  
   select(-"PrePubConcern_text") %>% 

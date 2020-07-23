@@ -2,13 +2,20 @@
 title: "Swinburne Open Science Task Force Survey (2019)"
 author: "Jennifer L Beaudry, Tom Johnstone, Jordy Kaufman & Lisa Given"
 date: '`r format (Sys.time(), "%d %B %Y")`'
-output:
+output:  
+  rmdformats::readthedown:
+    self_contained: true
+    thumbnails: false
+    lightbox: false
+    gallery: false
+    fig_retina: 1
+    toc_depth: 3
   #word_document: 
    # fig_width: 10 # this works, but it changes the font of plot_ly, etc.
    # fig_height: 12 # so, don't use for now
-  html_document:  
-    number_sections: true
-    toc: true
+  # html_document:  
+    # number_sections: true
+    # toc: true
   #pdf_document: default # this works now [but margin issues around plot_ly]
 always_allow_html: true # true for word; false for pdf (?)
 csl: apa-old-doi-prefix.csl
@@ -37,6 +44,7 @@ options(kableExtra.auto_format = TRUE)
 
 ```{r library, include=FALSE}
 # load the library
+# need to install & load `rmdformats` package before you knit
 library(tinytex)
 library(knitr)
 library(here)

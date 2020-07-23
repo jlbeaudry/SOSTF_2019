@@ -6,7 +6,9 @@ output:
   #word_document: 
    # fig_width: 10 # this works, but it changes the font of plot_ly, etc.
    # fig_height: 12 # so, don't use for now
-  html_document: default 
+  html_document:  
+    number_sections: true
+    toc: true
   #pdf_document: default # this works now [but margin issues around plot_ly]
 always_allow_html: true # true for word; false for pdf (?)
 csl: apa-old-doi-prefix.csl
@@ -216,7 +218,7 @@ per_ac_level <- perc(x = df$AcLevel_Label, y = nvalid_ac_level)
 
 ```
 
-# Overview
+Overview
 
 We conducted a survey in September 2019 to examine people's current use of open 
 science practices, to examine their perceptions of these practices, and to examine
@@ -225,16 +227,21 @@ started the survey, although not all respondents completed all questions; thus,
 we report the sample size for each question. This document presents an overview 
 of their responses. 
 
-## Demographics: Academic Levels
+# Demographics
+
 
 In terms of respondents' demographic information, we did not collect information 
 about gender or age to provide more anonymity to our respondents. We did, however,
 ask about their Academic Level/Type and their Discpline (based on 2-digit and 
-4-digit Field of Research [FOR] codes). Of the `r nrow(valid_ac_level)`
-respondents who provided details about their Academic Level, `r per_ac_level [5]`%
-were PhD students, `r per_ac_level [7]`% were Professors, and 
-`r per_ac_level [10]`% were Senior Lecturers. The breakdown of the rest of the 
-academic levels for the rest of the respondents are in the table below. 
+4-digit Field of Research [FOR] codes). 
+
+## Academic Levels 
+
+Of the `r nrow(valid_ac_level)`respondents who provided details about their 
+Academic Level, `r per_ac_level [5]`% were PhD students, `r per_ac_level [7]`% 
+were Professors, and `r per_ac_level [10]`% were Senior Lecturers. 
+The breakdown of the rest of the academic levels for the rest of the respondents 
+are in the table below. 
 
 ```{r ac_level_table, echo=FALSE, warning=TRUE}
 
@@ -270,7 +277,7 @@ FOR_freq <- df %>%
 a <- colSums(FOR_freq[1:18,3])
 ```
 
-## Demographics: Disciplines
+## Disciplines
 
 In terms of Field of Research Codes, `r a` respondents classified themselves 
 as belonging to one of the two-digit FOR codes from 01 to 20, one person indicated 
@@ -434,7 +441,7 @@ per_crisis <- perc(x = df$crisis, y = nvalid_crisis)  #percentage per level
 # output of `per_crisis` inserted in text below
 ```
 
-## Estimates of Reproducibility by Perceived Crisis  
+# Estimates of Reproducibility by Perceived Crisis  
 
 Participants were asked if they believed their field is experiencing a
 "reproducibility crisis". Of the `r nvalid_crisis` respondents who answered this 
@@ -483,10 +490,10 @@ p
 ```
   
    
-## Experience with Open Science Practices
+# Experience with Open Science Practices
 
   
-### Overall Experience with Open Science Practices
+## Overall Experience with Open Science Practices
 
 ```{r os_experience, include = FALSE, warning=TRUE}
 
@@ -577,11 +584,11 @@ knitr::kable(col.names = c("Reported Experience", "Frequency", "Percentage"),
 
 ```
 
-#### Complete Picture of Perceived Importance and Reported Experience
+## Complete Picture of Perceived Importance and Reported Experience
 
 This gives a solid picture of the overall situation in terms of perceived importance.
 
-##### Importance of Practices
+### Importance of Practices
 
 ```{r stacked_imp_data, eval=TRUE, include=FALSE}
 ## Figure out what the data needs to look like...
@@ -707,7 +714,7 @@ knitr::kable (col.names = c("Practice", "Perceived Importance", "Frequency",
 
 ```
 
-##### Experience with Practices
+### Experience with Practices
 
 This shows the overall situation in terms of reported experience with the various practices.
 
@@ -811,7 +818,7 @@ p <- ggplot(tb, aes(fill = Experience, y = Percentage, x = Practice)) +
 p
 ```
 
-#### Barriers to Open Science Practices
+### Barriers to Open Science Practices
 
 ```{r os_barriers_data, eval=TRUE, echo=FALSE, warning=TRUE}
 
@@ -914,12 +921,12 @@ p
 
 ```
 
-### Experience with different types of open science practices
+# Experience with different types of open science practices
    
 Next, we break down the results according to their experience with specific types 
 of open science practices. 
 
-#### Study Preregistration
+## Study Preregistration
 
 We defined study preregistration for our participants as: "Documenting and submitting
 to a journal or public repository one's research questions, methodological design, 
@@ -927,7 +934,7 @@ and anlysis plan prior to analysing the data. This time-stamped document is made
 openly available by the time the research is published so that any deviation from 
 the original research plan is visible to the scientific community."
 
-##### Perceived Importance of Preregistration 
+### Perceived Importance of Preregistration 
 
 ```{r prereg_imp_count, echo = FALSE, warning=TRUE}
 
@@ -996,7 +1003,7 @@ knitr::kable (col.names = c("Perceived Importance", "Frequency",
 
 ```
 
-##### Experience with Study Preregistration
+### Experience with Study Preregistration
 
 ```{r prereg_exp_count, echo = FALSE, warning=TRUE}
 # filter rows with valid responses for this variable
@@ -1055,7 +1062,7 @@ knitr::kable (col.names = c("Reported Experience", "Frequency", "Percentage"),
 
 ```
 
-##### Concerns about Preregistration 
+### Concerns about Preregistration 
 
 ```{r prereg_concerns_data, echo=FALSE, warning=TRUE}
 
@@ -1147,7 +1154,7 @@ p
 
 ```
 
-#### Open Materials and/or Code 
+## Open Materials and/or Code 
 
 The next section of the survey related to the use of open materials and/or code. 
 For our purposes, we explained that open materials and/or code referred to researcher-
@@ -1155,7 +1162,7 @@ created resources used while collecting or analyzing data (e.g., survey question
 video stimuli, vignettes, algorithms, coding schemes, analytic code, etc.) that 
 are made openly available to the research community.
 
-##### Perceived Importance of Open Materials and/or Code 
+### Perceived Importance of Open Materials and/or Code 
 
 ```{r code_imp_count, echo = FALSE, warning=TRUE}
 
@@ -1229,7 +1236,7 @@ knitr::kable (col.names = c("Perceived Importance", "Frequency", "Percentage"),
 ```
 
 
-##### Experience with Open Materials and/or Code
+### Experience with Open Materials and/or Code
 
 ```{r code_exp_count, echo=FALSE, warning=TRUE}
 
@@ -1280,7 +1287,7 @@ knitr::kable (col.names = c("Reported Experience", "Frequency", "Percentage"),
 # html output = font_size = 14 # insert in kable styling
 
 ```
-##### Use of Open Materials and/or Code
+### Use of Open Materials and/or Code
 
 ```{r code_use_count, echo=FALSE, warning=TRUE}
 
@@ -1359,7 +1366,7 @@ knitr::kable (col.names = c("Reported Use", "Frequency", "Percentage"),
 # html output = font_size = 14 # insert in kable styling
 ```
 
-##### Concerns about Open Materials and/or Code
+### Concerns about Open Materials and/or Code
 
 ```{r code_concerns_data, echo=FALSE, warning=TRUE}
 
@@ -1453,14 +1460,14 @@ p
 
 ```
 
-#### Open Data
+## Open Data
 
 The next section of the survey related to the use of open data. 
 For our purposes, we explained that open data can be defined as "online, free of 
 cost, accessible data that can be used, reused and distributed provided that the 
 data source is attributed and shared alike." [FIND SOURCE FROM SURVEY]
 
-##### Perceived Importance of Open Data 
+### Perceived Importance of Open Data 
 
 ```{r data_imp_count, echo = FALSE, warning=TRUE}
 
@@ -1533,7 +1540,7 @@ knitr::kable (col.names = c("Perceived Importance", "Frequency", "Percentage"),
 ```
 
 
-##### Experience with Open Data
+### Experience with Open Data
 
 ```{r data_exp_count, echo=FALSE, warning=TRUE}
 
@@ -1591,7 +1598,7 @@ knitr::kable (col.names = c("Reported Experience", "Frequency", "Percentage"),
 
 ```
 
-##### Use of Open Data
+### Use of Open Data
 
 ```{r data_use_count, echo=FALSE, warning=TRUE}
 
@@ -1669,7 +1676,7 @@ knitr::kable (col.names = c("Reported Use", "Frequency", "Percentage"),
 # html output = font_size = 14 # insert in kable styling
 ```
 
-##### Concerns about Open Data
+### Concerns about Open Data
 
 ```{r data_concerns_data, echo=FALSE, warning=TRUE, eval = TRUE}
 
@@ -1775,7 +1782,7 @@ p
 
 ```
 
-#### Pre-publication Archiving
+## Pre-publication Archiving
 
 The next section of the survey related to the use of pre-publication archiving. 
 For our purposes, we explained that pre-publication archiving is also known as 
@@ -1784,7 +1791,7 @@ before </em></b> it undergoes peer review in an academic journal or other outlet
 Generally, this is achieved by uploading the manuscript to an archive such as arXiv
 (physics, maths), bioRxiv (biology), SocArxiv (sociology), etc.
 
-##### Perceived Importance of Pre-publication Archiving 
+### Perceived Importance of Pre-publication Archiving 
 
 ```{r prepub_imp_count, echo = FALSE, warning=TRUE}
 
@@ -1840,7 +1847,7 @@ knitr::kable (col.names = c("Perceived Importance", "Frequency", "Percentage"),
 
 ```
 
-##### Experience with Pre-publication Archiving
+### Experience with Pre-publication Archiving
 
 ```{r prepub_count_exp, echo=FALSE, warning=TRUE}
 
@@ -1895,7 +1902,7 @@ knitr::kable (col.names = c("Reported Experience", "Frequency", "Percentage"),
 
 ```
 
-##### Use of Pre-publication Archiving
+### Use of Pre-publication Archiving
 
 ```{r prepub_use_count, echo=FALSE, warning=TRUE}
 
@@ -1973,7 +1980,7 @@ knitr::kable (col.names = c("Reported Use", "Frequency", "Percentage"),
 # html output = font_size = 14 # insert in kable styling
 ```
 
-##### Concerns about Pre-publication Archiving
+### Concerns about Pre-publication Archiving
 
 ```{r prepub_concerns_data, echo=FALSE, warning=TRUE, eval = TRUE}
 
@@ -2061,7 +2068,7 @@ p
 
 ```
 
-#### Open Access Publishing
+## Open Access Publishing
 
 The next section of the survey addressed Open Access publishing. We first explained
 the two different kinds of open access publishing: (1) paying an open access fee 
@@ -2070,7 +2077,7 @@ the final accepted version of your manuscript (peer-reviewed but not
 journal-formatted) in an open access repository (e.g., Swinburne Research Bank
 or bioRxiv). 
 
-##### Proportion of Publications that are Open Access 
+### Proportion of Publications that are Open Access 
 
 ```{r oa_prop_count, echo=FALSE, warning=TRUE}
 
@@ -2110,7 +2117,7 @@ knitr::kable (col.names = c("Response", "Frequency", "Percentage"),
 
 ```
 
-##### Open Access Fees
+### Open Access Fees
 
 ```{r oa_fees_data, echo=FALSE, warning=TRUE, eval = TRUE}
 
@@ -2194,7 +2201,9 @@ p
 
 ```
 
-#### Most Common Open Science Practices in Their Field
+## Additional Open Science Issues
+
+### Most Common Open Science Practices in Their Field
 
 ```{r os_most_data, eval=TRUE, echo=FALSE}
 

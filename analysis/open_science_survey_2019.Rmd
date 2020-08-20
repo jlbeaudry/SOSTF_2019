@@ -2,7 +2,10 @@
 title: "Swinburne Open Science Task Force Survey (2019)"
 author: "Jennifer Beaudry, Tom Johnstone, Jordy Kaufman, Lisa Given & Michelle Vincent"
 date: '`r format (Sys.time(), "%d %B %Y")`'
-output:  
+output:
+ # bookdown::pdf_document2 #another option for pdf output
+  #  keep_tex: true
+   # toc: false
   #word_document: 
    # fig_width: 10 # this works, but it changes the font of plot_ly, etc.
    # fig_height: 12 # so, don't use for now
@@ -764,7 +767,7 @@ the practice (39%) or were aware, but had not used it (38%). Only 16% of respond
 reported any experience with pre-publication archiving. 
 
 More information about their use of and concerns about these various practices 
-are reported in the "**Experience with eifferent types of open science practices**"
+are reported in the "**Experience with different types of open science practices**"
 section.
 
 ```{r stacked_exp_data, warning=FALSE}

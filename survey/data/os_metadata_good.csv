@@ -77,3 +77,35 @@ OAfees_7_TEXT,factor,OAfees_text,Other: Text,,,,,,,OAfees
 OAfees_8,factor,OAfees_withdrew,I could not afford to pay the fees and withdrew the manuscript,,,,,,,OAfees
 OAfees_10,factor,OAfees_waiver,I received a fee waiver from the journal,,,,,,,OAfees
 OAfees_11,factor,OAfees_hdr,My HDR student paid the fees with their research funding,,,,,,,OAfees
+,,,,,,,,,,
+OSmost_1,factor,OSmost_data,Open data,,,,,,,OSmost
+OSmost_2,factor,OSmost_code,Open materials/code,,,,,,,OSmost
+OSmost_3,factor,OSmost_prepub,Pre-publication archiving,,,,,,,OSmost
+OSmost_4,factor,OSmost_prereg,Study preregistration,,,,,,,OSmost
+OSmost_5,factor,OSmost_none,None,,,,,,,OSmost
+OSmost_6,factor,OSmost_OA,Open access publishing,,,,,,,OSmost
+OSmost_7,factor,OSmost_unknown,I don't know about the open science practices of researchers in my field,,,,,,,OSmost
+OSmost_9,factor,OSmost_other,Other,,,,,,,OSmost
+OSmost_9_TEXT,factor,OSmost_text,Other: Text,,,,,,,OSmost
+OSmost_10,factor,OSmost_repo,Open access archiving in a repository,,,,,,,OSmost
+,,,,,,,,,,
+OSBarriersList_1,factor,OSBarrier_noOAFunding,Lack of funding for open access publishing,Lack of funding for open access publishing,,,,,,OSBarrier
+OSBarriersList_2,factor,OSBarrier_noCredit,Lack of credit in my institution for engaging in open science,Lack of institutional credit for engaging in OS,,,,,,OSBarrier
+OSBarriersList_3,factor,OSBarrier_noMandate,"Lack of mandates from funders, institutions or other regulators","Lack of mandates from funders, institutions or other regulators",,,,,,OSBarrier
+OSBarriersList_4,factor,OSBarrier_noInfo,Lack of information about open science practices,Lack of information about OS,,,,,,OSBarrier
+OSBarriersList_5,factor,OSBarrier_noInfrastructure,"Lack of supporting infrastructure (e.g., open data platforms)","Lack of supporting infrastructure (e.g., open data platforms)",,,,,,OSBarrier
+OSBarriersList_6,factor,OSBarrier_noTimeEngage,Lack of time to engage in open science practices,Lack of time to engage in OS ,,,,,,OSBarrier
+OSBarriersList_8,factor,OSBarrier_colleaguesDis,Researchers are discouraged from engaging in open science practices by their colleagues,Researchers are discouraged from engaging in OS by colleagues,,,,,,OSBarrier
+OSBarriersList_9,factor,OSBarrier_noInterest,Lack of interest from researchers,Lack of interest from researchers,,,,,,OSBarrier
+OSBarriersList_10,factor,OSBarrier_none,I do not perceive any barriers,I do not perceive any barriers,,,,,,OSBarrier
+OSBarriersList_11,factor,OSBarrier_intimidating,The open science community is intimidating,The OS community is intimidating,,,,,,OSBarrier
+OSBarriersList_12,factor,OSBarrier_other,Other,Other,,,,,,OSBarrier
+OSBarriersList_12_TEXT,factor,OSBarrier_text,Other: Text,Other: Text,,,,,,OSBarrier
+OSBarriersList_13,factor,OSBarrier_supervisorsDis,HDR students are discouraged from engaging in open science practices by thesis supervisors,HDR students are discouraged from engaging in OS by thesis supervisors,,,,,,OSBarrier
+OSBarriersList_15,factor,OSBarrier_noTraining,Lack of training required to implement open science practices,Lack of training required to implement OS,,,,,,OSBarrier
+OSBarriersList_16,factor,OSBarrier_independent,Researchers don't want to be told how to do their research,Researchers don't want to be told how to do their research,,,,,,OSBarrier
+OSBarriersList_17,factor,OSBarrier_noRecognition,Lack of recognition in my field about the value of open science practices,Lack of recognition in my field about the value of OS,,,,,,OSBarrier
+OSBarriersList_18,factor,OSBarrier_noSupport,Lack of professional staff that provide support for open science practices,Lack of professional staff that provide support for OS,,,,,,OSBarrier
+OSBarriersList_19,factor,OSBarrier_noOSFunding,Lack of research funding to support open science practices,Lack of research funding to support OS,,,,,,OSBarrier
+OSBarriersList_20,factor,OSBarrier_noTimeLearn,Lack of time to learn open science practices,Lack of time to learn OS,,,,,,OSBarrier
+OSBarriersList_21,factor,OSBarrier_noExpertise,"Lack of expertise to engage in open science practices (e.g., assignment of metadata)","Lack of expertise to engage in OS (e.g., assignment of metadata)",,,,,,OSBarrier

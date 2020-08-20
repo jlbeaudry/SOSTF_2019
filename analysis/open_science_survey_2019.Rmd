@@ -1,22 +1,22 @@
 ---
 title: "Swinburne Open Science Task Force Survey (2019)"
-author: "Jennifer L Beaudry, Tom Johnstone, Jordy Kaufman & Lisa Given"
+author: "Jennifer Beaudry, Tom Johnstone, Jordy Kaufman, Lisa Given & Michelle Vincent"
 date: '`r format (Sys.time(), "%d %B %Y")`'
 output:  
   #word_document: 
    # fig_width: 10 # this works, but it changes the font of plot_ly, etc.
    # fig_height: 12 # so, don't use for now
-   rmdformats::readthedown:
-    self_contained: true
-    thumbnails: true
-    lightbox: true
-    gallery: false
-    fig_retina: 1
-    toc_depth: 3
+  # rmdformats::readthedown:
+  #  self_contained: true
+   # thumbnails: true
+    #lightbox: true
+    #gallery: false
+    #fig_retina: 1
+    #toc_depth: 3
    # html_document:  
     # number_sections: true
     # toc: true
-  #pdf_document: default # this works now [but margin issues around plot_ly]
+  pdf_document: default # this works now [but margin issues around plot_ly]
 always_allow_html: true # true for word; false for pdf (?)
 csl: apa-old-doi-prefix.csl
 bibliography: Beaudry_Library.bib
@@ -42,6 +42,7 @@ knitr::opts_chunk$set(
   fig.align = "center"
 )
 knitr::opts_knit$set(width = 75)
+  
 # If I knit as a word doc:
   # switch auto_format to 'false'; 'true' for pdf or html
   # add 'fig.width = 8, fig.height = 8' to opts_chunk 
@@ -225,8 +226,7 @@ styler <- function(dat) {
   dat %>%
     kable_styling(bootstrap_options = "striped", full_width = F, 
                  position = 'center',
-                latex_options = "hold_position", 
-                font_size = 16) # remove for pdf/word
+                latex_options = c("hold_position", "scale_down")) # remove 'font_size = 16' for pdf/word - set for html
 }
 
 ```
@@ -249,9 +249,12 @@ valid_ac_level <- filter(df, AcLevel_Label != "NA")
 nvalid_ac_level <- nrow(valid_ac_level)
 per_ac_level <- perc(x = df$AcLevel_Label, y = nvalid_ac_level) 
 
+# for pdf, include Overview as a heading. Remove for html so I can see the full 
+  # table of contents
+
 ```
 
-Overview
+# Overview
 
 We conducted a survey in September 2019 to examine people's current use of open 
 science practices, to examine their perceptions of these practices, and to examine
@@ -487,20 +490,20 @@ p <- ggplot(data = valid_rep_est,
               colour="blue",
               size = 2.2,
               alpha=.5) +
-  stat_summary(fun.y=mean,
-               fun.ymin=mean,
-               fun.ymax=mean,
+  stat_summary(fun=mean,
+               fun.min=mean,
+               fun.max=mean,
                geom='crossbar',
                width=0.5) +
   scale_x_discrete(name = x_name, limits = x_labels) +
   scale_y_continuous(name = y_name) +
   coord_cartesian(ylim = c(0,100)) +
-  theme_classic (base_size = 12) +
+  theme_classic (base_size = 18) +
   ggtitle(title)
 
 p
 
-# code to save it in the figs folder. Increase 'base_size' from 12 to 18 for slides. 
+# code to save it in the figs folder. Increase 'base_size' from 12 to 18 for slides/pdf. 
 # ggsave(here::here("figs", "reprod_estimates_by_crisis.png"), plot = p)
 ```
   
@@ -569,7 +572,7 @@ p
 ```
 
 
-```{r os_experience_pie, fig.width=4,fig.height=4}
+```{r os_experience_pie, fig.width=4, fig.height=4, eval=FALSE}
 
 title = "What is your experience with open science practices? (n = %d)"
 
@@ -596,9 +599,14 @@ knitr::kable(col.names = c("Reported Experience", "Frequency", "Percentage"),
 
 ```
 
-## Complete Picture of Perceived Importance and Reported Experience
+## Overall Perceived Importance and Reported Experience
 
-This gives a solid picture of the overall situation in terms of perceived importance.
+Throughout the survey, respondents separately rated the perceived importance for 
+their field of the four main open science practices, and they also reported their 
+own experience with those practices. Specifically, we asked them about 
+preregistering their studies in advance of data collection, making their study 
+material and/or code openly available, making their data openly available, 
+and making their work available on pre-publication archives. 
 
 ### Importance of Practices
 
@@ -655,7 +663,7 @@ imp_long <- valid_df_imp %>%
 
 total_n <- length(unique(imp_long$ParticipantNumber))
 
-tb <- imp_long %>% 
+tb_imp <- imp_long %>% 
   group_by(Practice) %>% 
   dplyr::count(Importance) %>% 
   mutate(Percentage = round (n/(total_n)*100))
@@ -667,14 +675,26 @@ tb <- imp_long %>%
 
 ```
 
+This figure includes the data from respondents who answered at least one of 
+these questions. The figure demonstrates that our respondents believed that 
+open materials, code, and data were the most important practices for their own 
+fields and that pre-publication archiving was the least important. Whereas, 
+nearly 75% indicated that open materials/code and open data were important 
+(either extremely important or somewhat important), only 36% indicated that 
+pre-publication archiving was important. 
+
+More information about their use of and concerns about these various practices 
+are reported in the "**Experience with different types of open science practices**"
+section. 
+
 ```{r stacked_imp_bar, fig.height=6, fig.width=12}
 # Relevel my importance factors
 
-tb$Importance <- factor (tb$Importance, levels = c("Extremely important",
+tb_imp$Importance <- factor (tb_imp$Importance, levels = c("Extremely important",
                                            "Somewhat important", 
                                            "Somewhat unimportant",
                                            "Not at all"))
-tb$Practice <- factor (tb$Practice, levels = c("PrePubImp", 
+tb_imp$Practice <- factor (tb_imp$Practice, levels = c("PrePubImp", 
                                                "DataImp", 
                                                "CodeImp", 
                                                "PreRegImp"))
@@ -684,36 +704,40 @@ tb$Practice <- factor (tb$Practice, levels = c("PrePubImp",
 title = str_wrap (sprintf("Perceived importance of open science practices (n = %d)", 
                           total_n), width = 40)
 
-p <- ggplot(tb, aes(fill = Importance, y = Percentage, x = Practice)) +
+p <- ggplot(tb_imp, aes(fill = Importance, y = Percentage, x = Practice)) +
   geom_bar(position="fill", stat="identity", colour = "black") +
   scale_fill_brewer(palette = "Blues", na.value = "grey50", direction = -1) +
   labs (x = element_blank(),
         y = "Percentage", 
         title = title) +
-    theme_classic(base_size = 12) +
+    theme_classic(base_size = 18) +
     theme(plot.title = element_text(hjust = 0.5)) + 
   coord_flip() +
   scale_x_discrete(labels = c("Pre-publication\n Archiving", "Open Data", "Open\n Materials/Code", "Preregistration")) +
   scale_y_continuous(labels = c("0", "25", "50", "75", "100"))
 
 p
+
+ggsave(here::here("figs", "all_importance.png"), 
+       width = 12, height = 6, dpi = "retina")
+# change base_size to 12 for regular knit
 ```
 
 
 ```{r stacked_imp_table, include=FALSE}
 
 # Relevel my importance factors
-tb$Importance <- factor (tb$Importance, levels = c("Extremely important",
-                                           "Somewhat important", 
+tb_imp$Importance <- factor (tb_imp$Importance, levels = c("Extremely important",
+                                           "Somewhat important",
                                            "Somewhat unimportant",
                                            "Not at all"))
-tb$Practice <- factor (tb$Practice, levels = c("PrePubImp", 
+tb_imp$Practice <- factor (tb_imp$Practice, levels = c("PrePubImp", 
                                                "DataImp", 
                                                "CodeImp", 
                                                "PreRegImp"))
 
 
-tb %>% 
+tb_imp %>% 
 knitr::kable (col.names = c("Practice", "Perceived Importance", "Frequency",
                             "Percentage"), 
               caption = 
@@ -726,7 +750,22 @@ knitr::kable (col.names = c("Practice", "Perceived Importance", "Frequency",
 
 ### Experience with Practices
 
-This shows the overall situation in terms of reported experience with the various practices.
+This figure shows respondents experience with preregistering their studies in 
+advance of data collection, making their study material and/or code openly 
+available, making their data openly available, and making their work available on 
+pre-publication archives. This figure includes the data from respondents who 
+answered at least one of these questions. The figure demonstrates that our 
+respondents had very little experience with any of these open science practices. 
+Respondents had the most experience with open materials/code and open data, but 
+even with those practices, the most common response (37% for materials/code and
+41% for data) was that they were aware of the practice, but had not personally 
+used it. With regard to preregistration, respondents were largely unaware of 
+the practice (39%) or were aware, but had not used it (38%). Only 16% of respondents
+reported any experience with pre-publication archiving. 
+
+More information about their use of and concerns about these various practices 
+are reported in the "**Experience with eifferent types of open science practices**"
+section.
 
 ```{r stacked_exp_data, warning=FALSE}
 
@@ -782,7 +821,7 @@ exp_long <- valid_df_exp %>%
 
 total_n <- length(unique(exp_long$ParticipantNumber))
 
-tb <- exp_long %>% 
+tb_exp <- exp_long %>% 
   group_by(Practice) %>% 
   dplyr::count(Experience) %>% 
   mutate(Percentage = round (n/(total_n)*100))
@@ -792,18 +831,18 @@ tb <- exp_long %>%
 ```{r stacked_exp_bar, fig.height=6, fig.width=12}
 # Relevel my Experience factors
 
-# Different labels used for various practices, so I need to relabel
+# Different labels used for various practices in the survey, so I need to relabel
 
-tb <- tb %>%  dplyr::mutate(Experience = fct_recode (Experience, 
+tb_exp <- tb_exp %>%  dplyr::mutate(Experience = fct_recode (Experience, 
                             "Extensive Experience" = "Regular Use",
                             "Extensive Experience" = "Reg Use",
                             "Some Experience" = "Some Use"))
 
-tb$Experience <- factor (tb$Experience, levels = c("Extensive Experience",
+tb_exp$Experience <- factor (tb_exp$Experience, levels = c("Extensive Experience",
                                            "Some Experience", 
                                            "Aware, But Not Used",
                                            "Unaware"))
-tb$Practice <- factor (tb$Practice, levels = c("PrePubExp", 
+tb_exp$Practice <- factor (tb_exp$Practice, levels = c("PrePubExp", 
                                                "DataExp", 
                                                "CodeExp", 
                                                "PreRegExp"))
@@ -814,20 +853,24 @@ title = str_wrap (sprintf("Reported experience with open science practices (n = 
                           total_n), width = 40)
 
 
-p <- ggplot(tb, aes(fill = Experience, y = Percentage, x = Practice)) +
+p <- ggplot(tb_exp, aes(fill = Experience, y = Percentage, x = Practice)) +
   geom_bar(position="fill", stat="identity", colour = "black") +
   scale_fill_brewer(palette = "Blues", na.value = "grey50", direction = -1, 
                     labels =c("Extensive experience","Some experience", "Aware, but not used", "Unaware", "N/A")) +
   labs (x = element_blank(),
         y = "Percentage", 
         title = title) +
-    theme_classic(base_size = 12) +
+    theme_classic(base_size = 18) +
     theme(plot.title = element_text(hjust = 0.5)) + 
   coord_flip() +
   scale_x_discrete(labels = c("Pre-publication\n Archiving", "Open Data", "Open\n Materials/Code", "Preregistration")) +
   scale_y_continuous(labels = c("0", "25", "50", "75", "100"))
   
 p
+
+ggsave(here::here("figs", "all_experience.png"), 
+       width = 12, height = 6, dpi = "retina")
+# change base_size to 12 for regular knit
 ```
 
 ### Barriers to Open Science Practices
@@ -925,13 +968,14 @@ p <- ggplot(tb2) +
       y = "Percentage", 
         title = title) +
   coord_flip(ylim = c(0,80)) +
-  theme_classic(base_size = 12) + 
+  theme_classic(base_size = 16) + 
   scale_x_discrete(labels = function(x) str_wrap(x, width = 75)) + #wrap the labels
-  theme(plot.title = element_text(hjust = 0.5)) 
+  theme(plot.title = element_text(hjust = 0.5, size = NULL)) 
 p
 
-
-
+ggsave(here::here("figs", "all_barriers.png"), 
+       width = 12, height = 8, dpi = "retina")
+# change base_size to 12 for regular knit & remove size = 14 from plot.title
 ```
 
 # Experience with different types of open science practices

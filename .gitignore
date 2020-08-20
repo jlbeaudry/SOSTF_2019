@@ -15,3 +15,8 @@ data
 >>>>>>> 40cc82d2037eb67c8832cbd3ff3054f3cfd346a8
 *.DS_Store
 scratchpad
+anaylysis/*_files
+analysis/*_files
+analysis/*_cache
+analysis/*.log
+analysis/*.pdf

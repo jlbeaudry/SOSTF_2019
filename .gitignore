@@ -20,3 +20,6 @@ analysis/*.pdf
 analysis/*_files*
 *.log
 *.pdf
+*.docx
+Rplot.png
+elians_case_when.R

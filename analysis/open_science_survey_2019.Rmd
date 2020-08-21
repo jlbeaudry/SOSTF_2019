@@ -3,9 +3,9 @@ title: "Swinburne Open Science Task Force Survey (2019)"
 author: "Jennifer Beaudry, Tom Johnstone, Jordy Kaufman, Lisa Given & Michelle Vincent"
 date: '`r format (Sys.time(), "%d %B %Y")`'
 output:
- bookdown::pdf_document2: #another option for pdf output
-   keep_tex: true
-   toc: false
+  # bookdown::pdf_document2: #another option for pdf output
+    # keep_tex: true
+    # toc: false
   #word_document: 
    # fig_width: 10 # this works, but it changes the font of plot_ly, etc.
    # fig_height: 12 # so, don't use for now
@@ -19,22 +19,20 @@ output:
    # html_document:  
     # number_sections: true
     # toc: true
-  # pdf_document: default # this works now [but margin issues around plot_ly]
-always_allow_html: true # true for word; false for pdf (?)
+ pdf_document: default # this works now
+always_allow_html: false # true for word; false for pdf (?)
 csl: apa-old-doi-prefix.csl
 bibliography: Beaudry_Library.bib
 ---
 
 
 ```{r setup, include=FALSE}
-#knitr::opts_chunk$set(echo = TRUE, fig.align= "center")
-options(scipen = 999, 
-        kableExtra.auto_format = TRUE) 
+options(scipen = 999)
 
 ## Global options
 knitr::opts_chunk$set(
   echo = FALSE,
-  cache = TRUE,
+  cache = FALSE, # do not use this with github!
   prompt = FALSE,
   tidy = TRUE,
   comment = NA,
@@ -45,6 +43,8 @@ knitr::opts_chunk$set(
   fig.align = "center"
 )
 knitr::opts_knit$set(width = 75)
+
+
   
 # If I knit as a word doc:
   # switch auto_format to 'false'; 'true' for pdf or html
@@ -225,11 +225,18 @@ meta_rename <-  function(df, metadata, old, new) {
 
 #### KABLE STYLE #####  
 
-styler <- function(dat) {
+styler_html <- function(dat) {
   dat %>%
-    kable_styling(bootstrap_options = "striped", full_width = F, 
+     kable_styling(bootstrap_options = "striped", full_width = F, 
                  position = 'center',
-                latex_options = c("hold_position", "scale_down")) # remove 'font_size = 16' for pdf/word - set for html
+                font_size = 16)
+}
+
+styler_pdf <- function(dat) {
+  dat %>%
+     kable_styling(full_width = F, 
+                 position = 'center',
+                latex_options = c("striped", "HOLD_position"))
 }
 
 ```
@@ -292,10 +299,11 @@ a2 <- valid_ac_level %>%
   # of the rows in the tibble)
 a3 <-a2 [c(7,1,10,11,2,9,6,5,3,8,4),]
 
-knitr::kable(a3, col.names = c("Academic Levels", "Frequency", "Percentage"), 
+knitr::kable(a3, 
+             col.names = c("Academic Levels", "Frequency", "Percentage"), 
              caption = sprintf("Academic Levels of Respondents (n = %d)", 
                                nvalid_ac_level), align = 'lcc') %>% 
-  styler() 
+        styler_pdf()
 
 ```
 
@@ -320,105 +328,10 @@ as belonging to one of the two-digit FOR codes from 01 to 20, one person indicat
 "Other", and `r FOR_freq[20,3]` respondents did not specify their FOR code. We 
 did not have any responses from researchers in Earth Sciences (04), Agricultural 
 and Veterinary Sciences (07), History and Archeology (21), and Philosophy and 
-Religious Studies (22). 
+Religious Studies (22).  
 
-%%% I RECKON I'LL MOVE THIS TO AN APPENDIX %%%
+SAY SOMETHING HERE ABOUT COLLAPSING THEM & POINT THEM TO THE APPENDIX
 
-```{r FOR_table}
-
-d2 <- df %>% 
-  select (c(FORcode_2_num, FORcode_2_label)) %>% 
-  dplyr::count(FORcode_2_num,FORcode_2_label) %>% 
-  mutate (Percentage = round (n/nrow(df)*100))
-
-# specify the exact order of the columns based on d2 (select them according to 
-  # the order of the rows in the tibble)
-# f2 <-d2 [c(12,16,3,8,1,9,7,20,13,2,6,5,4,19,17,11,18,10,15,14),]
-  # I don't seem to be using this in this version, replaced with desc
-
-dplyr::arrange(d2,-desc(FORcode_2_num)) %>% 
-knitr::kable(col.names = c("FOR Code", "Field of Research Division", "Frequency",
-                           "Percentage"), 
-             caption = sprintf("Reported Two-Digit Field of Research Codes for Respondents (n = %d)", nrow(df)), align = 'clcc') %>% 
-  styler() 
-
-```
-
-
-```{r FOR_table_by_role, include = FALSE}
-
-# Now look at how the data changes according to their academic level (student or not)
-#  very few unspecified with students! Out of the 54 students, only 1 'other' and 1 'unspecified'
-  # I don't need to use this either...CAN CUT THIS WHOLE CHUNK EVENTUALLY
-
-student <- dplyr::filter(df, AcLevel_Label == "PhD Student" | 
-                           AcLevel_Label == "Masters Student" | 
-                           AcLevel_Label == "Research Assistant") %>% 
-  dplyr::count(FORcode_2_num, FORcode_2_label)
-
-dplyr::arrange(student,-desc(FORcode_2_num)) %>% 
-knitr::kable(col.names = c("FOR Code", "Field of Research Division", "Frequency"),
-             caption = sprintf("Reported Two-Digit Field of Research Codes for Student Respondents (n = %d)", (sum(student[3]))), align = 'clc') %>% 
-  styler() 
-
-# now showing the staff breakdown
-
-staff <- dplyr::filter(df, AcLevel_Label == "Professor" |
-                         AcLevel_Label == "Associate Professor" | 
-                         AcLevel_Label == "Senior Lecturer" | 
-                         AcLevel_Label == "Senior Research Fellow" | 
-                         AcLevel_Label == "Lecturer" | 
-                         AcLevel_Label == "Research Fellow" | 
-                         AcLevel_Label == "Postdoc") %>% 
-  dplyr::count(FORcode_2_num, FORcode_2_label)
-
-dplyr::arrange(staff,-desc(FORcode_2_num)) %>% 
-knitr::kable(col.names = c("FOR Code", "Field of Research Division", "Frequency"),
-             caption = sprintf("Reported Two-Digit Field of Research Codes for Staff Respondents (n = %d)", (sum(staff[3]))), align = 'clc') %>% 
-  styler() 
-
-# now showing for respondents who did not specify their academic levels (NA or 'other')
-
-unknown <- dplyr::filter(df, is.na(AcLevel_Label) | 
-                           AcLevel_Label == "Other") %>% 
-  dplyr::count(FORcode_2_num, FORcode_2_label)
-
-dplyr::arrange(unknown,-desc(FORcode_2_num)) %>% 
-knitr::kable(col.names = c("FOR Code", "Field of Research Division", "Frequency"), caption = sprintf("Reported Two-Digit Field of Research Codes for Unknown Academic Levels (n = %d)",(sum(unknown[3])))) %>% 
-  styler() 
-
-```
-
-For ease of interpretation and to reduce the identifiability of the respondents, 
-for the FOR divisions with a small number of respondents (less than 10), we
-combined similar divisions into disciplinary groups. Specifically, the new 
-discipline grouping of Arts, Social Sciences, and Humanities (ASSH) included 
-Education (FOR = `r FOR_freq[11,1]`, <em>n</em> = `r FOR_freq[11,3]`); Studies 
-in Human Society (FOR = `r FOR_freq[14,1]`, <em>n</em> = `r FOR_freq[14,3]`); 
-Studies in Creative Arts and Writing (FOR = `r FOR_freq[17,1]`, <em>n</em> =
-`r FOR_freq[17,3]`); and Language, Communication and Culture (FOR = 
-`r FOR_freq[18,1]`, <em>n</em> = `r FOR_freq[18,3]`). The new discipline grouping
-of Business & Law included Economics (FOR = `r FOR_freq[12,1]`, <em>n</em> = 
-`r FOR_freq[12,3]`); Commerce, Management, Tourism and Services (FOR = 
-`r FOR_freq[13,1]`, <em>n</em> = `r FOR_freq[13,3]`), and Law and Legal Studies
-(FOR = `r FOR_freq[16,1]`, <em>n</em> = `r FOR_freq[16,3]`). 
-The new discipline grouping of Technology & Computer Sciences included Information
-and Computing Sciences (FOR = `r FOR_freq[6,1]`, <em>n</em> = `r FOR_freq[6,3]`),
-and Technology (FOR = `r FOR_freq[8,1]`, <em>n</em> = `r FOR_freq[8,3]`). We 
-allocated Built Environment and Design (FOR = `r FOR_freq[10,1]`, <em>n</em> = 
-`r FOR_freq[10,3]`) to the "Other" category. 
-  
-We retained the FOR divisions of Engineering (FOR = `r FOR_freq[7,1]`, <em>n</em> 
-= `r FOR_freq[7,3]`); Medical and Health Sciences (FOR = `r FOR_freq[9,1]`,
-<em>n</em> = `r FOR_freq[9,3]`); Physical Sciences (FOR = `r FOR_freq[2,1]`,
-<em>n</em> = `r FOR_freq[2,3]`); and Psychology and Cognitive Sciences (FOR = 
-`r FOR_freq[15,1]`, <em>n</em> = `r FOR_freq[15,3]`) as their own discipline 
-groupings. The breakdown for the number of respondents according to discpline 
-groupings is displayed in the next table.
-  
-<em>I AM SURE YOU WILL ALL AGREE THAT WE DON'T NEED THESE TWO PARAGRAPHS IN THE 
-MAIN TEXT, BUT LEAVING IT FOR NOW TO MAKE SURE WE UNDERSTAND HOW EVERYTHING WAS 
-GROUPED TOGETHER.</em> :)
 
 ```{r discipline_table}
 
@@ -434,7 +347,7 @@ d3 %>%
 knitr::kable(col.names = c("Disciplines", "Frequency", "Percentage"), 
              caption = sprintf("Discipline Groupings of Respondents (n = %d)",nrow(df)), 
               align = 'lcc') %>% 
-  styler() 
+  styler_pdf() 
 
 # grouping the stem & non-stem disciples together in a new variable
 df <- df %>% 
@@ -596,7 +509,7 @@ tb_os_exp %>%
 knitr::kable(col.names = c("Reported Experience", "Frequency", "Percentage"), 
              caption = sprintf("Overall Experience with Open Science Practices (n = %d)",
                                nvalid_os_exp), align = 'lcc')  %>% 
-  styler() 
+  styler_pdf() 
 
 # the align parameter changes how the columns are aligned. l = left; c = centre
 
@@ -747,7 +660,7 @@ knitr::kable (col.names = c("Practice", "Perceived Importance", "Frequency",
                 sprintf("Perceived Importance of Open Science Practices (n = %d)",
                                 total_n), 
               align = 'lcc') %>% 
-  styler() 
+  styler_pdf() 
 
 ```
 
@@ -1052,10 +965,10 @@ tb_ex2 <- tb_ex [c(2,4,1,3),]  # rearrange the responses
 tb_ex2 %>% 
 knitr::kable (col.names = c("Perceived Importance", "Frequency",
                             "Percentage"), 
-              caption = sprintf("Perceived Importance of Preregistration<br> (n = %d)",
+              caption = sprintf("Perceived Importance of Preregistration (n = %d)",
                                 nvalid_prereg_imp_ex), 
               align = 'lcc') %>% 
-  styler() 
+  styler_pdf() 
 
 ```
 
@@ -1108,10 +1021,10 @@ tb2 <- tb[c(1,2,3,4),] #fix order
 
 tb2 %>% 
 knitr::kable (col.names = c("Reported Experience", "Frequency", "Percentage"),
-              caption = sprintf("Experience with Study Preregistration <br> (n = %d)",
+              caption = sprintf("Experience with Study Preregistration (n = %d)",
                                 nvalid_prereg_exp), 
               align = 'lcc') %>% 
-  styler() 
+  styler_pdf() 
 
 ```
 
@@ -1282,7 +1195,7 @@ tb_ex2 %>%
 knitr::kable (col.names = c("Perceived Importance", "Frequency", "Percentage"), 
               caption = sprintf("Perceived Importance of Open Materials and/or Code (n = %d)", nvalid_code_imp_ex), 
               align = 'lcc') %>% 
-  styler() 
+  styler_pdf() 
 
 ```
 
@@ -1332,7 +1245,7 @@ tb2 %>%
 knitr::kable (col.names = c("Reported Experience", "Frequency", "Percentage"), 
               caption = sprintf("Experience with Open Materials and/or Code (n = %d)",
                                 nvalid_code_exp), align = 'lcc') %>% 
-  styler() 
+  styler_pdf() 
 
 ```
 ### Use of Open Materials and/or Code
@@ -1408,7 +1321,7 @@ tb2 %>%
 knitr::kable (col.names = c("Reported Use", "Frequency", "Percentage"), 
               caption = sprintf("Reported Use of Open Materials and/or Code (n = %d)", n_code_use), 
               align = 'lcc') %>% 
-  styler() 
+  styler_pdf() 
 ```
 
 ### Concerns about Open Materials and/or Code
@@ -1578,7 +1491,7 @@ tb_ex2 %>%
 knitr::kable (col.names = c("Perceived Importance", "Frequency", "Percentage"), 
               caption = sprintf("Perceived Importance of Open Data (n = %d)", nvalid_data_imp_ex), 
               align = 'lcc') %>% 
-  styler() 
+  styler_pdf() 
 
 ```
 
@@ -1634,7 +1547,7 @@ tb2 %>%
 knitr::kable (col.names = c("Reported Experience", "Frequency", "Percentage"), 
               caption = sprintf("Experience with Open Data (n = %d)",
                                 nvalid_data_exp), align = 'lcc') %>% 
-  styler() 
+  styler_pdf() 
 
 ```
 
@@ -1710,7 +1623,7 @@ tb %>%
 knitr::kable (col.names = c("Reported Use", "Frequency", "Percentage"), 
               caption = sprintf("Reported Use of Open Data (n = %d)", n_data_use), 
               align = 'lcc') %>% 
-  styler() 
+  styler_pdf() 
 ```
 
 ### Concerns about Open Data
@@ -1878,7 +1791,7 @@ tb2 %>%
 knitr::kable (col.names = c("Perceived Importance", "Frequency", "Percentage"), 
               caption = sprintf("Perceived Importance of Pre-publication Archiving (n = %d)", nvalid_prepub_imp), 
               align = 'lcc') %>% 
-  styler() 
+  styler_pdf() 
 
 ```
 
@@ -1928,9 +1841,9 @@ tb2 <- tb [c(2,1,4,3),] # fix the order of responses from 'unaware' to 'ext exp'
 
 tb2 %>% 
 knitr::kable (col.names = c("Reported Experience", "Frequency", "Percentage"), 
-              caption = sprintf("Experience with Pre-publication Archiving<br> (n = %d)",
+              caption = sprintf("Experience with Pre-publication Archiving (n = %d)",
                                 nvalid_prepub_exp), align = 'lcc') %>% 
-  styler() 
+  styler_pdf() 
 
 ```
 
@@ -2006,7 +1919,7 @@ tb %>%
 knitr::kable (col.names = c("Reported Use", "Frequency", "Percentage"), 
               caption = sprintf("Reported Use of Pre-publication Archiving (n = %d)", n_prepub_use), 
               align = 'lcc') %>% 
-  styler() 
+  styler_pdf() 
 ```
 
 ### Concerns about Pre-publication Archiving
@@ -2140,7 +2053,7 @@ tb2 %>%
 knitr::kable (col.names = c("Response", "Frequency", "Percentage"), 
               caption = sprintf("Proportion of Publications that are Open Access (n = %d)",
                                 nvalid_OAprop), align = 'lcc') %>% 
-  styler() 
+  styler_pdf() 
 
 ```
 
@@ -2322,6 +2235,104 @@ p <- ggplot(tb2) +
 p
 
 ```
+
+# Appendix
+
+
+```{r FOR_table_by_role, include = FALSE}
+
+# Now look at how the data changes according to their academic level (student or not)
+#  very few unspecified with students! Out of the 54 students, only 1 'other' and 1 'unspecified'
+  # I don't need to use this either...CAN CUT THIS WHOLE CHUNK EVENTUALLY
+
+student <- dplyr::filter(df, AcLevel_Label == "PhD Student" | 
+                           AcLevel_Label == "Masters Student" | 
+                           AcLevel_Label == "Research Assistant") %>% 
+  dplyr::count(FORcode_2_num, FORcode_2_label)
+
+dplyr::arrange(student,-desc(FORcode_2_num)) %>% 
+knitr::kable(col.names = c("FOR Code", "Field of Research Division", "Frequency"),
+             caption = sprintf("Reported Two-Digit Field of Research Codes for Student Respondents (n = %d)", (sum(student[3]))), align = 'clc') %>% 
+  styler_pdf() 
+
+# now showing the staff breakdown
+
+staff <- dplyr::filter(df, AcLevel_Label == "Professor" |
+                         AcLevel_Label == "Associate Professor" | 
+                         AcLevel_Label == "Senior Lecturer" | 
+                         AcLevel_Label == "Senior Research Fellow" | 
+                         AcLevel_Label == "Lecturer" | 
+                         AcLevel_Label == "Research Fellow" | 
+                         AcLevel_Label == "Postdoc") %>% 
+  dplyr::count(FORcode_2_num, FORcode_2_label)
+
+dplyr::arrange(staff,-desc(FORcode_2_num)) %>% 
+knitr::kable(col.names = c("FOR Code", "Field of Research Division", "Frequency"),
+             caption = sprintf("Reported Two-Digit Field of Research Codes for Staff Respondents (n = %d)", (sum(staff[3]))), align = 'clc') %>% 
+  styler_pdf() 
+
+# now showing for respondents who did not specify their academic levels (NA or 'other')
+
+unknown <- dplyr::filter(df, is.na(AcLevel_Label) | 
+                           AcLevel_Label == "Other") %>% 
+  dplyr::count(FORcode_2_num, FORcode_2_label)
+
+dplyr::arrange(unknown,-desc(FORcode_2_num)) %>% 
+knitr::kable(col.names = c("FOR Code", "Field of Research Division", "Frequency"), caption = sprintf("Reported Two-Digit Field of Research Codes for Unknown Academic Levels (n = %d)",(sum(unknown[3])))) %>% 
+  styler_pdf() 
+
+```
+
+
+
+```{r FOR_table}
+
+d2 <- df %>% 
+  select (c(FORcode_2_num, FORcode_2_label)) %>% 
+  dplyr::count(FORcode_2_num,FORcode_2_label) %>% 
+  mutate (Percentage = round (n/nrow(df)*100))
+
+# specify the exact order of the columns based on d2 (select them according to 
+  # the order of the rows in the tibble)
+# f2 <-d2 [c(12,16,3,8,1,9,7,20,13,2,6,5,4,19,17,11,18,10,15,14),]
+  # I don't seem to be using this in this version, replaced with desc
+
+dplyr::arrange(d2,-desc(FORcode_2_num)) %>% 
+knitr::kable(col.names = c("FOR Code", "Field of Research Division", "Frequency",
+                           "Percentage"), 
+             caption = sprintf("Reported Two-Digit Field of Research Codes for Respondents (n = %d)", nrow(df)), align = 'clcc') %>% 
+  styler_pdf() 
+
+```
+
+
+For ease of interpretation and to reduce the identifiability of the respondents, 
+for the FOR divisions with a small number of respondents (less than 10), we
+combined similar divisions into disciplinary groups. Specifically, the new 
+discipline grouping of Arts, Social Sciences, and Humanities (ASSH) included 
+Education (FOR = `r FOR_freq[11,1]`, <em>n</em> = `r FOR_freq[11,3]`); Studies 
+in Human Society (FOR = `r FOR_freq[14,1]`, <em>n</em> = `r FOR_freq[14,3]`); 
+Studies in Creative Arts and Writing (FOR = `r FOR_freq[17,1]`, <em>n</em> =
+`r FOR_freq[17,3]`); and Language, Communication and Culture (FOR = 
+`r FOR_freq[18,1]`, <em>n</em> = `r FOR_freq[18,3]`). The new discipline grouping
+of Business & Law included Economics (FOR = `r FOR_freq[12,1]`, <em>n</em> = 
+`r FOR_freq[12,3]`); Commerce, Management, Tourism and Services (FOR = 
+`r FOR_freq[13,1]`, <em>n</em> = `r FOR_freq[13,3]`), and Law and Legal Studies
+(FOR = `r FOR_freq[16,1]`, <em>n</em> = `r FOR_freq[16,3]`). 
+The new discipline grouping of Technology & Computer Sciences included Information
+and Computing Sciences (FOR = `r FOR_freq[6,1]`, <em>n</em> = `r FOR_freq[6,3]`),
+and Technology (FOR = `r FOR_freq[8,1]`, <em>n</em> = `r FOR_freq[8,3]`). We 
+allocated Built Environment and Design (FOR = `r FOR_freq[10,1]`, <em>n</em> = 
+`r FOR_freq[10,3]`) to the "Other" category. 
+  
+We retained the FOR divisions of Engineering (FOR = `r FOR_freq[7,1]`, <em>n</em> 
+= `r FOR_freq[7,3]`); Medical and Health Sciences (FOR = `r FOR_freq[9,1]`,
+<em>n</em> = `r FOR_freq[9,3]`); Physical Sciences (FOR = `r FOR_freq[2,1]`,
+<em>n</em> = `r FOR_freq[2,3]`); and Psychology and Cognitive Sciences (FOR = 
+`r FOR_freq[15,1]`, <em>n</em> = `r FOR_freq[15,3]`) as their own discipline 
+groupings. The breakdown for the number of respondents according to discpline 
+groupings is displayed in the next table.
+  
 
 # The End
 ```{r skim df, eval=FALSE, include=FALSE}

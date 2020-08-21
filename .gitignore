@@ -23,3 +23,5 @@ analysis/*.pdf
 *.csv
 *.tex
 analysis/*_files*
+*.log
+*.pdf

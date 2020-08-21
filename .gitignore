@@ -15,3 +15,8 @@ analysis/*_files
 analysis/*_cache
 analysis/*.log
 analysis/*.pdf
+*.csv
+*.tex
+analysis/*_files*
+*.log
+*.pdf

@@ -3,9 +3,9 @@ title: "Swinburne Open Science Task Force Survey (2019)"
 author: "Jennifer Beaudry, Tom Johnstone, Jordy Kaufman, Lisa Given & Michelle Vincent"
 date: '`r format (Sys.time(), "%d %B %Y")`'
 output:
- # bookdown::pdf_document2 #another option for pdf output
-  #  keep_tex: true
-   # toc: false
+ bookdown::pdf_document2: #another option for pdf output
+   keep_tex: true
+   toc: false
   #word_document: 
    # fig_width: 10 # this works, but it changes the font of plot_ly, etc.
    # fig_height: 12 # so, don't use for now
@@ -19,7 +19,7 @@ output:
    # html_document:  
     # number_sections: true
     # toc: true
-  pdf_document: default # this works now [but margin issues around plot_ly]
+  # pdf_document: default # this works now [but margin issues around plot_ly]
 always_allow_html: true # true for word; false for pdf (?)
 csl: apa-old-doi-prefix.csl
 bibliography: Beaudry_Library.bib

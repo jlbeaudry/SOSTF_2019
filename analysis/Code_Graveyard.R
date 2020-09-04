@@ -617,9 +617,10 @@ df_imp <- a %>% full_join(b) %>% full_join(c) %>% full_join(d)
   ### NOTES FROM THE YAML ###
 
 output:
-  # bookdown::pdf_document2: #another option for pdf output
-  # keep_tex: true
-  # toc: false
+  # bookdown::pdf_document2: #another option for pdf output, but it makes things very wonky, 
+  # including the captions & the text becomes centred.
+    # keep_tex: true
+    # toc: false
   #word_document: 
   # fig_width: 10 # this works, but it changes the font of plot_ly, etc.
   # fig_height: 12 # so, don't use for now
@@ -635,5 +636,9 @@ output:
 # toc: true
 pdf_document: default # this works now
 always_allow_html: false # true for word; false for pdf (?)
+
+
+
+
 
 

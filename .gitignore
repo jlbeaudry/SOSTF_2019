@@ -28,3 +28,4 @@ analysis/*_files*
 *.docx
 Rplot.png
 elians_case_when.R
+.png

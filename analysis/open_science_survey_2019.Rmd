@@ -23,7 +23,9 @@ knitr::opts_chunk$set(
   warning = TRUE,
   results = 'asis',
   fig.showtext = TRUE, 
-  fig.align = "center"
+  fig.align = "center", 
+  fig.height = 6,
+  fig.width = 12
 )
 knitr::opts_knit$set(width = 75)
 ```
@@ -256,6 +258,28 @@ and anlysis plan prior to analysing the data. This time-stamped document is made
 openly available by the time the research is published so that any deviation from 
 the original research plan is visible to the scientific community."
 
+### Open materials and/or code
+
+For our purposes, we explained that open materials and/or code referred to researcher-
+created resources used while collecting or analyzing data (e.g., survey questions, 
+video stimuli, vignettes, algorithms, coding schemes, analytic code, etc.) that 
+are made openly available to the research community.
+
+### Open data
+
+The next section of the survey related to the use of open data. 
+For our purposes, we explained that open data can be defined as "online, free of 
+cost, accessible data that can be used, reused and distributed provided that the 
+data source is attributed and shared alike." [FIND SOURCE FROM SURVEY]
+
+### Pre-publication archiving
+
+For our purposes, we explained that pre-publication archiving is also known as 
+preprint archiving, and refers to making a manuscript openly available <em><b>
+before </em></b> it undergoes peer review in an academic journal or other outlet.
+Generally, this is achieved by uploading the manuscript to an archive such as arXiv
+(physics, maths), bioRxiv (biology), SocArxiv (sociology), etc.
+
 # Demographics 
 
 In terms of respondents' demographic information, we did not collect information 
@@ -379,14 +403,12 @@ Participants were also asked to estimate the percentage of research publications
 their field that are reproducible. In `r fig_nums("crisis", display = "cite")`,
 we plotted participants' reproducibility estimates according to their responses 
 to the perceived crisis in their field (n = `r nvalid_rep_est`). The 
-black bar is the mean estimate of 
-reproducibility by the perceived crisis levels. 
-
-\newpage
+black bar is the mean estimate of reproducibility by the perceived crisis 
+levels. \newline 
 
 `r fig_nums("crisis")`
 
-```{r crisis_by_estimate_stripchart, fig.height=6, fig.width=12}
+```{r crisis_by_estimate_stripchart}
 
 #estimates of reproducibility by levels of crisis as a stripchart 
 #title = sprintf("Estimates of reproducibility by perceived crisis in field (n = %d)",nvalid_rep_est)
@@ -417,9 +439,6 @@ p
 # code to save it in the figs folder. Increase 'base_size' from 12 to 18 for slides/pdf. 
 # ggsave(here::here("figs", "reprod_estimates_by_crisis.png"), plot = p)
 
-# `r sprintf(crisis.cap (n = %d), nvalid_rep_est)`
-# `r sprintf(table_nums("crisis"),(n=%d),nvalid_rep_est)`
-#how do I add in the sprintf?
 ```
 
 
@@ -477,7 +496,7 @@ knitr::kable(booktabs = T, linesep = "",
 ```
 
 
-## Importance of Practices
+## Perceived Importance of Open Science Practices
 
 ```{r stacked_imp_data, warning=FALSE}
 ## Figure out what the data needs to look like...
@@ -563,7 +582,7 @@ practice; only 36% indicated that it was important for their field. \newline
 
 `r fig_nums("imp_all")`
 
-```{r stacked_imp_bar, fig.height=6, fig.width=12}
+```{r stacked_imp_bar}
 # Relevel my importance factors
 
 tb_imp$Importance <- factor (tb_imp$Importance, levels = c("Extremely important",
@@ -689,7 +708,7 @@ fig_nums(name = "exp_all",
            display = FALSE)
 ```
 
-## Experience with Practices
+## Experience with Open Science Practices
 
 Participants also reported their own experience with each of the four
 main open science practices: (i) preregistering their studies in 
@@ -707,11 +726,9 @@ used it. With regard to preregistration, respondents were largely unaware of
 the practice (39%) or were aware, but had not used it (38%). Only 16% of respondents
 reported any experience with pre-publication archiving. 
 
-\newpage
-
 `r fig_nums("exp_all")`
 
-```{r stacked_exp_bar, fig.height=6, fig.width=12}
+```{r stacked_exp_bar}
 # Relevel my Experience factors
 # Different labels used for various practices in the survey, so I need to relabel
 
@@ -753,405 +770,8 @@ ggsave(here::here("figs", "all_experience.png"),
 # change base_size to 12 for regular knit
 ```
 
+NEED TO INTRODUCE THIS SECTION FOR THE VARIOUS PRACTICES...
 
-# Perceived Barriers and Reported Concerns about Open Science Practices
-
-## Barriers to Open Science Practices
-
-```{r os_barriers_data}
-
-# wrangle this data so it's in long form & only includes endorsements.
-
-OSBarrier_long <- df %>% 
-     select(c("ParticipantNumber", 
-              "OSBarrier_noOAFunding":"OSBarrier_noExpertise", 
-              "FORcode_2_label")) %>%  
-    select(-"OSBarrier_text") %>% 
-     pivot_longer(c("OSBarrier_noOAFunding":"OSBarrier_noExpertise"), 
-     names_to = "OSBarrier", 
-     values_to = "OSBarrier_Endorsement") %>% 
-  filter(OSBarrier_Endorsement == "1")  
-
-# recode the data so the response options have proper labels
-
-c <- metadata %>% 
-    filter(Scale == "OSBarrier") %>% 
-    filter(NewVariable != "OSBarrier_text") #remove this value from metadata
-
-d <- full_join(OSBarrier_long, c, by = c("OSBarrier" = "NewVariable")) %>% 
-  rename ("OSBarrier_label" = "ItemTextShort")
-
-# getting a tibble for the counts
-c_osbarrier <- plyr::count(d$OSBarrier)
-
-# to figure out how many respondents shared concerns calculate unique number of participants
-n_osbarrier <- length(unique(d$ParticipantNumber))
-
-# create a tibble with percentages (of respondents who answered this question) & 
-# then reorder them by descending percentages
-tb <- d %>% 
-  dplyr::count(OSBarrier_label) %>% 
-  mutate(Percentage = round (n/n_osbarrier*100)) %>% 
-  dplyr::arrange(desc(n))
-
-fig_nums(name = "barriers", 
-           caption = "Barriers to uptake of open science in your field", 
-           display = FALSE)
-```
-
-We provided the respondents with a list of possible barriers to the uptake of
-open science practices in general. We asked them to endorse any statement that 
-they agreed is a barrier in their field. `r fig_nums("barriers", display = "cite")` 
-shows the percentage of the `r n_osbarrier` respondents who selected each 
-response. \newline
-
-`r fig_nums("barriers")`
-
-```{r os_barrier_bar, fig.height = 6, fig.width=12}
-
-# it's a really big graph, so I'm setting fig.height = 6, fig.width = 12 for html, 
-  # reorder the response options from lowest to highest, with no barriers last
-
-tb2 <- tb %>% 
-  dplyr::mutate(OSBarrier_label = factor (OSBarrier_label,
-                                levels = c("Other", #TOP STARTS AT BOTTOM
-                                "The OS community is intimidating",
-                                "Researchers don't want to be told how to do their research",
-                               "Researchers are discouraged by colleagues",
-                               "HDR students are discouraged by thesis supervisors",
-                               "Lack of interest from researchers",
-                               "Lack of supporting infrastructure",
-                               "Lack of expertise (e.g., assignment of metadata)", 
-                               "Lack of mandates from funders, institutions, or regulators",
-                               "Lack of time to learn",
-                               "Lack of time to engage",
-                               "Lack of information",
-                               "Lack of recognition in my field about the value of OS",
-                               "Lack of professional staff that provide support",
-                               "Lack of training required to implement OS",
-                               "Lack of institutional credit",
-                               "Lack of research funding to support OS",
-                               "Lack of funding for open access publishing",
-                                "I do not perceive any barriers"))) #BOTTOM IS TOP
-
-
-# create a character vector for the colours for each bar
-cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
-          "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
-          "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
-          "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
-          "lightskyblue3", "lightskyblue3", "grey50")
-
-# build the bar chart
-# title = str_wrap (sprintf("Barriers to uptake of open science in your field (n = %d)",
-                          # n_osbarrier), width = 40)
-
-# plot the reordered data and colours. Because the data is in a tibble rather than 
-  # a dataframe with counts, I could use 'geom_col' rather than 'geom_bar' 
-  # (or I could use stat = "identity" with 'geom_bar')
-
-p <- ggplot(tb2) + 
-  aes(x = OSBarrier_label, y = Percentage) +
-   geom_bar(stat = "identity", colour = "black", fill = cols) +
-    labs (x = element_blank(),
-      y = "Percentage") +
-  coord_flip(ylim = c(0,80)) +
-  theme_classic(base_size = 18) + 
-  scale_x_discrete(labels = function(x) str_wrap(x, width = 75)) + #wrap the labels
-  theme(plot.title = element_text(hjust = 0.5, size = NULL)) 
-p
-
-ggsave(here::here("figs", "all_barriers.png"), 
-       width = 12, height = 8, dpi = "retina")
-# change base_size to 12 for regular knit & remove size = 14 from plot.title
-```
-
-For each of the four main open science practices, we also asked respondents about 
-their concerns about each of the practices. 
-
-## Study Preregistration
-
-
-
-### Experience with Study Preregistration
-
-```{r prereg_exp_count}
-# filter rows with valid responses for this variable
-valid_prereg_exp <- filter(df, PreRegExp != "NA")
-
-# calculate number of rows with a valid response for this variable
-nvalid_prereg_exp <- nrow(valid_prereg_exp)
-
-# create a tibble with frequency & percentage for all who answered question
-tb <- valid_prereg_exp %>% 
-  dplyr::count(PreRegExp) %>% 
-  mutate(Percentage = round (n/(nrow(valid_prereg_exp))*100)) %>% 
-  dplyr::arrange(desc(n))
-
-```
-
-We then asked respondents about their own experience with study preregistration. 
-Of the `r nvalid_prereg_exp` participants who answered this question, `r tb[1,2]`
- (`r tb[1,3]`%) were unaware of study preregistration; `r tb[2,2]` (`r tb[2,3]`%) 
-were aware of study preregistration, but had not used it; `r tb[3,2]` (`r tb[3,3]`%) 
-had some experience with it, but did not regularly preregister their studies; and 
-`r tb[4,2]` (`r tb[4,3]`%) regularly preregister their studies. 
-
-```{r prereg_exp_pie, include=FALSE}
-
-title = "What is your experience with preregistration? (n = %d)"
-
-# pie chart
-colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(the_data = df, label_var = "PreRegExp", 
-                      the_title = title, 
-                      colours,the_quantity = "percent")
-p
-rm(title)
-```
-
-```{r prereg_exp_table}
-
-# change the label for Regular Use
-tb$PreRegExp <- tb$PreRegExp %>% 
-  mapvalues(
-    c("Unaware", "Aware, But Not Used", "Some Experience", "Reg Use"), 
-    c("Unaware", "Aware, But Not Used", "Some Experience", "Regular Use"))
-
-tb2 <- tb[c(1,2,3,4),] #fix order
-
-tb2 %>% 
-knitr::kable (booktabs = T, linesep = "",
-              col.names = c("Reported Experience", "Frequency", "Percentage"),
-              caption = sprintf("Experience with Study Preregistration (n = %d)",
-                                nvalid_prereg_exp), 
-              align = 'lcc') %>% 
-  styler_pdf() 
-
-```
-
-### Concerns about Preregistration 
-
-```{r prereg_concerns_data}
-
-# wrangle the concern data so it's in long form & only includes endorsements.
-
-PreRegCon_long <- df %>% 
-     select(c("ParticipantNumber", "AcLevel_Label",
-              "PreRegCon_delay":"PreRegCon_none", 
-              "FORcode_2_label")) %>%  
-    select(-"PreRegCon_text") %>% 
-     pivot_longer(c("PreRegCon_delay":"PreRegCon_none"), 
-     names_to = "PreRegConcern", 
-     values_to = "PreReg_Endorsement") %>% 
-  filter(PreReg_Endorsement == "1")  
-
-# recode the data so the response options have proper labels
-
-c <- metadata %>% 
-    filter(Scale == "PreRegConcern") %>% 
-    filter(NewVariable != "PreRegCon_text") #remove this value from metadata
-
-d <- full_join(PreRegCon_long, c, by = c("PreRegConcern" = "NewVariable")) %>% 
-  rename ("PreRegConcern_label" = "ItemTextShort")
-
-# getting a tibble for the counts
-c_prereg_con <- plyr::count(d$PreRegConcern)
-
-# to figure out how many respondents shared concerns calculate unique number of participants
-n_prereg_con <- length(unique(d$ParticipantNumber))
-
-# create a tibble with percentages (of respondents who answered this question) & 
-# then reorder them by descending percentages
-
-tb <- d %>% 
-  dplyr::count(PreRegConcern_label) %>% 
-  mutate(Percentage = round (n/n_prereg_con*100)) %>% 
-  dplyr::arrange(desc(n)) 
-
-```
-
-We also asked respondents if they have any concerns about preregistering their 
-studies. After asking respondents to share their concerns in a free text format, 
-we then provided a list of possible concerns that researchers could have about
-preregistering their studies. 
-
-Respondents were able to select as many concerns as they liked. Of the `r n_prereg_con`
-respondents who answered this question, `r tb [7,2]` (`r tb [7,3]`%) 
-reported that they do not share any of the listed concerns. The following figure 
-presents, of those who answered this question, the percentage who selected 
-each of the concerns.  
-
-```{r prereg_concerns_bar, fig.height=6, fig.width=12}
-
-# reorder the response options from lowest to highest, with concerns last
-tb2 <- tb %>% 
-  dplyr::mutate(PreRegConcern_label = factor (PreRegConcern_label, 
-                                levels = c("Other concern",
-                                           "More difficult to find significant results", 
-                                           "More difficult to publish in certain journals", 
-                                           "Delays data collection", 
-                                           "Stifles creativity",  
-                                           "Prevents exploratory research", 
-                                           "Need to look at data to analyse it", 
-                                           "Risk of scooping", 
-                                           "I do not share any of these concerns")))
-
-# create a character vector for the colours for each bar
-cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
-          "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", "grey50")
-
-# build the bar chart
-title = str_wrap (sprintf("Concerns about preregistering studies (n = %d)", 
-                          n_prereg_con), width = 37)
-
-# plot the reordered data and colours. Because the data is in a tibble rather than 
-  # a dataframe with counts, I could use 'geom_col' rather than 'geom_bar' 
-  # (or I could use stat = "identity" with 'geom_bar')
-
-p <- ggplot(tb2) + 
-  aes(x = PreRegConcern_label, y = Percentage) +
-   geom_bar(stat = "identity", colour = "black", fill = cols) +
-    labs (x = element_blank(),
-      y = "Percentage", 
-        title = title) +
-  scale_x_discrete(labels = function(x) str_wrap(x, width = 50)) + #wrap the labels
-  coord_flip(ylim = c(0,60)) +
-  theme_classic(base_size = 12) + 
-  theme(plot.title = element_text(hjust = 0.5)) 
-p
-
-```
-
-## Open Materials and/or Code 
-
-The next section of the survey related to the use of open materials and/or code. 
-For our purposes, we explained that open materials and/or code referred to researcher-
-created resources used while collecting or analyzing data (e.g., survey questions, 
-video stimuli, vignettes, algorithms, coding schemes, analytic code, etc.) that 
-are made openly available to the research community.
-
-### Perceived Importance of Open Materials and/or Code 
-
-```{r code_imp_count}
-
-# filter rows with valid responses for this variable; first df contains all valid 
-  # responses the second df contains all valid responses, except "Researchers...do 
-  # not use materials and/or code "
-
-valid_code_imp <- filter(df, CodeImp != "NA")
-valid_code_imp_ex <- filter(valid_code_imp, CodeImp != "Researchers in my discipline do not use materials and/or code")
-
-nvalid_code_imp <- nrow(valid_code_imp)
-nvalid_code_imp_ex <- nrow(valid_code_imp_ex)
-
-# create a tibble with frequency & percentage for all who answered question
-tb <- valid_code_imp %>% 
-  dplyr::count(CodeImp) %>% 
-  mutate(Percentage = round (n/(nrow(valid_code_imp))*100)) %>% 
-  dplyr::arrange(desc(n))
-
-# create a tibble with frequency & percentage for data excluding "do not use"
-tb_ex <- valid_code_imp_ex %>% 
-  dplyr::count(CodeImp) %>% 
-  mutate(Percentage = round (n/(nrow(valid_code_imp_ex))*100)) %>% 
-  dplyr::arrange(desc(n))
-
-```
-
-We first asked participants how important they thought it was for their field to
-make materials and/or code openly available. Of the `r sum(tb[2])` participants 
-who answered this question, a small percentage (`r tb[5,3]`%) indicated 
-that researchers in their discipline do not use materials and/or code. As such, 
-we excluded them from this analysis. Of the remaining `r sum(tb_ex[2])` 
-respondents, `r tb_ex[2,3]`% indicated that open materials and/or code were 
-extremely important for their field; `r tb_ex[1,3]`% indicated that they were 
-somewhat important; `r tb_ex[3,3]`% indicated that they were somewhat unimportant; 
-and `r tb_ex[4,3]`% indicated that open materials and/or code were not at all 
-important for their field. 
-
-
-```{r code_imp_ex_pie, include = FALSE}
-
-title = "Perceived importance of open materials and/or code (n = %d)"
-
-# pie chart
-colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(the_data = valid_code_imp_ex, 
-                      label_var = "CodeImp", 
-                      the_title = title, 
-                      colours,the_quantity = "percent")
-p
-```
-
-```{r code_imp_ex_table}
-
-tb_ex <- valid_code_imp_ex %>% 
-  dplyr::count(CodeImp) %>% 
-  mutate(Percentage = round (n/(nrow(valid_code_imp_ex))*100)) %>% 
-  dplyr::arrange(desc(n))
-
-tb_ex2 <-tb_ex [c(4,3,1,2),] # rearrange the responses
-
-tb_ex2 %>% 
-knitr::kable (booktabs = T, linesep = "",
-              col.names = c("Perceived Importance", "Frequency", "Percentage"), 
-              caption = sprintf("Perceived Importance of Open Materials and/or Code (n = %d)", nvalid_code_imp_ex), 
-              align = 'lcc') %>% 
-  styler_pdf() 
-
-```
-
-
-### Experience with Open Materials and/or Code
-
-```{r code_exp_count}
-
-# filter rows with valid responses for this variable
-valid_code_exp <- filter(df,CodeExp != "NA")
-
-# calculate number of rows with a valid response for this variable
-nvalid_code_exp <- nrow(valid_code_exp)
-
-tb <- valid_code_exp %>% 
-  dplyr::count(CodeExp) %>%  
-    mutate(Percentage = round (n/nvalid_code_exp*100)) %>% 
-    dplyr::arrange(desc(n))
-
-```
-
-The following section shows how many people have experience with open code 
-and/or materials. Of the `r nvalid_code_exp` participants who answered this 
-question, `r tb[1,2]` (`r tb[1,3]`%) reported that, until now, they hadn't heard 
-of open materials and/or code; `r tb[2,2]` (`r tb[2,3]`%) were aware of open
-materials and/or code, but had not used it in their own research; `r tb[3,2]` 
-(`r tb[3,3]`%) had some experience with open materials and/or code, but do not 
-use them regularly; and `r tb[4,2]` (`r tb[4,3]`%) regularly use open materials
-and/or code. 
-
-```{r code_exp_pie, include = FALSE}
-
-title = "What is your experience with open materials and/or code (n = %d)"
-
-#pie chart
-colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(df,label_var="CodeExp",the_title = title, colours = colours, the_quantity="percent")
-p
-```
-
-
-```{r code_exp_table}
-
-tb2 <- tb [c(2,1,3,4),] # fix the order of responses
-
-tb2 %>% 
-knitr::kable (booktabs = T, linesep = "",
-              col.names = c("Reported Experience", "Frequency", "Percentage"), 
-              caption = sprintf("Experience with Open Materials and/or Code (n = %d)",
-                                nvalid_code_exp), align = 'lcc') %>% 
-  styler_pdf() 
-
-```
 ### Use of Open Materials and/or Code
 
 ```{r code_use_count}
@@ -1229,235 +849,6 @@ knitr::kable (booktabs = T, linesep = "",
   styler_pdf() 
 ```
 
-### Concerns about Open Materials and/or Code
-
-```{r code_concerns_data}
-
-# wrangle this data so it's in long form & only includes endorsements.
-
-CodeCon_long <- df %>% 
-     select(c("ParticipantNumber", 
-              "CodeCon_criticise":"CodeCon_ip", 
-              "FORcode_2_label")) %>%  
-    select(-"CodeCon_text") %>% 
-     pivot_longer(c("CodeCon_criticise":"CodeCon_ip"), 
-     names_to = "CodeConcern", 
-     values_to = "CodeCon_Endorsement") %>% 
-  filter(CodeCon_Endorsement == "1")  
-
-
-# recode the data so the response options have proper labels
-
-c <- metadata %>% 
-    filter(Scale == "CodeConcern") %>% 
-    filter(NewVariable != "CodeCon_text") #remove this value from metadata
-
-d <- full_join(CodeCon_long, c, by = c("CodeConcern" = "NewVariable")) %>% 
-  rename ("CodeConcern_label" = "ItemTextShort")
-
-# getting a tibble for the counts
-c_code_con <- plyr::count(d$CodeConcern)
-
-# to figure out how many respondents shared concerns calculate unique number of participants
-n_code_con <- length(unique(d$ParticipantNumber))
-
-# create a tibble with percentages (of respondents who answered this question) & 
-# then reorder them by descending percentages
-tb <- d %>% 
-  dplyr::count(CodeConcern_label) %>% 
-  mutate(Percentage = round (n/n_code_con*100)) %>% 
-  dplyr::arrange(desc(n))
-
-```
-
-We also asked respondents if they have any concerns about making their research 
-materials and/or code open. After asking respondents to share their concerns in 
-a free text format, we provided a list of possible concerns that researchers 
-could have about sharing their materials and/or code. Respondents were able to 
-select as many concerns as they liked. A total of `r n_code_con` respondents 
-answered this question. Of those who respondended to this question,
-`r tb [4,2]` (`r tb [4,3]`%) reported that they do not share any of the listed 
-concerns. The following figure presents, of those who answered this question, 
-the percentage who selected each of the concerns.  
-
-```{r code_concerns_bar, fig.height=6, fig.width=12}
-# build the bar chart
-
-# reorder the response options from lowest to highest, with concerns last
-tb2 <- tb %>% 
-  dplyr::mutate(CodeConcern_label = factor (CodeConcern_label, 
-                levels = c("Other concern",
-                         "Others might find errors in my published work", 
-                         "Reuse could violate epistemological framework", 
-                         "Others might ask me to provide assistance with their research", 
-                         "Others might criticise my materials/code", 
-                        "Others might find it difficult to understand my materials/code", 
-                         "I might lose control over how they are used", 
-                         "I might not receive appropriate credit", 
-                         "Issues related to intellectual property", 
-                         "I do not share any of these concerns")))
-
-# create a character vector for the colours for each bar
-cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
-          "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
-          "lightskyblue3", "grey50")
-
-# build the bar chart
-title = str_wrap (sprintf("Concerns about open materials and/or code (n = %d)", 
-                          n_code_con), width = 40)
-
-# plot the reordered data and colours. Because the data is in a tibble rather than a     
-  # dataframe with counts, I could use 'geom_col' rather than 'geom_bar'(or I 
-  # could use stat = "identity" with 'geom_bar')
-
-p <- ggplot(tb2) + 
-  aes(x = CodeConcern_label, y = Percentage) +
-  geom_bar(stat = "identity", colour = "black", fill = cols) +
-  labs (x = element_blank(),
-        y = "Percentage", 
-        title = title) +
-  coord_flip(ylim = c(0,60)) +
-  scale_x_discrete(labels = function(x) str_wrap(x, width = 50)) + #wrap the labels
-  theme_classic(base_size = 12) + 
-  theme(plot.title = element_text(hjust = 0.5)) # centre the title
-p
-
-```
-
-## Open Data
-
-The next section of the survey related to the use of open data. 
-For our purposes, we explained that open data can be defined as "online, free of 
-cost, accessible data that can be used, reused and distributed provided that the 
-data source is attributed and shared alike." [FIND SOURCE FROM SURVEY]
-
-### Perceived Importance of Open Data 
-
-```{r data_imp_count}
-
-# filter rows with valid responses for this variable; first df contains all valid 
-  # responses the second df contains all valid responses, except "Researchers...do 
-  # not use materials and/or code "
-
-valid_data_imp <- filter(df, DataImp != "NA")
-valid_data_imp_ex <- filter(valid_data_imp, DataImp != "Research publications in my field are not based on data")
-
-nvalid_data_imp <- nrow(valid_data_imp)
-nvalid_data_imp_ex <- nrow(valid_data_imp_ex)
-
-# create a tibble with frequency & percentage for all who answered question
-tb <- valid_data_imp %>% 
-  dplyr::count(DataImp) %>% 
-  mutate(Percentage = round (n/(nrow(valid_data_imp))*100)) %>% 
-  dplyr::arrange(desc(n))
-
-# create a tibble with frequency & percentage for data excluding "do not use"
-tb_ex <- valid_data_imp_ex %>% 
-  dplyr::count(DataImp) %>% 
-  mutate(Percentage = round (n/(nrow(valid_data_imp_ex))*100)) %>% 
-  dplyr::arrange(desc(n))
-
-```
-
-We first asked participants how important they thought it was for their field that 
-data from published research are openly available. Of the `r sum(tb[2])` participants 
-who answered this question, a small number `r tb[5,2]` (`r tb[5,3]`%) indicated that
-`r tolower(tb[5,1])`. As such, we excluded them from this analysis. Of the 
-remaining `r sum(tb_ex[2])` respondents, `r tb_ex[1,2]` (`r tb_ex[1,3]`%) indicated 
-that open data were `r tolower(tb_ex[1,1])` for their field; `r tb_ex[2,2]` 
-(`r tb_ex[2,3]`%) indicated that they were `r tolower(tb_ex[2,1])`; `r tb_ex[3,2]` 
-(`r tb_ex[3,3]`%) indicated that they were `r tolower(tb_ex[3,1])`; 
-and `r tb_ex[4,2]` (`r tb_ex[4,3]`%) indicated that open data were `r tolower(tb_ex[4,1])` 
-important for their field. 
-
-```{r data_imp_ex_pie, eval=FALSE}
-
-title = "Perceived importance of open data (n = %d)"
-
-# pie chart
-colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(the_data = valid_data_imp_ex, 
-                      label_var = "DataImp", 
-                      the_title = title, 
-                      colours,the_quantity = "percent")
-p
-```
-
-```{r data_imp_ex_table}
-
-tb_ex <- valid_data_imp_ex %>% 
-  dplyr::count(DataImp) %>% 
-  mutate(Percentage = round (n/(nrow(valid_data_imp_ex))*100)) %>% 
-  dplyr::arrange(desc(n))
-
-tb_ex2 <-tb_ex [c(4,3,2,1),] # rearrange the responses
-
-tb_ex2 %>% 
-knitr::kable (booktabs = T, linesep = "",
-              col.names = c("Perceived Importance", "Frequency", "Percentage"), 
-              caption = sprintf("Perceived Importance of Open Data (n = %d)", nvalid_data_imp_ex), 
-              align = 'lcc') %>% 
-  styler_pdf() 
-
-```
-
-
-### Experience with Open Data
-
-```{r data_exp_count}
-
-# filter rows with valid responses for this variable
-valid_data_exp <- filter(df,DataExp != "NA")
-
-# FIGURING OUT WHICH PARTICIPANTS SAID THE VARIOUS RESPONSES
-
-# dataexp <- df %>% 
-  # filter(DataExp == "Aware, But Not Used") %>% 
-  # select(ParticipantNumber, DataExp, DataConcernsList)
-# write.csv(test, here::here("data", "DataExp.csv"), row.names = TRUE)
-
-# calculate number of rows with a valid response for this variable
-nvalid_data_exp <- nrow(valid_data_exp)
-
-tb <- valid_data_exp %>% 
-  dplyr::count(DataExp) %>%  
-    mutate(Percentage = round (n/nvalid_data_exp*100)) %>% 
-    dplyr::arrange(desc(n))
-
-```
-
-We also asked participants about their experience with open data. Of the 
-`r sum(tb[2])` participants who answered this question, `r tb[4,2]` (`r tb[4,3]`%) 
-indicated that until now, they were unaware of open data; `r tb[1,2]` 
-(`r tb[1,3]`%) indicated that they were were aware of open data, but had not used
-it in their research; `r tb[2,2]` (`r tb[2,3]`%) indicated that they had some 
-experience with open data, but did not use them regularly; and `r tb[3,2]` 
-(`r tb[3,3]`%) indicated that they regularly use open data. 
-
-```{r data_exp_pie, eval=FALSE}
-
-title = "What is your experience with open data? (n = %d)"
-
-#pie chart
-colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(df,label_var="DataExp",the_title = title, colours = colours, the_quantity="percent")
-p
-```
-
-
-```{r data_exp_table}
-
-tb2 <- tb [c(4,1,2,3),] # fix the order of responses from 'unaware' to 'reg use'
-
-tb2 %>% 
-knitr::kable (booktabs = T, linesep = "",
-              col.names = c("Reported Experience", "Frequency", "Percentage"), 
-              caption = sprintf("Experience with Open Data (n = %d)",
-                                nvalid_data_exp), align = 'lcc') %>% 
-  styler_pdf() 
-
-```
-
 ### Use of Open Data
 
 ```{r data_use_count}
@@ -1522,7 +913,7 @@ they have used open data in previous work. Respondents were allowed to select
 as many uses as applied. Of these `r n_data_use` researchers, the most popular 
 response (`r tb[1,3]`%) was that they used open data from other sources in their 
 own research. Few researchers reported using open data when peer reviewing other 
-researchers'work (`r tb2[4,3]`%).
+researchers' work (`r tb2[4,3]`%).
 
 ```{r data_use_table}
 
@@ -1532,229 +923,6 @@ knitr::kable (booktabs = T, linesep = "",
               caption = sprintf("Reported Use of Open Data (n = %d)", n_data_use), 
               align = 'lcc') %>% 
   styler_pdf() 
-```
-
-### Concerns about Open Data
-
-```{r data_concerns_data}
-
-# wrangle this data so it's in long form & only includes endorsements.
-
-DataConcern_long <- df %>% 
-  select (c("ParticipantNumber", "AcLevel_Label",
-            "DataConcern_criticise":"DataConcern_scoop",
-            "FORcode_2_label")) %>%  
-  select(-"DataConcern_text") %>% 
-  pivot_longer(c("DataConcern_criticise":"DataConcern_scoop"),
-               names_to = "DataConcern", 
-               values_to = "DataConcern_Endorsement") %>% 
-  filter(DataConcern_Endorsement == "1")
-
-# recode the data so the response options have proper labels
-
-c <- metadata %>% 
-    filter(Scale == "DataConcern") %>% 
-    filter(NewVariable != "DataConcern_text") #remove this value from metadata
-
-d <- full_join(DataConcern_long, c, by = c("DataConcern" = "NewVariable")) %>% 
-  rename ("DataConcern_label" = "ItemTextShort")
-
-# getting a tibble for the counts
-c_data_con <- plyr::count(d$DataConcern)
-
-# to figure out how many respondents shared concerns calculate unique number of participants
-n_data_con <- length(unique(d$ParticipantNumber))
-
-# create a tibble with percentages (of respondents who answered this question) & 
-# then reorder them by descending percentages
-tb <- d %>% 
-  dplyr::count(DataConcern_label) %>% 
-  mutate(Percentage = round (n/n_data_con*100)) %>% 
-  dplyr::arrange(desc(n)) 
- # mutate_if(is.character, ~factor(.)) # make it a factor
-
-# AH...I only need these next two steps if I'm actually able to figure out how 
-  # to use the `x` variable to reorder the variable, while using the `x_label`
-  # variable to name the actual columns in the tables. Otherwise, skip this.
-
-d2 <- d %>% # create tibble with the Data Concern counts
-  select(DataConcern, DataConcern_label)  %>% 
-      dplyr::count(DataConcern) 
-  #  mutate_if(is.character, ~factor(.))
-
-# join the two tables together
-tb2 <- left_join(x = tb, y = d2, by = "n") 
-```
-
-We also asked respondents if they have any concerns about making their data open.
-After asking respondents to share their concerns in a free text format, we 
-provided a list of possible concerns that researchers could have about sharing 
-their data. Respondents were able to select as many concerns as they liked. 
-A total of `r n_data_con` respondents answered this question. Of those who respondended,
-`r tb2 [11,2]` (`r tb2 [11,3]`%) reported that they do not share any of the listed 
-concerns. The following figure presents, of those who answered this question, 
-the percentage who selected each of the concerns.  
-
-```{r data_concerns_bar, fig.height=6, fig.width=12}
-
-# build the bar chart
-
-# reorder the rows according to the DataConcern_label 
-tb3 <- tb2 %>% 
-  dplyr::mutate(DataConcern_label = factor(DataConcern_label, 
-                levels = c("Other concern", 
-                           "It devalues research data collection", 
-                           "Unfair for other researchers to benefit from my data collection", 
-                          "Others might criticise my data and/or research practices", 
-                           "Too much time or effort", 
-                           "I might lose control over how my data are being used",
-                           "I might not receive appropriate credit for my data collection", 
-                           "Others could use my data for another study that I intended to conduct in the future", 
-                           "Issues related to intellectual property", 
-                           "Issues related to privacy", 
-                           "Issues related to ethics", 
-                           "I do not share any of these concerns")))
-
-
-
-# create a character vector for the colours for each bar
-cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
-          "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
-          "lightskyblue3", "lightskyblue3", "lightskyblue3", "grey50")
-
-                    
-# build the bar chart
-title = str_wrap (sprintf("Concerns about open data (n = %d)", 
-                          n_data_con), width = 40)
-
-p <- ggplot(tb3) + 
-  aes(x = DataConcern_label, y = Percentage) +
-  geom_bar(stat = "identity", colour = "black", fill = cols) +
-  labs (x = element_blank(),
-        y = "Percentage", 
-        title = title) +
-  coord_flip(ylim = c(0,60)) +
-  scale_x_discrete(labels = function(x) str_wrap(x, width = 50)) + #wrap the labels
-  theme_classic(base_size = 12) + 
-  theme(plot.title = element_text(hjust = 0.5)) # centre the title
-p
-
-```
-
-## Pre-publication Archiving
-
-The next section of the survey related to the use of pre-publication archiving. 
-For our purposes, we explained that pre-publication archiving is also known as 
-preprint archiving, and refers to making a manuscript openly available <em><b>
-before </em></b> it undergoes peer review in an academic journal or other outlet.
-Generally, this is achieved by uploading the manuscript to an archive such as arXiv
-(physics, maths), bioRxiv (biology), SocArxiv (sociology), etc.
-
-### Perceived Importance of Pre-publication Archiving 
-
-```{r prepub_imp_count}
-
-# filter rows with valid responses for this variable
-
-valid_prepub_imp <- filter(df, PrePubImp != "NA")
-
-nvalid_prepub_imp <- nrow(valid_prepub_imp)
-
-# create a tibble with frequency & percentage for all who answered question
-tb <- valid_prepub_imp %>% 
-  dplyr::count(PrePubImp) %>% 
-  mutate(Percentage = round (n/(nrow(valid_prepub_imp))*100)) %>% 
-  dplyr::arrange(desc(n))
-
-```
-
-We first asked participants how important they thought pre-publication archiving
-was for their field. Of the `r sum(tb[2])` participants who answered this 
-question `r tb[4,2]` (`r tb[4,3]`%) indicated 
-that pre-publication archiving was `r tolower(tb[4,1])` for their field; 
-`r tb[1,2]` (`r tb[1,3]`%) indicated that it was `r tolower(tb[1,1])`; 
-`r tb[2,2]` (`r tb[2,3]`%) indicated that it was `r tolower(tb[2,1])`; 
-and `r tb[3,2]` (`r tb[3,3]`%) indicated that pre-publication archiving was 
-`r tolower(tb[3,1])` important for their field. 
-
-```{r prepub_imp_ex_pie, eval=FALSE}
-
-title = "Perceived importance of pre-publication archiving (n = %d)"
-
-# pie chart
-colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(the_data = valid_prepub_imp, 
-                      label_var = "PrePubImp", 
-                      the_title = title, 
-                      colours,the_quantity = "percent")
-p
-```
-
-
-```{r prepub_imp_table}
-
-tb2 <-tb [c(3,2,1,4),] # rearrange the responses from 'not at all' to 'ext imp'
-
-tb2 %>% 
-knitr::kable (booktabs = T, linesep = "",
-              col.names = c("Perceived Importance", "Frequency", "Percentage"), 
-              caption = sprintf("Perceived Importance of Pre-publication Archiving (n = %d)", nvalid_prepub_imp), 
-              align = 'lcc') %>% 
-  styler_pdf() 
-
-```
-
-### Experience with Pre-publication Archiving
-
-```{r prepub_count_exp}
-
-# filter rows with valid responses for this variable
-valid_prepub_exp <- filter(df,PrePubExp != "NA")
-
-# calculate number of rows with a valid response for this variable
-nvalid_prepub_exp <- nrow(valid_prepub_exp)
-
-tb <- valid_prepub_exp %>% 
-  dplyr::count(PrePubExp) %>%  
-    mutate(Percentage = round (n/nvalid_prepub_exp*100)) %>% 
-    dplyr::arrange(desc(n))
-
-```
-
-We also asked participants about their experience with pre-publication archiving. 
-Of the `r sum(tb[2])` participants who answered this question, `r tb[2,2]` 
-(`r tb[2,3]`%) indicated that until now, they were unaware of pre-publication 
-archiving; `r tb[1,2]` (`r tb[1,3]`%) indicated that they were were aware of pre-
-publication arhciving, but had not used it; `r tb[4,2]` (`r tb[4,3]`%) indicated 
-that they had some experience with pre-publication archiving; and `r tb[3,2]` 
-(`r tb[3,3]`%) indicated that they have extensive experience with pre-publication
-archiving. 
-
-```{r prepub_exp_pie, eval=FALSE}
-
-title = "What is your experience with pre-publication archiving? (n = %d)"
-
-#pie chart
-colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(df,
-                      label_var="PrePubExp",
-                      the_title = title, 
-                      colours = colours, 
-                      the_quantity="percent")
-p
-```
-
-```{r prepub_exp_table}
-
-tb2 <- tb [c(2,1,4,3),] # fix the order of responses from 'unaware' to 'ext exp'
-
-tb2 %>% 
-knitr::kable (booktabs = T, linesep = "",
-              col.names = c("Reported Experience", "Frequency", "Percentage"), 
-              caption = sprintf("Experience with Pre-publication Archiving (n = %d)",
-                                nvalid_prepub_exp), align = 'lcc') %>% 
-  styler_pdf() 
-
 ```
 
 ### Use of Pre-publication Archiving
@@ -1833,7 +1001,418 @@ knitr::kable (booktabs = T, linesep = "",
   styler_pdf() 
 ```
 
-### Concerns about Pre-publication Archiving
+# Perceived Barriers and Reported Concerns
+
+## Barriers to Engaging in Open Science Practices
+
+```{r os_barriers_data}
+
+# wrangle this data so it's in long form & only includes endorsements.
+
+OSBarrier_long <- df %>% 
+     select(c("ParticipantNumber", 
+              "OSBarrier_noOAFunding":"OSBarrier_noExpertise", 
+              "FORcode_2_label")) %>%  
+    select(-"OSBarrier_text") %>% 
+     pivot_longer(c("OSBarrier_noOAFunding":"OSBarrier_noExpertise"), 
+     names_to = "OSBarrier", 
+     values_to = "OSBarrier_Endorsement") %>% 
+  filter(OSBarrier_Endorsement == "1")  
+
+# recode the data so the response options have proper labels
+
+c <- metadata %>% 
+    filter(Scale == "OSBarrier") %>% 
+    filter(NewVariable != "OSBarrier_text") #remove this value from metadata
+
+d <- full_join(OSBarrier_long, c, by = c("OSBarrier" = "NewVariable")) %>% 
+  rename ("OSBarrier_label" = "ItemTextShort")
+
+# getting a tibble for the counts
+c_osbarrier <- plyr::count(d$OSBarrier)
+
+# to figure out how many respondents shared concerns calculate unique number of participants
+n_osbarrier <- length(unique(d$ParticipantNumber))
+
+# create a tibble with percentages (of respondents who answered this question) & 
+# then reorder them by descending percentages
+tb <- d %>% 
+  dplyr::count(OSBarrier_label) %>% 
+  mutate(Percentage = round (n/n_osbarrier*100)) %>% 
+  dplyr::arrange(desc(n))
+
+fig_nums(name = "barriers", 
+           caption = "Barriers to the uptake of open science in your field", 
+           display = FALSE)
+```
+
+We provided the respondents with a list of possible barriers to the uptake of
+open science practices in general. We asked them to endorse any statement that 
+they agreed is a barrier in their field. `r fig_nums("barriers", display = "cite")` 
+shows the percentage of the `r n_osbarrier` respondents who selected each 
+response. \newline
+
+`r fig_nums("barriers")`
+
+```{r os_barrier_bar}
+
+  # reorder the response options from lowest to highest, with no barriers last
+
+tb2 <- tb %>% 
+  dplyr::mutate(OSBarrier_label = factor (OSBarrier_label,
+                                levels = c("Other", #TOP STARTS AT BOTTOM
+                                "The OS community is intimidating",
+                                "Researchers don't want to be told how to do their research",
+                               "Researchers are discouraged by colleagues",
+                               "HDR students are discouraged by thesis supervisors",
+                               "Lack of interest from researchers",
+                               "Lack of supporting infrastructure",
+                               "Lack of expertise (e.g., assignment of metadata)", 
+                               "Lack of mandates from funders, institutions, or regulators",
+                               "Lack of time to learn",
+                               "Lack of time to engage",
+                               "Lack of information",
+                               "Lack of recognition in my field about the value of OS",
+                               "Lack of professional staff that provide support",
+                               "Lack of training required to implement OS",
+                               "Lack of institutional credit",
+                               "Lack of research funding to support OS",
+                               "Lack of funding for open access publishing",
+                                "I do not perceive any barriers"))) #BOTTOM IS TOP
+
+
+# create a character vector for the colours for each bar
+cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
+          "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
+          "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
+          "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
+          "lightskyblue3", "lightskyblue3", "grey50")
+
+# build the bar chart
+# title = str_wrap (sprintf("Barriers to uptake of open science in your field (n = %d)",
+                          # n_osbarrier), width = 40)
+
+# plot the reordered data and colours. Because the data is in a tibble rather than 
+  # a dataframe with counts, I could use 'geom_col' rather than 'geom_bar' 
+  # (or I could use stat = "identity" with 'geom_bar')
+
+p <- ggplot(tb2) + 
+  aes(x = OSBarrier_label, y = Percentage) +
+   geom_bar(stat = "identity", colour = "black", fill = cols) +
+    labs (x = element_blank(),
+      y = "Percentage") +
+  coord_flip(ylim = c(0,80)) +
+  theme_classic(base_size = 18) + 
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 75)) + #wrap the labels
+  theme(plot.title = element_text(hjust = 0.5, size = NULL)) 
+p
+
+# ggsave(here::here("figs", "all_barriers.png"), 
+       # width = 12, height = 8, dpi = "retina")
+```
+
+For each of the four main open science practices, we also asked respondents about 
+their concerns about each of the practices. For each of the practices, we asked
+respondents to share their concerns in a free text format. Then, we provided 
+a list of possible concerns that researchers could have about the relevant practice. 
+From this list, respondents were able to select as many concerns as were relevant.
+
+## Concerns about Preregistration 
+
+```{r prereg_concerns_data}
+
+# wrangle the concern data so it's in long form & only includes endorsements.
+
+PreRegCon_long <- df %>% 
+     select(c("ParticipantNumber", "AcLevel_Label",
+              "PreRegCon_delay":"PreRegCon_none", 
+              "FORcode_2_label")) %>%  
+    select(-"PreRegCon_text") %>% 
+     pivot_longer(c("PreRegCon_delay":"PreRegCon_none"), 
+     names_to = "PreRegConcern", 
+     values_to = "PreReg_Endorsement") %>% 
+  filter(PreReg_Endorsement == "1")  
+
+# recode the data so the response options have proper labels
+
+c <- metadata %>% 
+    filter(Scale == "PreRegConcern") %>% 
+    filter(NewVariable != "PreRegCon_text") #remove this value from metadata
+
+d <- full_join(PreRegCon_long, c, by = c("PreRegConcern" = "NewVariable")) %>% 
+  rename ("PreRegConcern_label" = "ItemTextShort")
+
+# getting a tibble for the counts
+c_prereg_con <- plyr::count(d$PreRegConcern)
+
+# to figure out how many respondents shared concerns calculate unique number of participants
+n_prereg_con <- length(unique(d$ParticipantNumber))
+
+# create a tibble with percentages (of respondents who answered this question) & 
+# then reorder them by descending percentages
+
+tb <- d %>% 
+  dplyr::count(PreRegConcern_label) %>% 
+  mutate(Percentage = round (n/n_prereg_con*100)) %>% 
+  dplyr::arrange(desc(n)) 
+
+fig_nums(name = "prereg_concerns", 
+           caption = "Concerns about preregistering studies", 
+           display = FALSE)
+
+```
+
+Of the `r n_prereg_con`
+respondents who answered th question about their concerns for preregistering 
+research studies, `r tb [7,3]`% reported that they do not share any of the listed 
+concerns. `r fig_nums("prereg_concerns", display = "cite")` 
+presents, of those who answered this question, the percentage who selected 
+each of the concerns.  \newline
+
+`r fig_nums("prereg_concerns")`
+
+```{r prereg_concerns_bar}
+
+# reorder the response options from lowest to highest, with concerns last
+tb2 <- tb %>% 
+  dplyr::mutate(PreRegConcern_label = factor (PreRegConcern_label, 
+                                levels = c("Other concern",
+                                           "More difficult to find significant results", 
+                                           "More difficult to publish in certain journals", 
+                                           "Delays data collection", 
+                                           "Stifles creativity",  
+                                           "Prevents exploratory research", 
+                                           "Need to look at data to analyse it", 
+                                           "Risk of scooping", 
+                                           "I do not share any of these concerns")))
+
+# create a character vector for the colours for each bar
+cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
+          "lightskyblue3", "lightskyblue3", "grey50", "lightskyblue3", "lightskyblue3")
+
+# build the bar chart
+# title = str_wrap (sprintf("Concerns about preregistering studies (n = %d)", 
+                          # n_prereg_con), width = 37)
+
+# plot the reordered data and colours. Because the data is in a tibble rather than 
+  # a dataframe with counts, I could use 'geom_col' rather than 'geom_bar' 
+  # (or I could use stat = "identity" with 'geom_bar')
+
+p <- ggplot(tb2) + 
+  aes(x = PreRegConcern_label, y = Percentage) +
+   geom_bar(stat = "identity", colour = "black", fill = cols) +
+    labs (x = element_blank(),
+      y = "Percentage") +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 50)) + #wrap the labels
+  coord_flip(ylim = c(0,60)) +
+  theme_classic(base_size = 18) + 
+  theme(plot.title = element_text(hjust = 0.5)) 
+p
+
+```
+
+## Concerns about Open Materials and/or Code
+
+```{r code_concerns_data}
+
+# wrangle this data so it's in long form & only includes endorsements.
+
+CodeCon_long <- df %>% 
+     select(c("ParticipantNumber", 
+              "CodeCon_criticise":"CodeCon_ip", 
+              "FORcode_2_label")) %>%  
+    select(-"CodeCon_text") %>% 
+     pivot_longer(c("CodeCon_criticise":"CodeCon_ip"), 
+     names_to = "CodeConcern", 
+     values_to = "CodeCon_Endorsement") %>% 
+  filter(CodeCon_Endorsement == "1")  
+
+
+# recode the data so the response options have proper labels
+
+c <- metadata %>% 
+    filter(Scale == "CodeConcern") %>% 
+    filter(NewVariable != "CodeCon_text") #remove this value from metadata
+
+d <- full_join(CodeCon_long, c, by = c("CodeConcern" = "NewVariable")) %>% 
+  rename ("CodeConcern_label" = "ItemTextShort")
+
+# getting a tibble for the counts
+c_code_con <- plyr::count(d$CodeConcern)
+
+# to figure out how many respondents shared concerns calculate unique number of participants
+n_code_con <- length(unique(d$ParticipantNumber))
+
+# create a tibble with percentages (of respondents who answered this question) & 
+# then reorder them by descending percentages
+tb <- d %>% 
+  dplyr::count(CodeConcern_label) %>% 
+  mutate(Percentage = round (n/n_code_con*100)) %>% 
+  dplyr::arrange(desc(n))
+
+fig_nums(name = "code_concerns", 
+           caption = "Concerns about open materials and/or code", 
+           display = FALSE)
+```
+
+A total of `r n_code_con` respondents answered the question about their concerns 
+about making research materials and/or code open. Of those who respondended, 
+`r tb [4,3]`% reported that they do not share any of the listed concerns. 
+`r fig_nums("code_concerns", display = "cite")` presents, of those who answered 
+this question, the percentage who selected each of the concerns.  \newline
+
+`r fig_nums("code_concerns")`
+
+```{r code_concerns_bar}
+# build the bar chart
+# reorder the response options from lowest to highest, with concerns last
+tb2 <- tb %>% 
+  dplyr::mutate(CodeConcern_label = factor (CodeConcern_label, 
+                levels = c("Other concern",
+                         "Others might find errors in my published work", 
+                         "Reuse could violate epistemological framework", 
+                         "Others might ask me to provide assistance with their research", 
+                         "Others might criticise my materials/code", 
+                        "Others might find it difficult to understand my materials/code", 
+                         "I might lose control over how they are used", 
+                         "I might not receive appropriate credit", 
+                         "Issues related to intellectual property", 
+                         "I do not share any of these concerns")))
+
+# create a character vector for the colours for each bar
+cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "grey50", 
+          "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
+          "lightskyblue3", "lightskyblue3")
+
+# build the bar chart
+# title = str_wrap (sprintf("Concerns about open materials and/or code (n = %d)", 
+                          # n_code_con), width = 40)
+
+# plot the reordered data and colours. Because the data is in a tibble rather than a     
+  # dataframe with counts, I could use 'geom_col' rather than 'geom_bar'(or I 
+  # could use stat = "identity" with 'geom_bar')
+
+p <- ggplot(tb2) + 
+  aes(x = CodeConcern_label, y = Percentage) +
+  geom_bar(stat = "identity", colour = "black", fill = cols) +
+  labs (x = element_blank(),
+        y = "Percentage") +
+  coord_flip(ylim = c(0,60)) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 50)) + #wrap the labels
+  theme_classic(base_size = 18) 
+p
+
+```
+
+## Concerns about Open Data
+
+```{r data_concerns_data}
+
+# wrangle this data so it's in long form & only includes endorsements.
+
+DataConcern_long <- df %>% 
+  select (c("ParticipantNumber", "AcLevel_Label",
+            "DataConcern_criticise":"DataConcern_scoop",
+            "FORcode_2_label")) %>%  
+  select(-"DataConcern_text") %>% 
+  pivot_longer(c("DataConcern_criticise":"DataConcern_scoop"),
+               names_to = "DataConcern", 
+               values_to = "DataConcern_Endorsement") %>% 
+  filter(DataConcern_Endorsement == "1")
+
+# recode the data so the response options have proper labels
+
+c <- metadata %>% 
+    filter(Scale == "DataConcern") %>% 
+    filter(NewVariable != "DataConcern_text") #remove this value from metadata
+
+d <- full_join(DataConcern_long, c, by = c("DataConcern" = "NewVariable")) %>% 
+  rename ("DataConcern_label" = "ItemTextShort")
+
+# getting a tibble for the counts
+c_data_con <- plyr::count(d$DataConcern)
+
+# to figure out how many respondents shared concerns calculate unique number of participants
+n_data_con <- length(unique(d$ParticipantNumber))
+
+# create a tibble with percentages (of respondents who answered this question) & 
+# then reorder them by descending percentages
+tb <- d %>% 
+  dplyr::count(DataConcern_label) %>% 
+  mutate(Percentage = round (n/n_data_con*100)) %>% 
+  dplyr::arrange(desc(n)) 
+ # mutate_if(is.character, ~factor(.)) # make it a factor
+
+# AH...I only need these next two steps if I'm actually able to figure out how 
+  # to use the `x` variable to reorder the variable, while using the `x_label`
+  # variable to name the actual columns in the tables. Otherwise, skip this.
+
+d2 <- d %>% # create tibble with the Data Concern counts
+  select(DataConcern, DataConcern_label)  %>% 
+      dplyr::count(DataConcern) 
+  #  mutate_if(is.character, ~factor(.))
+
+# join the two tables together
+tb2 <- left_join(x = tb, y = d2, by = "n") 
+
+fig_nums(name = "data_concerns", 
+           caption = "Concerns about open data", 
+           display = FALSE)
+```
+
+A total of `r n_data_con` respondents answered this question about concerns 
+they had about making their data open. Of those who respondended, `r tb2 [11,3]`%
+reported that they did not share any of the listed 
+concerns. `r fig_nums("data_concerns", display = "cite")` presents, of those who 
+answered this question, the percentage who selected each of the concerns.\newline
+
+`r fig_nums("data_concerns")`
+
+```{r data_concerns_bar}
+
+# build the bar chart
+
+# reorder the rows according to the DataConcern_label 
+tb3 <- tb2 %>% 
+  dplyr::mutate(DataConcern_label = factor(DataConcern_label, 
+                levels = c("Other concern", 
+                           "It devalues research data collection", 
+                           "Unfair for other researchers to benefit from my data collection", 
+                          "Others might criticise my data and/or research practices", 
+                           "Too much time or effort", 
+                           "I might lose control over how my data are being used",
+                           "I might not receive appropriate credit for my data collection", 
+                           "Others could use my data for another study that I intended to conduct in the future", 
+                           "Issues related to intellectual property", 
+                           "Issues related to privacy", 
+                           "Issues related to ethics", 
+                           "I do not share any of these concerns")))
+
+# create a character vector for the colours for each bar
+cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
+          "lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3", 
+          "lightskyblue3", "lightskyblue3", "grey50", "lightskyblue3")
+
+                    
+# build the bar chart
+# title = str_wrap (sprintf("Concerns about open data (n = %d)", 
+                          # n_data_con), width = 40)
+
+p <- ggplot(tb3) + 
+  aes(x = DataConcern_label, y = Percentage) +
+  geom_bar(stat = "identity", colour = "black", fill = cols) +
+  labs (x = element_blank(),
+        y = "Percentage") +
+  coord_flip(ylim = c(0,60)) +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 50)) + #wrap the labels
+  theme_classic(base_size = 18) + 
+  theme(plot.title = element_text(hjust = 0.5)) # centre the title
+p
+
+```
+
+
+## Concerns about Pre-publication Archiving
 
 ```{r prepub_concerns_data}
 
@@ -1872,19 +1451,21 @@ tb <- d %>%
   dplyr::arrange(desc(n)) 
  # mutate_if(is.character, ~factor(.)) # make it a factor
 
+fig_nums(name = "prepub_concerns", 
+           caption = "Concerns about pre-publication archiving", 
+           display = FALSE)
 ```
 
-We asked all respondents if they have any concerns about uploading a manuscript
-to a pre-publication archive before submitting it for peer review. After asking 
-respondents to share their concerns in a free text format, we provided a list of 
-possible concerns that researchers could have about engaging in this practice. 
-Respondents were able to select as many concerns as they liked. A total of 
-`r n_prepub_con` respondents answered this question. Of those who respondended,
-`r tb [6,2]` (`r tb [6,3]`%) reported that they do not share any of the listed 
-concerns. The following figure presents, of those who answered this question, 
-the percentage who selected each of the concerns.  
+A total of `r n_prepub_con` respondents answered this question about concerns 
+they had about uploading a manuscript to a pre-publication archive before 
+submitting it for peer review. Of those who respondended,
+`r tb [6,3]`% reported that they do not share any of the listed 
+concerns. `r fig_nums("prepub_concerns", display = "cite")` presents, of those 
+who answered this question, the percentage who selected each of the concerns. \newline 
 
-```{r prepub_concerns_bar, fig.height=6, fig.width=12}
+`r fig_nums("prepub_concerns")`
+
+```{r prepub_concerns_bar}
 
 # build the bar chart
 
@@ -1901,27 +1482,26 @@ tb2 <- tb %>%
 
 # create a character vector for the colours for each bar
 cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", 
-          "lightskyblue3", "lightskyblue3", "lightskyblue3", "grey50")
+          "lightskyblue3", "lightskyblue3", "grey50", "lightskyblue3")
                     
 
 # build the bar chart
-title = str_wrap (sprintf("Concerns about pre-publication archiving (n = %d)", 
-                          n_prepub_con), width = 40)
+# title = str_wrap (sprintf("Concerns about pre-publication archiving (n = %d)", 
+                          # n_prepub_con), width = 40)
 
 p <- ggplot(tb2) + 
   aes(x = PrePubConcern_label, y = Percentage) +
   geom_bar(stat = "identity", colour = "black", fill = cols) +
   labs (x = element_blank(),
-        y = "Percentage", 
-        title = title) +
+        y = "Percentage") +
   coord_flip(ylim = c(0,70)) +
   scale_x_discrete(labels = function(x) str_wrap(x, width = 50)) + #wrap the labels
-  theme_classic(base_size = 12) + 
-  theme(plot.title = element_text(hjust = 0.5)) # centre the title
+  theme_classic(base_size = 18) 
 p
 
 ```
 
+# Additional Open Science Issues
 
 ## Open Access Publishing
 
@@ -1950,12 +1530,12 @@ tb <- valid_OAprop %>%
 ```
 
 We asked participants to indicate approximately what proportion of their 
-publications from the last 5 years are open access. Of the `r sum(tb[2])` 
+publications from the last 5 years are open access (see Table 
+\ref{tab:oa_prop_table}). Of the `r sum(tb[2])` 
 participants who answered this question, the most common responses were that 
-some (`r tb[1,2]`; `r tb[1,3]`%) or none (`r tb[2,2]`; `r tb[2,3]`%) of their 
-publications were open access. A small proportion (`r tb[3,2]`; `r tb[3,3]`%) 
-indicated that they did not know what proportion were open access. The following
-table provides the breakdown of responses.
+some (`r tb[1,3]`%) or none (`r tb[2,3]`%) of their 
+publications were open access. A small proportion (`r tb[3,3]`%) 
+indicated that they did not know what proportion were open access.
 
 ```{r oa_prop_table}
 
@@ -2008,17 +1588,22 @@ tb <- d %>%
   mutate(Percentage = round (n/n_oafees*100)) %>% 
   dplyr::arrange(desc(n)) 
 
+fig_nums(name = "oa_fees", 
+           caption = "How respondents paid for open access publishing", 
+           display = FALSE)
 ```
 
-We asked all respondents, except those who said that none of their publications 
+We asked respondents, except those who said that none of their publications 
 in the last 5 years were open access, how they paid for article 
 processing charges that many journals charge for open access publishing. We 
 provided a list of possible payment approaches and respondents were able to 
-select as many concerns as they liked. A total of `r n_oafees` respondents 
-answered this question. The following table presents, of those who answered this 
-question, the percentage who used each of the different payment approaches.  
+select as many concerns as they liked. `r fig_nums("oa_fees", display = "cite")` 
+presents, of those who answered this question (n = `r n_oafees`), the 
+percentage who used each of the different payment approaches.  \newline
 
-```{r oa_fees_bar, fig.height=6, fig.width=12}
+`r fig_nums("oa_fees")`
+
+```{r oa_fees_bar}
 
 # build the bar chart
 
@@ -2038,24 +1623,21 @@ tb2 <- tb %>%
 
                     
 # build the bar chart
-title = str_wrap (sprintf("How did you pay any Open Access publishing fees? (n = %d)",
-                          n_oafees), width = 40)
+# title = str_wrap (sprintf("How did you pay any Open Access publishing fees? (n = %d)",
+                          # n_oafees), width = 40)
 
 p <- ggplot(tb2) + 
   aes(x = OAfees_label, y = Percentage) +
   geom_bar(stat = "identity", colour = "black", fill = "lightskyblue3") +
   labs (x = element_blank(),
-        y = "Percentage", 
-        title = title) +
+        y = "Percentage") +
   coord_flip(ylim = c(0,70)) +
   scale_x_discrete(labels = function(x) str_wrap(x, width = 50)) + #wrap the labels
-  theme_classic(base_size = 12) + 
-  theme(plot.title = element_text(hjust = 0.5)) # centre the title
+  theme_classic(base_size = 18) 
+  # theme(plot.title = element_text(hjust = 0.5)) # centre the title
 p
 
 ```
-
-## Additional Open Science Issues
 
 ### Most Common Open Science Practices in Their Field
 
@@ -2095,19 +1677,26 @@ tb <- d %>%
   dplyr::arrange(desc(n)) 
  # mutate_if(is.character, ~factor(.)) # make it a factor
 
+fig_nums(name = "os_most", 
+           caption = "Most common open science practices in respondents' fields", 
+           display = FALSE)
+
 ```
 
 We asked respondents which of the following open science practices (if any) were
-commonly used in their field. They could tick all that applied. The graph below
-represents the percentage of the `r n_osmost` respondents who selected each response.
-Given that information about some of these open science practices are publicly available
-and often associted with the published product (e.g., the final paper 
+commonly used in their field. They could tick all that applied. 
+`r fig_nums("os_most", display = "cite")`represents the percentage of the 
+`r n_osmost` respondents who selected each response. Given that information about 
+some of these open science practices are publicly available
+and often associated with the published product (e.g., the final paper 
 regularly includes links to repository storing data, materials, and/or code, as 
-well as a link to the preregistration, if relevant), it is surprising that nearly
-a fifth of respondents indicated that they did not know about the open science 
-practices of researchers in their field. 
+well as a link to the preregistration, if relevant), it is disconcerting that nearly
+a fifth of respondents reported that they did not know about the open science 
+practices of researchers in their field. \newline
 
-```{r os_most_bar, fig.height=6, fig.width=12}
+`r fig_nums("os_most")`
+
+```{r os_most_bar}
 
 # build the bar chart
 
@@ -2124,30 +1713,30 @@ tb2 <- tb %>%
                            "Open access archiving in a repository",
                            "Open access publishing",
                            "I don't know about the open science practices of researchers in my field")))
-                
-# create a character vector for the colours for each bar
-cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", 
-          "lightskyblue3", "lightskyblue3", "lightskyblue3", 
-          "lightskyblue3", "lightskyblue3", "grey50")
-                    
 
+# create a character vector for the colours for each bar
+cols2 <- c("lightskyblue3", "lightskyblue3", "lightskyblue3",
+          "lightskyblue3", "lightskyblue3", "grey50", 
+          "lightskyblue3", "grey50", "lightskyblue3")
+                    
 # build the bar chart
-title = str_wrap (sprintf("Most common practices in respondent's field (n = %d)",
-                          n_osmost), width = 40)
+# title = str_wrap (sprintf("Most common practices in respondent's field (n = %d)",
+                          # n_osmost), width = 40)
 
 p <- ggplot(tb2) + 
   aes(x = OSmost_label, y = Percentage) +
-  geom_bar(stat = "identity", colour = "black", fill = cols) +
+  geom_bar(stat = "identity", colour = "black", fill = cols2) +
   labs (x = element_blank(),
-        y = "Percentage", 
-        title = title) +
+        y = "Percentage") +
   coord_flip(ylim = c(0,70)) +
   scale_x_discrete(labels = function(x) str_wrap(x, width = 50)) + #wrap the labels
-  theme_classic(base_size = 12) + 
-  theme(plot.title = element_text(hjust = 0.5)) # centre the title
+  theme_classic(base_size = 18) 
+  # theme(plot.title = element_text(hjust = 0.5)) # centre the title
 p
 
 ```
+
+\newpage
 
 # Appendices
 
@@ -2247,6 +1836,8 @@ knitr::kable(booktabs = T, linesep = "",
 
 ```
 
+\newpage
+
 ## Appendix 2: Perceived Importance Tables
 
 ```{r prereg_imp_count}
@@ -2276,7 +1867,6 @@ tb_ex <- valid_prereg_imp_ex %>%
 
 ```
 
-
 ```{r prereg_imp_ex_table}
 
 tb_ex2 <- tb_ex [c(2,4,1,3),]  # rearrange the responses
@@ -2288,6 +1878,252 @@ knitr::kable (booktabs = T, linesep = "",
               caption = sprintf("Perceived Importance of Preregistration (n = %d)",
                                 nvalid_prereg_imp_ex), 
               align = 'lcc') %>% 
+  styler_pdf() 
+
+```
+
+```{r code_imp_count}
+
+# filter rows with valid responses for this variable; first df contains all valid 
+  # responses the second df contains all valid responses, except "Researchers...do 
+  # not use materials and/or code "
+
+valid_code_imp <- filter(df, CodeImp != "NA")
+valid_code_imp_ex <- filter(valid_code_imp, CodeImp != "Researchers in my discipline do not use materials and/or code")
+
+nvalid_code_imp <- nrow(valid_code_imp)
+nvalid_code_imp_ex <- nrow(valid_code_imp_ex)
+
+# create a tibble with frequency & percentage for all who answered question
+tb <- valid_code_imp %>% 
+  dplyr::count(CodeImp) %>% 
+  mutate(Percentage = round (n/(nrow(valid_code_imp))*100)) %>% 
+  dplyr::arrange(desc(n))
+
+# create a tibble with frequency & percentage for data excluding "do not use"
+tb_ex <- valid_code_imp_ex %>% 
+  dplyr::count(CodeImp) %>% 
+  mutate(Percentage = round (n/(nrow(valid_code_imp_ex))*100)) %>% 
+  dplyr::arrange(desc(n))
+
+```
+
+```{r code_imp_ex_table}
+
+tb_ex <- valid_code_imp_ex %>% 
+  dplyr::count(CodeImp) %>% 
+  mutate(Percentage = round (n/(nrow(valid_code_imp_ex))*100)) %>% 
+  dplyr::arrange(desc(n))
+
+tb_ex2 <-tb_ex [c(4,3,1,2),] # rearrange the responses
+
+tb_ex2 %>% 
+knitr::kable (booktabs = T, linesep = "",
+              col.names = c("Perceived Importance", "Frequency", "Percentage"), 
+              caption = sprintf("Perceived Importance of Open Materials and/or Code (n = %d)", nvalid_code_imp_ex), 
+              align = 'lcc') %>% 
+  styler_pdf() 
+
+```
+
+```{r data_imp_count}
+
+# filter rows with valid responses for this variable; first df contains all valid 
+  # responses the second df contains all valid responses, except "Researchers...do 
+  # not use materials and/or code "
+
+valid_data_imp <- filter(df, DataImp != "NA")
+valid_data_imp_ex <- filter(valid_data_imp, DataImp != "Research publications in my field are not based on data")
+
+nvalid_data_imp <- nrow(valid_data_imp)
+nvalid_data_imp_ex <- nrow(valid_data_imp_ex)
+
+# create a tibble with frequency & percentage for all who answered question
+tb <- valid_data_imp %>% 
+  dplyr::count(DataImp) %>% 
+  mutate(Percentage = round (n/(nrow(valid_data_imp))*100)) %>% 
+  dplyr::arrange(desc(n))
+
+# create a tibble with frequency & percentage for data excluding "do not use"
+tb_ex <- valid_data_imp_ex %>% 
+  dplyr::count(DataImp) %>% 
+  mutate(Percentage = round (n/(nrow(valid_data_imp_ex))*100)) %>% 
+  dplyr::arrange(desc(n))
+
+```
+
+```{r data_imp_ex_table}
+
+tb_ex <- valid_data_imp_ex %>% 
+  dplyr::count(DataImp) %>% 
+  mutate(Percentage = round (n/(nrow(valid_data_imp_ex))*100)) %>% 
+  dplyr::arrange(desc(n))
+
+tb_ex2 <-tb_ex [c(4,3,2,1),] # rearrange the responses
+
+tb_ex2 %>% 
+knitr::kable (booktabs = T, linesep = "",
+              col.names = c("Perceived Importance", "Frequency", "Percentage"), 
+              caption = sprintf("Perceived Importance of Open Data (n = %d)", nvalid_data_imp_ex), 
+              align = 'lcc') %>% 
+  styler_pdf() 
+
+```
+
+```{r prepub_imp_count}
+
+# filter rows with valid responses for this variable
+
+valid_prepub_imp <- filter(df, PrePubImp != "NA")
+
+nvalid_prepub_imp <- nrow(valid_prepub_imp)
+
+# create a tibble with frequency & percentage for all who answered question
+tb <- valid_prepub_imp %>% 
+  dplyr::count(PrePubImp) %>% 
+  mutate(Percentage = round (n/(nrow(valid_prepub_imp))*100)) %>% 
+  dplyr::arrange(desc(n))
+
+```
+
+```{r prepub_imp_table}
+
+tb2 <-tb [c(3,2,1,4),] # rearrange the responses from 'not at all' to 'ext imp'
+
+tb2 %>% 
+knitr::kable (booktabs = T, linesep = "",
+              col.names = c("Perceived Importance", "Frequency", "Percentage"), 
+              caption = sprintf("Perceived Importance of Pre-publication Archiving (n = %d)", nvalid_prepub_imp), 
+              align = 'lcc') %>% 
+  styler_pdf() 
+
+```
+
+\newpage
+## Appendix 3: Reported Experience Tables
+
+```{r prereg_exp_count}
+# filter rows with valid responses for this variable
+valid_prereg_exp <- filter(df, PreRegExp != "NA")
+
+# calculate number of rows with a valid response for this variable
+nvalid_prereg_exp <- nrow(valid_prereg_exp)
+
+# create a tibble with frequency & percentage for all who answered question
+tb <- valid_prereg_exp %>% 
+  dplyr::count(PreRegExp) %>% 
+  mutate(Percentage = round (n/(nrow(valid_prereg_exp))*100)) %>% 
+  dplyr::arrange(desc(n))
+
+```
+
+```{r prereg_exp_table}
+
+# change the label for Regular Use
+tb$PreRegExp <- tb$PreRegExp %>% 
+  mapvalues(
+    c("Unaware", "Aware, But Not Used", "Some Experience", "Reg Use"), 
+    c("Unaware", "Aware, But Not Used", "Some Experience", "Regular Use"))
+
+tb2 <- tb[c(1,2,3,4),] #fix order
+
+tb2 %>% 
+knitr::kable (booktabs = T, linesep = "",
+              col.names = c("Reported Experience", "Frequency", "Percentage"),
+              caption = sprintf("Experience with Study Preregistration (n = %d)",
+                                nvalid_prereg_exp), 
+              align = 'lcc') %>% 
+  styler_pdf() 
+
+```
+
+```{r code_exp_count}
+
+# filter rows with valid responses for this variable
+valid_code_exp <- filter(df,CodeExp != "NA")
+
+# calculate number of rows with a valid response for this variable
+nvalid_code_exp <- nrow(valid_code_exp)
+
+tb <- valid_code_exp %>% 
+  dplyr::count(CodeExp) %>%  
+    mutate(Percentage = round (n/nvalid_code_exp*100)) %>% 
+    dplyr::arrange(desc(n))
+
+```
+
+```{r code_exp_table}
+
+tb2 <- tb [c(2,1,3,4),] # fix the order of responses
+
+tb2 %>% 
+knitr::kable (booktabs = T, linesep = "",
+              col.names = c("Reported Experience", "Frequency", "Percentage"), 
+              caption = sprintf("Experience with Open Materials and/or Code (n = %d)",
+                                nvalid_code_exp), align = 'lcc') %>% 
+  styler_pdf() 
+
+```
+
+```{r data_exp_count}
+
+# filter rows with valid responses for this variable
+valid_data_exp <- filter(df,DataExp != "NA")
+
+# FIGURING OUT WHICH PARTICIPANTS SAID THE VARIOUS RESPONSES
+
+# dataexp <- df %>% 
+  # filter(DataExp == "Aware, But Not Used") %>% 
+  # select(ParticipantNumber, DataExp, DataConcernsList)
+# write.csv(test, here::here("data", "DataExp.csv"), row.names = TRUE)
+
+# calculate number of rows with a valid response for this variable
+nvalid_data_exp <- nrow(valid_data_exp)
+
+tb <- valid_data_exp %>% 
+  dplyr::count(DataExp) %>%  
+    mutate(Percentage = round (n/nvalid_data_exp*100)) %>% 
+    dplyr::arrange(desc(n))
+
+```
+
+```{r data_exp_table}
+
+tb2 <- tb [c(4,1,2,3),] # fix the order of responses from 'unaware' to 'reg use'
+
+tb2 %>% 
+knitr::kable (booktabs = T, linesep = "",
+              col.names = c("Reported Experience", "Frequency", "Percentage"), 
+              caption = sprintf("Experience with Open Data (n = %d)",
+                                nvalid_data_exp), align = 'lcc') %>% 
+  styler_pdf() 
+
+```
+
+```{r prepub_count_exp}
+
+# filter rows with valid responses for this variable
+valid_prepub_exp <- filter(df,PrePubExp != "NA")
+
+# calculate number of rows with a valid response for this variable
+nvalid_prepub_exp <- nrow(valid_prepub_exp)
+
+tb <- valid_prepub_exp %>% 
+  dplyr::count(PrePubExp) %>%  
+    mutate(Percentage = round (n/nvalid_prepub_exp*100)) %>% 
+    dplyr::arrange(desc(n))
+
+```
+
+```{r prepub_exp_table}
+
+tb2 <- tb [c(2,1,4,3),] # fix the order of responses from 'unaware' to 'ext exp'
+
+tb2 %>% 
+knitr::kable (booktabs = T, linesep = "",
+              col.names = c("Reported Experience", "Frequency", "Percentage"), 
+              caption = sprintf("Experience with Pre-publication Archiving (n = %d)",
+                                nvalid_prepub_exp), align = 'lcc') %>% 
   styler_pdf() 
 
 ```

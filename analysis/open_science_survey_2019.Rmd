@@ -3,7 +3,7 @@ title: "Swinburne Open Science Task Force Survey (2019)"
 author: "Jennifer Beaudry, Tom Johnstone, Jordy Kaufman, Lisa Given & Michelle Vincent"
 date: '`r format (Sys.time(), "%d %B %Y")`'
 output:
- pdf_document: default
+  pdf_document: default
 always_allow_html: false # true for word; false for pdf
 csl: apa-old-doi-prefix.csl
 bibliography: Beaudry_Library.bib
@@ -12,7 +12,6 @@ bibliography: Beaudry_Library.bib
 
 ```{r setup, include=FALSE}
 options(scipen = 999)
-
 ## Global options
 knitr::opts_chunk$set(
   echo = FALSE,
@@ -27,7 +26,6 @@ knitr::opts_chunk$set(
   fig.align = "center"
 )
 knitr::opts_knit$set(width = 75)
-
 ```
 
 
@@ -206,13 +204,13 @@ styler_pdf <- function(dat) {
 
 #### CAPTIONER###
 
-table_nums <- captioner(prefix = "Figure")
+fig_nums <- captioner(prefix = "Figure")
 ```
 
 ```{r import data}
 #import the data. Here I'm using the original Qualtrics data, rather than Jordy's revised one.
 df <- read_csv (here::here("data", "data_sostf.csv"))
-
+                
 # import the metadata.
 metadata <- here::here("survey", "data", "os_metadata_good.csv") %>% 
   read_csv(col_names = TRUE, skip_empty_rows = TRUE) %>% 
@@ -246,7 +244,19 @@ of their responses to the various quantitative questions. We also asked a number
 of open-ended questions, which we are currently analysing. The full survey is
 available at https://osf.io/a4bwp/. 
 
-# Demographics
+## Definitions
+
+TO SAVE US TIME LATER (JORDY TO DECIDE WHERE THESE GO)
+
+### Prereg
+
+We defined study preregistration for our participants as: "Documenting and submitting
+to a journal or public repository one's research questions, methodological design, 
+and anlysis plan prior to analysing the data. This time-stamped document is made
+openly available by the time the research is published so that any deviation from 
+the original research plan is visible to the scientific community."
+
+# Demographics 
 
 In terms of respondents' demographic information, we did not collect information 
 about gender or age to provide more anonymity to our respondents. We did, however,
@@ -258,7 +268,7 @@ ask about their Academic Level/Type and their Discpline (based on 2-digit and
 Of the `r nrow(valid_ac_level)` respondents who provided details about their 
 Academic Level, `r per_ac_level [5]`% were PhD students, `r per_ac_level [7]`% 
 were Professors, and `r per_ac_level [10]`% were Senior Lecturers. 
-Table 1 reports the academic levels for all respondents. 
+Table \ref{tab:ac_level_table} reports the academic levels for all respondents. 
 
 ```{r ac_level_table}
 
@@ -303,8 +313,8 @@ Religious Studies (22).
 
 For ease of interpretation and to reduce the identifiability of the respondents,
 we combined similar divisions with smaller numbers of respondents into 
-disciplinary groups (see Appendix 1 for details). Table 2 shows the breakdown by
-these disciplinary groups.
+disciplinary groups (see Appendix 1 for details). Table \ref{tab:discipline_table} 
+shows the breakdown by these disciplinary groups.
 
 
 ```{r discipline_table}
@@ -350,7 +360,7 @@ per_crisis <- perc(x = df$crisis, y = nvalid_crisis)  #percentage per level
 # output of `per_crisis` inserted in text below
 
 # caption for the plot
-table_nums(name = "crisis", 
+fig_nums(name = "crisis", 
            caption = "Estimates of reproducibility by perceived crisis in field", 
            display = FALSE)
 # crisis.cap <- table_nums("crisis") # needs to be separate steps
@@ -366,19 +376,19 @@ there was a slight crisis, and `r per_crisis[3]`% that there was a significant
 reproducibility crisis in their field.   
 
 Participants were also asked to estimate the percentage of research publications 
-their field that are reproducible. In the figure below, we plotted participants' 
-reproducibility estimates according to their responses to the perceived 
-crisis in their field. The black bar is the mean estimate of reproducibility 
-perceived crisis. 
+their field that are reproducible. In `r fig_nums("crisis", display = "cite")`,
+we plotted participants' reproducibility estimates according to their responses 
+to the perceived crisis in their field (n = `r nvalid_rep_est`). The 
+black bar is the mean estimate of 
+reproducibility by the perceived crisis levels. 
 
 \newpage
 
-`r table_nums("crisis")`
+`r fig_nums("crisis")`
 
 ```{r crisis_by_estimate_stripchart, fig.height=6, fig.width=12}
 
 #estimates of reproducibility by levels of crisis as a stripchart 
-
 #title = sprintf("Estimates of reproducibility by perceived crisis in field (n = %d)",nvalid_rep_est)
 x_name = "Do you think your field is experiencing a 'Reprodubility Crisis'?"
 x_labels = c("Don't Know", "No Crisis", "Slight Crisis", "Significant Crisis")
@@ -414,7 +424,7 @@ p
 
 
 
-# Experience with Open Science Practices
+# Views and Use of Open Science Practices
 
   
 ## Overall Experience with Open Science Practices
@@ -442,54 +452,14 @@ we explained that the practices enveloped by the umbrella term of "open science"
 were (i) study preregistration, (ii) open materials and/or code, (iii) open data, 
 (iv) pre-publication archiving, and (v) open access publishing.   
 
-Table 3 below shows participants' experience with open science practices in
-general. Of the `r nvalid_os_exp` participants who answered this question, 
-`r os_exp[3,2]` (`r os_exp[3,3]`%) reported that they were unaware of open 
-science practices; `r os_exp[1,2]` (`r os_exp[1,3]`%) reported that they were 
-aware of open science practices, but had not used them; `r os_exp[2,2]` 
-(`r os_exp[2,3]`%) reported that they had some experience with open science
-practices; and only `r os_exp[4,2]` (`r os_exp[4,3]`%) reported that they had
+Table \ref{tab:tables_os_experience}  shows participants' experience with open 
+science practices in general. Of the `r nvalid_os_exp` participants who answered 
+this question, `r os_exp[3,3]`% reported that they were unaware of open 
+science practices; `r os_exp[1,3]`% reported that they were 
+aware of open science practices, but had not used them; `r os_exp[2,3]`%
+reported that they had some experience with open science
+practices; and only `r os_exp[4,3]`% reported that they had
 extensive experience with open science practices. 
-
-```{r os_experience_bar, include = FALSE}
-
-title = sprintf("Experience with open science practices (n = %d)",nvalid_os_exp)
-x_name = "What is your experience with open science practices?"
-x_labels = c("Unaware", "Aware, But Not Used", "Some Experience", "Extensive Experience")
-y_name = "Frequency"
-
-p <- ggplot(data = valid_os_exp, 
-       aes(x = OverallExp)) + 
-  geom_bar(
-  colour = "black" , 
-  fill = "blue") +
-  scale_x_discrete(name = "What is your experience with open science practices?",
-                   limits=c("Unaware", "Aware, But Not Used", "Some", "Extensive")) + 
-  theme_classic(base_size = 12) +
-  scale_y_continuous(name = "Frequency") +
-  coord_cartesian(ylim = c(0,100)) +
-  ggtitle(title)
-p
-
-# ggsave(here::here("figs", "os_overallexp_bar.png"))
-
-
-
-```
-
-
-```{r os_experience_pie, fig.width=4, fig.height=4, eval=FALSE}
-
-title = "What is your experience with open science practices? (n = %d)"
-
-# pie chart
-colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(the_data = df, label_var = "OverallExp",
-                      the_title = title, 
-                      colours,
-                      the_quantity = "percent")
-p
-```
 
 ```{r tables_os_experience}
 
@@ -506,20 +476,11 @@ knitr::kable(booktabs = T, linesep = "",
 
 ```
 
-## Overall Perceived Importance and Reported Experience
 
-Throughout the survey, respondents separately rated the perceived importance for 
-their field of the four main open science practices, and they also reported their 
-own experience with those practices. Specifically, we asked them about 
-preregistering their studies in advance of data collection, making their study 
-material and/or code openly available, making their data openly available, 
-and making their work available on pre-publication archives. 
-
-### Importance of Practices
+## Importance of Practices
 
 ```{r stacked_imp_data, warning=FALSE}
 ## Figure out what the data needs to look like...
-
 # try creating tibbles for each variable that I can join? 
  # filter out irrelevant responses, but keep NAs for now
   # for some reason this only works on the character vector NOT factors
@@ -580,19 +541,27 @@ tb_imp <- imp_long %>%
 
 # tb$Importance <- forcats::fct_explicit_na(tb$Importance, na_level = "N/A")
 
+fig_nums(name = "imp_all", 
+           caption = "Perceived importance of open science practices", 
+           display = FALSE)
+
 ```
 
-Figure X includes the data from respondents who answered at least one of 
-the questions about the importance of the four practices. The figure demonstrates 
-open materials, code, and data were the most important practices for our 
-respondents' own fields and that pre-publication archiving was the least important. 
-Whereas nearly 75% indicated that open materials/code and open data were important 
-(either extremely important or somewhat important), only 36% indicated that 
-pre-publication archiving was important. 
+Throughout the survey, respondents separately rated the four main open science 
+practices in terms of how important they are for their field. Specifically, 
+we asked them about (i) preregistering their studies in advance of data collection, 
+(ii) making their study material and/or code openly available, (iii) making their 
+data openly available, and (iv) making their work available on pre-publication archives. 
 
-More information about their use of and concerns about these various practices 
-are reported in the "**Experience with different types of open science practices**"
-section. 
+`r fig_nums("imp_all", display = "cite")` illustrates the responses from the `r total_n` 
+respondents who answered the perceived importance question for at least one of 
+the four practices. Open materials and/or code and open data were 
+the most important practices for respondents' fields; nearly 75% indicated 
+that these practices were important (either extremely important or somewhat 
+important) for their field. Pre-publication archiving was the least important
+practice; only 36% indicated that it was important for their field. \newline
+
+`r fig_nums("imp_all")`
 
 ```{r stacked_imp_bar, fig.height=6, fig.width=12}
 # Relevel my importance factors
@@ -608,15 +577,14 @@ tb_imp$Practice <- factor (tb_imp$Practice, levels = c("PrePubImp",
 
 # plot the graph
 
-title = str_wrap (sprintf("Perceived importance of open science practices (n = %d)", 
-                          total_n), width = 40)
+# title = str_wrap (sprintf("Perceived importance of open science practices (n = %d)", 
+                          # total_n), width = 40)
 
 p <- ggplot(tb_imp, aes(fill = Importance, y = Percentage, x = Practice)) +
   geom_bar(position="fill", stat="identity", colour = "black") +
   scale_fill_brewer(palette = "Blues", na.value = "grey50", direction = -1) +
   labs (x = element_blank(),
-        y = "Percentage", 
-        title = title) +
+        y = "Percentage") +
     theme_classic(base_size = 18) +
     theme(plot.title = element_text(hjust = 0.5)) + 
   coord_flip() +
@@ -656,24 +624,6 @@ knitr::kable (booktabs = T, linesep = "",
 
 ```
 
-### Experience with Practices
-
-This figure shows respondents experience with preregistering their studies in 
-advance of data collection, making their study material and/or code openly 
-available, making their data openly available, and making their work available on 
-pre-publication archives. This figure includes the data from respondents who 
-answered at least one of these questions. The figure demonstrates that our 
-respondents had very little experience with any of these open science practices. 
-Respondents had the most experience with open materials/code and open data, but 
-even with those practices, the most common response (37% for materials/code and
-41% for data) was that they were aware of the practice, but had not personally 
-used it. With regard to preregistration, respondents were largely unaware of 
-the practice (39%) or were aware, but had not used it (38%). Only 16% of respondents
-reported any experience with pre-publication archiving. 
-
-More information about their use of and concerns about these various practices 
-are reported in the "**Experience with different types of open science practices**"
-section.
 
 ```{r stacked_exp_data, warning=FALSE}
 
@@ -734,11 +684,35 @@ tb_exp <- exp_long %>%
   dplyr::count(Experience) %>% 
   mutate(Percentage = round (n/(total_n)*100))
 
+fig_nums(name = "exp_all", 
+           caption = "Reported experience with open science practices", 
+           display = FALSE)
 ```
+
+## Experience with Practices
+
+Participants also reported their own experience with each of the four
+main open science practices: (i) preregistering their studies in 
+advance of data collection, (ii) making their study material and/or code openly 
+available, (iii) making their data openly available, and (iv) making their work 
+available on pre-publication archives. 
+
+`r fig_nums("exp_all", display = "cite")` includes the data from the `r total_n` 
+respondents who answered the experience question for at least one of the four 
+practices. Our respondents reported very little experience with any of these open 
+science practices. Respondents had the most experience with open materials/code 
+and open data, but even with those practices, the most common response (37% for materials/code and
+41% for data) was that they were aware of the practice, but had not personally 
+used it. With regard to preregistration, respondents were largely unaware of 
+the practice (39%) or were aware, but had not used it (38%). Only 16% of respondents
+reported any experience with pre-publication archiving. 
+
+\newpage
+
+`r fig_nums("exp_all")`
 
 ```{r stacked_exp_bar, fig.height=6, fig.width=12}
 # Relevel my Experience factors
-
 # Different labels used for various practices in the survey, so I need to relabel
 
 tb_exp <- tb_exp %>%  dplyr::mutate(Experience = fct_recode (Experience, 
@@ -757,8 +731,8 @@ tb_exp$Practice <- factor (tb_exp$Practice, levels = c("PrePubExp",
 
 # plot the graph
 
-title = str_wrap (sprintf("Reported experience with open science practices (n = %d)",
-                          total_n), width = 40)
+# title = str_wrap (sprintf("Reported experience with open science practices (n = %d)",
+                          # total_n), width = 40)
 
 
 p <- ggplot(tb_exp, aes(fill = Experience, y = Percentage, x = Practice)) +
@@ -766,10 +740,8 @@ p <- ggplot(tb_exp, aes(fill = Experience, y = Percentage, x = Practice)) +
   scale_fill_brewer(palette = "Blues", na.value = "grey50", direction = -1, 
                     labels =c("Extensive experience","Some experience", "Aware, but not used", "Unaware", "N/A")) +
   labs (x = element_blank(),
-        y = "Percentage", 
-        title = title) +
+        y = "Percentage") +
     theme_classic(base_size = 18) +
-    theme(plot.title = element_text(hjust = 0.5)) + 
   coord_flip() +
   scale_x_discrete(labels = c("Pre-publication\n Archiving", "Open Data", "Open\n Materials/Code", "Preregistration")) +
   scale_y_continuous(labels = c("0", "25", "50", "75", "100"))
@@ -781,7 +753,10 @@ ggsave(here::here("figs", "all_experience.png"),
 # change base_size to 12 for regular knit
 ```
 
-### Barriers to Open Science Practices
+
+# Perceived Barriers and Reported Concerns about Open Science Practices
+
+## Barriers to Open Science Practices
 
 ```{r os_barriers_data}
 
@@ -819,12 +794,18 @@ tb <- d %>%
   mutate(Percentage = round (n/n_osbarrier*100)) %>% 
   dplyr::arrange(desc(n))
 
+fig_nums(name = "barriers", 
+           caption = "Barriers to uptake of open science in your field", 
+           display = FALSE)
 ```
 
 We provided the respondents with a list of possible barriers to the uptake of
-scientific practices. We asked them to endorse any statement that they agree is 
-a barrier in their field. The graph below shows the percentage of the 
-`r n_osbarrier` respondents who selected each response.
+open science practices in general. We asked them to endorse any statement that 
+they agreed is a barrier in their field. `r fig_nums("barriers", display = "cite")` 
+shows the percentage of the `r n_osbarrier` respondents who selected each 
+response. \newline
+
+`r fig_nums("barriers")`
 
 ```{r os_barrier_bar, fig.height = 6, fig.width=12}
 
@@ -833,25 +814,25 @@ a barrier in their field. The graph below shows the percentage of the
 
 tb2 <- tb %>% 
   dplyr::mutate(OSBarrier_label = factor (OSBarrier_label,
-                                levels = c("Other", #TOP TO BE BOTTOM
+                                levels = c("Other", #TOP STARTS AT BOTTOM
                                 "The OS community is intimidating",
                                 "Researchers don't want to be told how to do their research",
-                               "Researchers are discouraged from engaging in OS by colleagues",
-                               "HDR students are discouraged from engaging in OS by thesis supervisors",
+                               "Researchers are discouraged by colleagues",
+                               "HDR students are discouraged by thesis supervisors",
                                "Lack of interest from researchers",
-                               "Lack of supporting infrastructure (e.g., open data platforms)",
-                               "Lack of expertise to engage in OS (e.g., assignment of metadata)", 
-                               "Lack of mandates from funders, institutions or other regulators",
-                               "Lack of time to learn OS",
-                               "Lack of time to engage in OS",
-                               "Lack of information about OS",
+                               "Lack of supporting infrastructure",
+                               "Lack of expertise (e.g., assignment of metadata)", 
+                               "Lack of mandates from funders, institutions, or regulators",
+                               "Lack of time to learn",
+                               "Lack of time to engage",
+                               "Lack of information",
                                "Lack of recognition in my field about the value of OS",
-                               "Lack of professional staff that provide support for OS",
+                               "Lack of professional staff that provide support",
                                "Lack of training required to implement OS",
-                               "Lack of institutional credit for engaging in OS",
+                               "Lack of institutional credit",
                                "Lack of research funding to support OS",
                                "Lack of funding for open access publishing",
-                                "I do not perceive any barriers"))) #BOTTOM TO BE TOP
+                                "I do not perceive any barriers"))) #BOTTOM IS TOP
 
 
 # create a character vector for the colours for each bar
@@ -862,8 +843,8 @@ cols <- c("lightskyblue3", "lightskyblue3", "lightskyblue3", "lightskyblue3",
           "lightskyblue3", "lightskyblue3", "grey50")
 
 # build the bar chart
-title = str_wrap (sprintf("Barriers to uptake of open science in your field (n = %d)",
-                          n_osbarrier), width = 40)
+# title = str_wrap (sprintf("Barriers to uptake of open science in your field (n = %d)",
+                          # n_osbarrier), width = 40)
 
 # plot the reordered data and colours. Because the data is in a tibble rather than 
   # a dataframe with counts, I could use 'geom_col' rather than 'geom_bar' 
@@ -873,10 +854,9 @@ p <- ggplot(tb2) +
   aes(x = OSBarrier_label, y = Percentage) +
    geom_bar(stat = "identity", colour = "black", fill = cols) +
     labs (x = element_blank(),
-      y = "Percentage", 
-        title = title) +
+      y = "Percentage") +
   coord_flip(ylim = c(0,80)) +
-  theme_classic(base_size = 16) + 
+  theme_classic(base_size = 18) + 
   scale_x_discrete(labels = function(x) str_wrap(x, width = 75)) + #wrap the labels
   theme(plot.title = element_text(hjust = 0.5, size = NULL)) 
 p
@@ -886,84 +866,12 @@ ggsave(here::here("figs", "all_barriers.png"),
 # change base_size to 12 for regular knit & remove size = 14 from plot.title
 ```
 
-# Experience with different types of open science practices
-   
-Next, we break down the results according to their experience with specific types 
-of open science practices. 
+For each of the four main open science practices, we also asked respondents about 
+their concerns about each of the practices. 
 
 ## Study Preregistration
 
-We defined study preregistration for our participants as: "Documenting and submitting
-to a journal or public repository one's research questions, methodological design, 
-and anlysis plan prior to analysing the data. This time-stamped document is made
-openly available by the time the research is published so that any deviation from 
-the original research plan is visible to the scientific community."
 
-### Perceived Importance of Preregistration 
-
-```{r prereg_imp_count}
-
-# filter rows with valid responses for this variable; first df contains all valid 
-  # responses; the second df contains all valid responses, except 
-  # "Researchers in my discipline...do not conduct research studies"
-
-valid_prereg_imp <- filter(df, PreRegImp != "NA")
-valid_prereg_imp_ex <- filter(valid_prereg_imp, PreRegImp != "Researchers in my discipline do not conduct research studies")
-
-# calculate number of rows with a valid response for these variables
-nvalid_prereg_imp <- nrow(valid_prereg_imp)
-nvalid_prereg_imp_ex <- nrow(valid_prereg_imp_ex)
-
-# create a tibble with frequency & percentage for all who answered question
-tb <- valid_prereg_imp %>% 
-  dplyr::count(PreRegImp) %>% 
-  mutate(Percentage = round (n/(nrow(valid_prereg_imp))*100)) %>% 
-  dplyr::arrange(desc(n))
-
-# create a tibble with frequency & percentage for data excluding "do not use"
-tb_ex <- valid_prereg_imp_ex %>% 
-  dplyr::count(PreRegImp) %>% 
-  mutate(Percentage = round (n/(nrow(valid_prereg_imp_ex))*100)) %>% 
-  dplyr::arrange(desc(n))
-
-```
-
-We first asked participants how important preregistration of studies is for their field. 
-Of the `r nvalid_prereg_imp` participants who answered this question, a small percentage 
-(`r tb[5,3]`%) indicated that researchers in their discipline do not conduct 
-research studies. As such, we excluded them from this analysis. Of the remaining 
-`r nvalid_prereg_imp_ex` respondents, `r tb_ex[3,2]` (`r tb_ex[3,3]`%) indicated that 
-preregistration was extremely important for their field; `r tb_ex[1,2]` (`r tb_ex[1,3]`%)
-indicated that it was somewhat important; `r tb_ex[4,2]` (`r tb_ex[4,3]`)% indicated 
-that preregistration was somewhat unimportant; and `r tb_ex[2,2]` (`r tb_ex[2,3]`%)
-indicated that it was not at all important for their field. 
-
-```{r prereg_imp_ex_pie, include=FALSE}
-
-title = "Perceived Importance of Preregistration (n = %d)"
-
-# pie chart
-colours <- brewer.pal(4, "Blues")
-p <- simple_pie_chart(the_data = valid_prereg_imp_ex, label_var = "PreRegImp", 
-                      the_title = title, 
-                      colours,the_quantity = "percent")
-p
-```
-
-```{r prereg_imp_ex_table}
-
-tb_ex2 <- tb_ex [c(2,4,1,3),]  # rearrange the responses
-
-tb_ex2 %>% 
-knitr::kable (booktabs = T, linesep = "",
-              col.names = c("Perceived Importance", "Frequency",
-                            "Percentage"), 
-              caption = sprintf("Perceived Importance of Preregistration (n = %d)",
-                                nvalid_prereg_imp_ex), 
-              align = 'lcc') %>% 
-  styler_pdf() 
-
-```
 
 ### Experience with Study Preregistration
 
@@ -2014,6 +1922,7 @@ p
 
 ```
 
+
 ## Open Access Publishing
 
 The next section of the survey addressed Open Access publishing. We first explained
@@ -2240,8 +2149,9 @@ p
 
 ```
 
-# Appendix
+# Appendices
 
+## Appendix 1: Discipline Breakdown
 
 ```{r FOR_table_by_role, include = FALSE}
 
@@ -2290,9 +2200,10 @@ knitr::kable(booktabs = T, linesep = "",
 
 ```
 
- Specifically, the new 
-discipline grouping of Arts, Social Sciences, and Humanities (ASSH) included 
-Education (FOR = `r FOR_freq[11,1]`, <em>n</em> = `r FOR_freq[11,3]`); Studies 
+As mentioned in Demographics, we merged FOR disciplines into disciplinary groups. 
+Specifically, the new discipline grouping of Arts, Social Sciences, and Humanities 
+(ASSH) included Education (FOR = `r FOR_freq[11,1]`, 
+<em>n</em> = `r FOR_freq[11,3]`); Studies 
 in Human Society (FOR = `r FOR_freq[14,1]`, <em>n</em> = `r FOR_freq[14,3]`); 
 Studies in Creative Arts and Writing (FOR = `r FOR_freq[17,1]`, <em>n</em> =
 `r FOR_freq[17,3]`); and Language, Communication and Culture (FOR = 
@@ -2312,8 +2223,8 @@ We retained the FOR divisions of Engineering (FOR = `r FOR_freq[7,1]`, <em>n</em
 <em>n</em> = `r FOR_freq[9,3]`); Physical Sciences (FOR = `r FOR_freq[2,1]`,
 <em>n</em> = `r FOR_freq[2,3]`); and Psychology and Cognitive Sciences (FOR = 
 `r FOR_freq[15,1]`, <em>n</em> = `r FOR_freq[15,3]`) as their own discipline 
-groupings. The breakdown for the number of respondents according to discpline 
-groupings is displayed in the next table.
+groupings. Table \ref{tab:FOR_table} presents the breakdown for the number of 
+respondents according to discpline groupings.
 
 ```{r FOR_table}
 
@@ -2336,95 +2247,50 @@ knitr::kable(booktabs = T, linesep = "",
 
 ```
 
+## Appendix 2: Perceived Importance Tables
+
+```{r prereg_imp_count}
+
+# filter rows with valid responses for this variable; first df contains all valid 
+  # responses; the second df contains all valid responses, except 
+  # "Researchers in my discipline...do not conduct research studies"
+
+valid_prereg_imp <- filter(df, PreRegImp != "NA")
+valid_prereg_imp_ex <- filter(valid_prereg_imp, PreRegImp != "Researchers in my discipline do not conduct research studies")
+
+# calculate number of rows with a valid response for these variables
+nvalid_prereg_imp <- nrow(valid_prereg_imp)
+nvalid_prereg_imp_ex <- nrow(valid_prereg_imp_ex)
+
+# create a tibble with frequency & percentage for all who answered question
+tb <- valid_prereg_imp %>% 
+  dplyr::count(PreRegImp) %>% 
+  mutate(Percentage = round (n/(nrow(valid_prereg_imp))*100)) %>% 
+  dplyr::arrange(desc(n))
+
+# create a tibble with frequency & percentage for data excluding "do not use"
+tb_ex <- valid_prereg_imp_ex %>% 
+  dplyr::count(PreRegImp) %>% 
+  mutate(Percentage = round (n/(nrow(valid_prereg_imp_ex))*100)) %>% 
+  dplyr::arrange(desc(n))
+
+```
 
 
-  
+```{r prereg_imp_ex_table}
+
+tb_ex2 <- tb_ex [c(2,4,1,3),]  # rearrange the responses
+
+tb_ex2 %>% 
+knitr::kable (booktabs = T, linesep = "",
+              col.names = c("Perceived Importance", "Frequency",
+                            "Percentage"), 
+              caption = sprintf("Perceived Importance of Preregistration (n = %d)",
+                                nvalid_prereg_imp_ex), 
+              align = 'lcc') %>% 
+  styler_pdf() 
+
+```
+
 
 # The End
-```{r skim df, eval=FALSE, include=FALSE}
-
-# These are chunks from the course I took, that I'm keeping now just for reference
-# As a quick first pass, we can use the 'skim()' function to get a simple overview of each variable:
-#skim(df)
-
-# Now learning about group_by which appears to be a wonderful development!
-
-frames %>%
-  group_by(test_item, sample_size, n_obs, condition) %>%
-  summarise(response = mean(response)) %>% #can call "response" anything you want.
-  ungroup() #get in this habit because otherwise you might retain the grouping elsewhere.
-
-
-# Now playing around with it to include more summary statistics, and to print out the different summary stats in a tiblle.
-
-frames %>%
-  group_by(test_item) %>%
-  summarise(
-    mean_resp = mean(response),
-    sd_resp = sd(response),
-    count = n()
-  ) %>%
-  ungroup
-
-
-# Now play with filter to get summary stats from just a subset of the sample (their responses to only the 'small' objects).
-
-average_response <- frames %>%
-  group_by(test_item, sample_size, n_obs, condition) %>%
-  summarise(response = mean(response)) %>%
-  ungroup ()
-
-average_response %>%
-  filter(sample_size == "small") #this is not changing the average response variable because it still has everything in it.
-
-#Now play with arrange to get summary stats from just a subset of the sample (their responses to only the 'small' objects), and arrange by condition.
-
-average_response <- frames %>%
-  group_by (test_item, sample_size, n_obs, condition) %>%
-  summarise (response = mean(response)) %>%
-  ungroup ()
-
-average_response %>%
-  filter (sample_size == "small") %>%
-  arrange (condition)
-
-# Now play with select to build on filter & arrange, but to only show some of the columns.
-
-average_response <- frames %>%
-  group_by (test_item, sample_size, n_obs, condition) %>%
-  summarise (response = mean(response)) %>%
-  ungroup ()
-
-average_response_small <- average_response %>%
-  filter (sample_size == "small") %>%
-  arrange (condition) %>%
-  select (condition, test_item, response)
-
-average_response_small
-
-# Now use mutate to create a new variable, which takes into account how many trials they completed.
-
-average_response_small <- average_response_small %>%
-  mutate (generalisation = response/9) %>%
-  select (-response) #now remove response because we don't need it any longer
-
-average_response_small
-
-```
-
-```{r clean environment, echo = FALSE}
-rm(a2)
-rm(a3)
-rm(os_exp)
-rm(d2)
-rm(d3)
-rm(df)
-rm(FOR_freq)
-rm(n)
-rm(nvalid_ac_level)
-rm(nvalid_crisis)
-rm(nvalid_disc)
-rm(nvalid_os_exp)
-rm(nvalid_rep_est)
-```
-

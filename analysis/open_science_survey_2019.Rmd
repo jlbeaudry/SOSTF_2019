@@ -3,24 +3,8 @@ title: "Swinburne Open Science Task Force Survey (2019)"
 author: "Jennifer Beaudry, Tom Johnstone, Jordy Kaufman, Lisa Given & Michelle Vincent"
 date: '`r format (Sys.time(), "%d %B %Y")`'
 output:
-  # bookdown::pdf_document2: #another option for pdf output
-    # keep_tex: true
-    # toc: false
-  #word_document: 
-   # fig_width: 10 # this works, but it changes the font of plot_ly, etc.
-   # fig_height: 12 # so, don't use for now
-  # rmdformats::readthedown:
-  #  self_contained: true
-   # thumbnails: true
-    #lightbox: true
-    #gallery: false
-    #fig_retina: 1
-    #toc_depth: 3
-   # html_document:  
-    # number_sections: true
-    # toc: true
- pdf_document: default # this works now
-always_allow_html: false # true for word; false for pdf (?)
+ pdf_document: default
+always_allow_html: false # true for word; false for pdf
 csl: apa-old-doi-prefix.csl
 bibliography: Beaudry_Library.bib
 ---
@@ -44,20 +28,6 @@ knitr::opts_chunk$set(
 )
 knitr::opts_knit$set(width = 75)
 
-
-  
-# If I knit as a word doc:
-  # switch auto_format to 'false'; 'true' for pdf or html
-  # add 'fig.width = 8, fig.height = 8' to opts_chunk 
-
-# If knit as a pdf or html:
-# switch auto_format to 'true' 
-# include width and height parameters in the plot_ly function
-  #  width = 300, 
-  #  height = NULL,
-  # along with all other parameters
-# need to also figure out how to modify the margins (maybe the orca package or 
-  # maybe the webshot settings? More research needed.)
 ```
 
 
@@ -76,6 +46,7 @@ library(plotly)
 library(RColorBrewer)
 library(kableExtra)
 library(datapasta) # I don't need this to run the file, so delete when I'm done.
+library(captioner)
 ```
 
 ```{r function_defs}
@@ -89,12 +60,6 @@ perc <- function (x,y){  #x = variable; #y = n of valid cases
 }
 
 ## PIE CHART ##
-
-# Tom's to-do list
-    # open-ended data to Lisa...
-    # Tom to try to round to integer
-    # change y-axis & include parameter, which will change the data: done
-    # add in ability to order according to different criteria (labels or coded number): added order by response order. Still to add order by number of responses.
  
 simple_pie_chart <- function (the_data, label_var="", the_title="", colours, order = "ByRespNum", the_quantity = "", include_NA = "NO"){
 
@@ -214,7 +179,7 @@ simple_bar_graph <- function (the_data, label_var = "", the_title = "",
   return(p)
 }
 
- ### metadata RENAME ####
+ ### METADATA RENAME ####
 
 meta_rename <-  function(df, metadata, old, new) {
   
@@ -224,6 +189,7 @@ meta_rename <-  function(df, metadata, old, new) {
 }
 
 #### KABLE STYLE #####  
+  # use different styles depending on the output#
 
 styler_html <- function(dat) {
   dat %>%
@@ -238,6 +204,9 @@ styler_pdf <- function(dat) {
                 latex_options = c("striped", "HOLD_position"))
 }
 
+#### CAPTIONER###
+
+table_nums <- captioner(prefix = "Figure")
 ```
 
 ```{r import data}
@@ -263,17 +232,21 @@ per_ac_level <- perc(x = df$AcLevel_Label, y = nvalid_ac_level)
 
 ```
 
-# Overview
+# Methodology
 
-We conducted a survey in September 2019 to examine people's current use of open 
-science practices, to examine their perceptions of these practices, and to examine
-their perceived barriers to adopting these practices. Across the university, `r n` 
+We, the core working group of the Swinburne Open Science Task Force, conducted 
+a survey in September 2019 to examine our researchers' current use of open 
+science practices, their perceptions of these practices, and their perceived 
+barriers to adopting these practices. 
+
+Across the university, `r n` 
 started the survey, although not all respondents completed all questions; thus, 
 we report the sample size for each question. This document presents an overview 
-of their responses. 
+of their responses to the various quantitative questions. We also asked a number
+of open-ended questions, which we are currently analysing. The full survey is
+available at https://osf.io/a4bwp/. 
 
 # Demographics
-
 
 In terms of respondents' demographic information, we did not collect information 
 about gender or age to provide more anonymity to our respondents. We did, however,
@@ -285,8 +258,7 @@ ask about their Academic Level/Type and their Discpline (based on 2-digit and
 Of the `r nrow(valid_ac_level)` respondents who provided details about their 
 Academic Level, `r per_ac_level [5]`% were PhD students, `r per_ac_level [7]`% 
 were Professors, and `r per_ac_level [10]`% were Senior Lecturers. 
-The breakdown of the rest of the academic levels for the rest of the respondents 
-are in the table below. 
+Table 1 reports the academic levels for all respondents. 
 
 ```{r ac_level_table}
 
@@ -329,7 +301,10 @@ did not have any responses from researchers in Earth Sciences (04), Agricultural
 and Veterinary Sciences (07), History and Archeology (21), and Philosophy and 
 Religious Studies (22).  
 
-SAY SOMETHING HERE ABOUT COLLAPSING THEM & POINT THEM TO THE APPENDIX
+For ease of interpretation and to reduce the identifiability of the respondents,
+we combined similar divisions with smaller numbers of respondents into 
+disciplinary groups (see Appendix 1 for details). Table 2 shows the breakdown by
+these disciplinary groups.
 
 
 ```{r discipline_table}
@@ -373,6 +348,12 @@ per_crisis <- perc(x = df$crisis, y = nvalid_crisis)  #percentage per level
 # divided by number of valid cases for the crisis variable
 
 # output of `per_crisis` inserted in text below
+
+# caption for the plot
+table_nums(name = "crisis", 
+           caption = "Estimates of reproducibility by perceived crisis in field", 
+           display = FALSE)
+# crisis.cap <- table_nums("crisis") # needs to be separate steps
 ```
 
 # Estimates of Reproducibility by Perceived Crisis  
@@ -390,11 +371,15 @@ reproducibility estimates according to their responses to the perceived
 crisis in their field. The black bar is the mean estimate of reproducibility 
 perceived crisis. 
 
+\newpage
+
+`r table_nums("crisis")`
+
 ```{r crisis_by_estimate_stripchart, fig.height=6, fig.width=12}
 
 #estimates of reproducibility by levels of crisis as a stripchart 
 
-title = sprintf("Estimates of reproducibility by perceived crisis in field (n = %d)",nvalid_rep_est)
+#title = sprintf("Estimates of reproducibility by perceived crisis in field (n = %d)",nvalid_rep_est)
 x_name = "Do you think your field is experiencing a 'Reprodubility Crisis'?"
 x_labels = c("Don't Know", "No Crisis", "Slight Crisis", "Significant Crisis")
 y_name = "Estimated % of reproducible studies"
@@ -414,16 +399,21 @@ p <- ggplot(data = valid_rep_est,
   scale_x_discrete(name = x_name, limits = x_labels) +
   scale_y_continuous(name = y_name) +
   coord_cartesian(ylim = c(0,100)) +
-  theme_classic (base_size = 18) +
-  ggtitle(title)
+  theme_classic (base_size = 18)
+ # ggtitle(title)
 
 p
 
 # code to save it in the figs folder. Increase 'base_size' from 12 to 18 for slides/pdf. 
 # ggsave(here::here("figs", "reprod_estimates_by_crisis.png"), plot = p)
+
+# `r sprintf(crisis.cap (n = %d), nvalid_rep_est)`
+# `r sprintf(table_nums("crisis"),(n=%d),nvalid_rep_est)`
+#how do I add in the sprintf?
 ```
-  
-   
+
+
+
 # Experience with Open Science Practices
 
   
@@ -449,10 +439,10 @@ os_exp <- valid_os_exp %>%
 
 Before we asked participants about their experience with open science practices, 
 we explained that the practices enveloped by the umbrella term of "open science" 
-were study preregistration, open materials and/or code, open data, pre-publication
-archiving, and open access publishing.   
+were (i) study preregistration, (ii) open materials and/or code, (iii) open data, 
+(iv) pre-publication archiving, and (v) open access publishing.   
 
-The figure below shows participants' experience with open science practices in
+Table 3 below shows participants' experience with open science practices in
 general. Of the `r nvalid_os_exp` participants who answered this question, 
 `r os_exp[3,2]` (`r os_exp[3,3]`%) reported that they were unaware of open 
 science practices; `r os_exp[1,2]` (`r os_exp[1,3]`%) reported that they were 
@@ -592,11 +582,11 @@ tb_imp <- imp_long %>%
 
 ```
 
-This figure includes the data from respondents who answered at least one of 
-these questions. The figure demonstrates that our respondents believed that 
-open materials, code, and data were the most important practices for their own 
-fields and that pre-publication archiving was the least important. Whereas, 
-nearly 75% indicated that open materials/code and open data were important 
+Figure X includes the data from respondents who answered at least one of 
+the questions about the importance of the four practices. The figure demonstrates 
+open materials, code, and data were the most important practices for our 
+respondents' own fields and that pre-publication archiving was the least important. 
+Whereas nearly 75% indicated that open materials/code and open data were important 
 (either extremely important or somewhat important), only 36% indicated that 
 pre-publication archiving was important. 
 
@@ -2300,33 +2290,7 @@ knitr::kable(booktabs = T, linesep = "",
 
 ```
 
-
-
-```{r FOR_table}
-
-d2 <- df %>% 
-  select (c(FORcode_2_num, FORcode_2_label)) %>% 
-  dplyr::count(FORcode_2_num,FORcode_2_label) %>% 
-  mutate (Percentage = round (n/nrow(df)*100))
-
-# specify the exact order of the columns based on d2 (select them according to 
-  # the order of the rows in the tibble)
-# f2 <-d2 [c(12,16,3,8,1,9,7,20,13,2,6,5,4,19,17,11,18,10,15,14),]
-  # I don't seem to be using this in this version, replaced with desc
-
-dplyr::arrange(d2,-desc(FORcode_2_num)) %>% 
-knitr::kable(booktabs = T, linesep = "",
-             col.names = c("FOR Code", "Field of Research Division", "Frequency",
-                           "Percentage"), 
-             caption = sprintf("Reported Two-Digit Field of Research Codes for Respondents (n = %d)", nrow(df)), align = 'clcc') %>% 
-  styler_pdf() 
-
-```
-
-
-For ease of interpretation and to reduce the identifiability of the respondents, 
-for the FOR divisions with a small number of respondents (less than 10), we
-combined similar divisions into disciplinary groups. Specifically, the new 
+ Specifically, the new 
 discipline grouping of Arts, Social Sciences, and Humanities (ASSH) included 
 Education (FOR = `r FOR_freq[11,1]`, <em>n</em> = `r FOR_freq[11,3]`); Studies 
 in Human Society (FOR = `r FOR_freq[14,1]`, <em>n</em> = `r FOR_freq[14,3]`); 
@@ -2350,6 +2314,30 @@ We retained the FOR divisions of Engineering (FOR = `r FOR_freq[7,1]`, <em>n</em
 `r FOR_freq[15,1]`, <em>n</em> = `r FOR_freq[15,3]`) as their own discipline 
 groupings. The breakdown for the number of respondents according to discpline 
 groupings is displayed in the next table.
+
+```{r FOR_table}
+
+d2 <- df %>% 
+  select (c(FORcode_2_num, FORcode_2_label)) %>% 
+  dplyr::count(FORcode_2_num,FORcode_2_label) %>% 
+  mutate (Percentage = round (n/nrow(df)*100))
+
+# specify the exact order of the columns based on d2 (select them according to 
+  # the order of the rows in the tibble)
+# f2 <-d2 [c(12,16,3,8,1,9,7,20,13,2,6,5,4,19,17,11,18,10,15,14),]
+  # I don't seem to be using this in this version, replaced with desc
+
+dplyr::arrange(d2,-desc(FORcode_2_num)) %>% 
+knitr::kable(booktabs = T, linesep = "",
+             col.names = c("FOR Code", "Field of Research Division", "Frequency",
+                           "Percentage"), 
+             caption = sprintf("Reported Two-Digit Field of Research Codes for Respondents (n = %d)", nrow(df)), align = 'clcc') %>% 
+  styler_pdf() 
+
+```
+
+
+
   
 
 # The End

@@ -595,3 +595,45 @@ d <- df %>%
 # join the tibbles together
 
 df_imp <- a %>% full_join(b) %>% full_join(c) %>% full_join(d)
+
+
+#### NOTES ABOUT SETTINGS WHEN RENDERING THE DOCUMENT ####
+
+  ### NOTES FROM THE R SETUP CHUNK ###
+
+# If I knit as a word doc:
+# switch auto_format to 'false'; 'true' for pdf or html
+# add 'fig.width = 8, fig.height = 8' to opts_chunk 
+
+# If knit as a pdf or html:
+# switch auto_format to 'true' 
+# include width and height parameters in the plot_ly function
+#  width = 300, 
+#  height = NULL,
+# along with all other parameters
+# need to also figure out how to modify the margins (maybe the orca package or 
+# maybe the webshot settings? More research needed.)
+
+  ### NOTES FROM THE YAML ###
+
+output:
+  # bookdown::pdf_document2: #another option for pdf output
+  # keep_tex: true
+  # toc: false
+  #word_document: 
+  # fig_width: 10 # this works, but it changes the font of plot_ly, etc.
+  # fig_height: 12 # so, don't use for now
+  # rmdformats::readthedown:
+  #  self_contained: true
+  # thumbnails: true
+  #lightbox: true
+  #gallery: false
+#fig_retina: 1
+#toc_depth: 3
+# html_document:  
+# number_sections: true
+# toc: true
+pdf_document: default # this works now
+always_allow_html: false # true for word; false for pdf (?)
+
+

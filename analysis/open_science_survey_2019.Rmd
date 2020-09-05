@@ -3,7 +3,8 @@ title: "Swinburne Open Science Task Force Survey (2019)"
 author: "Jennifer Beaudry, Tom Johnstone, Jordy Kaufman, Lisa Given & Michelle Vincent"
 date: '`r format (Sys.time(), "%d %B %Y")`'
 output:
-  pdf_document: default
+  pdf_document: 
+    number_sections: true
 always_allow_html: false # true for word; false for pdf
 csl: apa-old-doi-prefix.csl
 bibliography: Beaudry_Library.bib
@@ -1054,7 +1055,7 @@ response. \newline
 
 `r fig_nums("barriers")`
 
-```{r os_barrier_bar}
+```{r os_barrier_bar, fig.height=8}
 
   # reorder the response options from lowest to highest, with no barriers last
 

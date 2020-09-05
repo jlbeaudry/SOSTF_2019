@@ -5,6 +5,7 @@ date: '`r format (Sys.time(), "%d %B %Y")`'
 output:
   pdf_document: 
     number_sections: true
+    dev: cairo_pdf
 always_allow_html: false # true for word; false for pdf
 csl: apa-old-doi-prefix.csl
 bibliography: Beaudry_Library.bib
@@ -39,6 +40,7 @@ library(tinytex)
 library(knitr)
 library(here)
 library(plyr)
+library(extrafont) #load the fonts needed for latex font in ggplot
 library(tidyverse)
 #library(skimr)
 library(ggbeeswarm)
@@ -48,10 +50,13 @@ library(RColorBrewer)
 library(kableExtra)
 library(datapasta) # I don't need this to run the file, so delete when I'm done.
 library(captioner)
+
 ```
 
 ```{r function_defs}
 # define functions here
+
+extrafont::loadfonts(device = "pdf")
 
 ## CALCULATE PERCENTAGES ##
 
@@ -205,9 +210,18 @@ styler_pdf <- function(dat) {
                 latex_options = c("striped", "HOLD_position"))
 }
 
-#### CAPTIONER###
+#### CAPTIONER TO ADD FIGURE CAPTIONS ###
 
 fig_nums <- captioner(prefix = "Figure")
+
+### USE LATEX FONT FOR GGPLOT, PLUS CHANGE FONT SIZE
+  # 18 FOR PDF; 12 FOR HTML
+
+ theme_pdf <- theme_classic(base_size = 18, base_family = "LM Roman 10")
+ theme_html <-theme_classic(base_size = 12)
+ 
+ # theme(plot.title = element_text(hjust = 0.5)) # centre the title if included
+
 ```
 
 ```{r import data}
@@ -407,8 +421,6 @@ to the perceived crisis in their field (n = `r nvalid_rep_est`). The
 black bar is the mean estimate of reproducibility by the perceived crisis 
 levels. \newline 
 
-`r fig_nums("crisis")`
-
 ```{r crisis_by_estimate_stripchart}
 
 #estimates of reproducibility by levels of crisis as a stripchart 
@@ -432,16 +444,19 @@ p <- ggplot(data = valid_rep_est,
   scale_x_discrete(name = x_name, limits = x_labels) +
   scale_y_continuous(name = y_name) +
   coord_cartesian(ylim = c(0,100)) +
-  theme_classic (base_size = 18)
- # ggtitle(title)
+  theme_pdf
 
-p
-
-# code to save it in the figs folder. Increase 'base_size' from 12 to 18 for slides/pdf. 
-# ggsave(here::here("figs", "reprod_estimates_by_crisis.png"), plot = p)
+# save it in the figs folder. 
+ggsave(here::here("analysis", "figs", "reprod_estimates_by_crisis.png"), plot = p, 
+              dpi = "retina")
 
 ```
 
+`r fig_nums("crisis")`
+
+```{r crisis, out.width = '100%'}
+knitr::include_graphics("figs/reprod_estimates_by_crisis.png")
+```
 
 
 # Views and Use of Open Science Practices
@@ -581,7 +596,6 @@ that these practices were important (either extremely important or somewhat
 important) for their field. Pre-publication archiving was the least important
 practice; only 36% indicated that it was important for their field. \newline
 
-`r fig_nums("imp_all")`
 
 ```{r stacked_imp_bar}
 # Relevel my importance factors
@@ -605,17 +619,24 @@ p <- ggplot(tb_imp, aes(fill = Importance, y = Percentage, x = Practice)) +
   scale_fill_brewer(palette = "Blues", na.value = "grey50", direction = -1) +
   labs (x = element_blank(),
         y = "Percentage") +
-    theme_classic(base_size = 18) +
-    theme(plot.title = element_text(hjust = 0.5)) + 
+  theme_pdf +
   coord_flip() +
   scale_x_discrete(labels = c("Pre-publication\n Archiving", "Open Data", "Open\n Materials/Code", "Preregistration")) +
   scale_y_continuous(labels = c("0", "25", "50", "75", "100"))
 
-p
+# p
 
-ggsave(here::here("figs", "all_importance.png"), 
-       width = 12, height = 6, dpi = "retina")
-# change base_size to 12 for regular knit
+# save it in the figs folder. 
+ggsave(here::here("analysis", "figs", "all_importance.png"), plot = p, 
+              dpi = "retina")
+
+```
+
+`r fig_nums("imp_all")`
+
+
+```{r imp_all, out.width = '100%'}
+knitr::include_graphics("figs/all_importance.png")
 ```
 
 
@@ -725,9 +746,7 @@ and open data, but even with those practices, the most common response (37% for 
 41% for data) was that they were aware of the practice, but had not personally 
 used it. With regard to preregistration, respondents were largely unaware of 
 the practice (39%) or were aware, but had not used it (38%). Only 16% of respondents
-reported any experience with pre-publication archiving. 
-
-`r fig_nums("exp_all")`
+reported any experience with pre-publication archiving. \newline
 
 ```{r stacked_exp_bar}
 # Relevel my Experience factors
@@ -759,17 +778,23 @@ p <- ggplot(tb_exp, aes(fill = Experience, y = Percentage, x = Practice)) +
                     labels =c("Extensive experience","Some experience", "Aware, but not used", "Unaware", "N/A")) +
   labs (x = element_blank(),
         y = "Percentage") +
-    theme_classic(base_size = 18) +
+   theme_pdf +
   coord_flip() +
   scale_x_discrete(labels = c("Pre-publication\n Archiving", "Open Data", "Open\n Materials/Code", "Preregistration")) +
   scale_y_continuous(labels = c("0", "25", "50", "75", "100"))
   
-p
+# p
 
-ggsave(here::here("figs", "all_experience.png"), 
-       width = 12, height = 6, dpi = "retina")
-# change base_size to 12 for regular knit
+ggsave(here::here("analysis", "figs", "all_experience.png"), plot = p, 
+       dpi = "retina")
 ```
+
+`r fig_nums("exp_all")`
+
+```{r exp_all, out.width = '100%'}
+knitr::include_graphics("figs/all_experience.png")
+```
+
 
 NEED TO INTRODUCE THIS SECTION FOR THE VARIOUS PRACTICES...
 
@@ -1053,8 +1078,6 @@ they agreed is a barrier in their field. `r fig_nums("barriers", display = "cite
 shows the percentage of the `r n_osbarrier` respondents who selected each 
 response. \newline
 
-`r fig_nums("barriers")`
-
 ```{r os_barrier_bar, fig.height=8}
 
   # reorder the response options from lowest to highest, with no barriers last
@@ -1103,14 +1126,21 @@ p <- ggplot(tb2) +
     labs (x = element_blank(),
       y = "Percentage") +
   coord_flip(ylim = c(0,80)) +
-  theme_classic(base_size = 18) + 
+  theme_pdf +
   scale_x_discrete(labels = function(x) str_wrap(x, width = 75)) + #wrap the labels
   theme(plot.title = element_text(hjust = 0.5, size = NULL)) 
-p
+# p
 
-# ggsave(here::here("figs", "all_barriers.png"), 
-       # width = 12, height = 8, dpi = "retina")
+ggsave(here::here("analysis", "figs", "all_barriers.png"), plot = p,
+       dpi = "retina")
 ```
+
+`r fig_nums("barriers")`
+
+```{r barriers, out.width = '100%'}
+knitr::include_graphics("figs/all_barriers.png")
+```
+
 
 For each of the four main open science practices, we also asked respondents about 
 their concerns about each of the practices. For each of the practices, we asked
@@ -1170,8 +1200,6 @@ concerns. `r fig_nums("prereg_concerns", display = "cite")`
 presents, of those who answered this question, the percentage who selected 
 each of the concerns.  \newline
 
-`r fig_nums("prereg_concerns")`
-
 ```{r prereg_concerns_bar}
 
 # reorder the response options from lowest to highest, with concerns last
@@ -1206,9 +1234,22 @@ p <- ggplot(tb2) +
       y = "Percentage") +
   scale_x_discrete(labels = function(x) str_wrap(x, width = 50)) + #wrap the labels
   coord_flip(ylim = c(0,60)) +
-  theme_classic(base_size = 18) + 
-  theme(plot.title = element_text(hjust = 0.5)) 
-p
+  theme_pdf
+  
+# p
+
+# save it in the figs folder. 
+ggsave(here::here("analysis", "figs", "prereg_concerns.png"), plot = p, 
+              dpi = "retina")
+
+```
+
+`r fig_nums("prereg_concerns")`
+
+
+```{r prereg_concerns, out.width = '100%'}
+
+knitr::include_graphics("figs/prereg_concerns.png")
 
 ```
 
@@ -1262,7 +1303,6 @@ about making research materials and/or code open. Of those who respondended,
 `r fig_nums("code_concerns", display = "cite")` presents, of those who answered 
 this question, the percentage who selected each of the concerns.  \newline
 
-`r fig_nums("code_concerns")`
 
 ```{r code_concerns_bar}
 # build the bar chart
@@ -1300,8 +1340,18 @@ p <- ggplot(tb2) +
         y = "Percentage") +
   coord_flip(ylim = c(0,60)) +
   scale_x_discrete(labels = function(x) str_wrap(x, width = 50)) + #wrap the labels
-  theme_classic(base_size = 18) 
-p
+  theme_pdf
+# p
+
+ggsave(here::here("analysis", "figs", "code_concerns.png"), plot = p,
+       dpi = "retina")
+
+```
+
+`r fig_nums("code_concerns")`
+
+```{r code_concerns, out.width = '100%'}
+knitr::include_graphics("figs/code_concerns.png")
 
 ```
 
@@ -1367,7 +1417,6 @@ reported that they did not share any of the listed
 concerns. `r fig_nums("data_concerns", display = "cite")` presents, of those who 
 answered this question, the percentage who selected each of the concerns.\newline
 
-`r fig_nums("data_concerns")`
 
 ```{r data_concerns_bar}
 
@@ -1406,12 +1455,21 @@ p <- ggplot(tb3) +
         y = "Percentage") +
   coord_flip(ylim = c(0,60)) +
   scale_x_discrete(labels = function(x) str_wrap(x, width = 50)) + #wrap the labels
-  theme_classic(base_size = 18) + 
-  theme(plot.title = element_text(hjust = 0.5)) # centre the title
-p
+  theme_pdf
+# p
+
+ggsave(here::here("analysis", "figs", "data_concerns.png"), plot = p,
+       dpi = "retina")
 
 ```
 
+`r fig_nums("data_concerns")`
+
+
+```{r data_concerns, out.width = '100%'}
+knitr::include_graphics("figs/data_concerns.png")
+
+```
 
 ## Concerns about Pre-publication Archiving
 
@@ -1464,7 +1522,7 @@ submitting it for peer review. Of those who respondended,
 concerns. `r fig_nums("prepub_concerns", display = "cite")` presents, of those 
 who answered this question, the percentage who selected each of the concerns. \newline 
 
-`r fig_nums("prepub_concerns")`
+
 
 ```{r prepub_concerns_bar}
 
@@ -1497,8 +1555,20 @@ p <- ggplot(tb2) +
         y = "Percentage") +
   coord_flip(ylim = c(0,70)) +
   scale_x_discrete(labels = function(x) str_wrap(x, width = 50)) + #wrap the labels
-  theme_classic(base_size = 18) 
-p
+  theme_pdf
+# p
+
+ggsave(here::here("analysis", "figs", "prepub_concerns.png"), plot = p,
+       dpi = "retina")
+
+```
+
+
+`r fig_nums("prepub_concerns")`
+
+
+```{r prepub_concerns, out.width = '100%'}
+knitr::include_graphics("figs/prepub_concerns.png")
 
 ```
 
@@ -1602,7 +1672,6 @@ select as many concerns as they liked. `r fig_nums("oa_fees", display = "cite")`
 presents, of those who answered this question (n = `r n_oafees`), the 
 percentage who used each of the different payment approaches.  \newline
 
-`r fig_nums("oa_fees")`
 
 ```{r oa_fees_bar}
 
@@ -1634,9 +1703,19 @@ p <- ggplot(tb2) +
         y = "Percentage") +
   coord_flip(ylim = c(0,70)) +
   scale_x_discrete(labels = function(x) str_wrap(x, width = 50)) + #wrap the labels
-  theme_classic(base_size = 18) 
-  # theme(plot.title = element_text(hjust = 0.5)) # centre the title
-p
+  theme_pdf
+# p
+
+ggsave(here::here("analysis", "figs", "oa_fees.png"), plot = p,
+       dpi = "retina")
+
+```
+
+`r fig_nums("oa_fees")`
+
+
+```{r oa_fees, out.width = '100%'}
+knitr::include_graphics("figs/oa_fees.png")
 
 ```
 
@@ -1695,7 +1774,6 @@ well as a link to the preregistration, if relevant), it is disconcerting that ne
 a fifth of respondents reported that they did not know about the open science 
 practices of researchers in their field. \newline
 
-`r fig_nums("os_most")`
 
 ```{r os_most_bar}
 
@@ -1731,9 +1809,19 @@ p <- ggplot(tb2) +
         y = "Percentage") +
   coord_flip(ylim = c(0,70)) +
   scale_x_discrete(labels = function(x) str_wrap(x, width = 50)) + #wrap the labels
-  theme_classic(base_size = 18) 
-  # theme(plot.title = element_text(hjust = 0.5)) # centre the title
-p
+  theme_pdf
+# p
+
+ggsave(here::here("analysis", "figs", "os_most.png"), plot = p,
+       dpi = "retina")
+
+```
+
+`r fig_nums("os_most")`
+
+
+```{r os_most, out.width = '100%'}
+knitr::include_graphics("figs/os_most.png")
 
 ```
 

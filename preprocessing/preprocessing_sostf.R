@@ -26,7 +26,7 @@ meta_rename <-  function(df, metadata, old, new) {
   rename_at(df, vars(keys), ~ values)
 }
 
-####### READ IN DATA FILE ############
+####### READ IN DATA FILES ############
 
 # laod data with the 'read_qualtrics' function
 
@@ -197,7 +197,7 @@ df$OAprop_num <- df$OAprop_num_o %>%
     c("4", "3", "2", "1", "0", "5"))
 
 # recode Concerns variables (for Preregistration, Code, Data, Pre-publication 
-  # archiving) and Use variables (for Code, Data, Pre-publication archiving)
+  # archiving) and Use variables (for PreReg, Code, Data, Pre-publication archiving)
 
 df <- meta_rename(df, metadata, old = OldVariable, new = NewVariable)
 
@@ -321,11 +321,6 @@ df <- mutate(df, AcLevel_Label = case_when (AcLevel_1 == '1' ~ "Professor",
 write.csv(df, here::here("data", "data_sostf.csv"), row.names = FALSE)
 
 
-# Clean Environment
-rm(df)
-rm(df_for)
-rm(read_qualtrics)
-rm(meta_rename)
 
 
 

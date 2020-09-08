@@ -237,6 +237,7 @@ metadata <- here::here("survey", "data", "os_metadata_good.csv") %>%
   select(-c(MinValue:ImportID)) #does not import the extraneous variables
 
 ```
+\raggedright
 
 # Abstract
 

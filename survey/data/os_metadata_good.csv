@@ -1,5 +1,12 @@
 ﻿OldVariable,VariableType,NewVariable,ItemText,ItemTextShort,MinValue,MaxValue,Scoring,ReverseCode,ImportID,Scale
 ,,,,,,,,,,
+PreregUse_1,factor,PreRegUse_clinicalTrial,I have preregistered at least one clinical trial on a clinical trials database,,,,,,,PreRegUse
+PreregUse_2,factor,PreRegUse_non-clinical,I have preregistered at least one study that was not a clinical trial,,,,,,,PreRegUse
+PreregUse_4,factor,PreRegUse_RR,I have submitted a Stage 1 Registered Report to a journal,,,,,,,PreRegUse
+PreregUse_6,factor,PreRegUse_protocol,I have published a research protocol prior to carrying out the study,,,,,,,PreRegUse
+PreregUse_7,factor,PreRegUse_other,Other,,,,,,,PreRegUse
+PreregUse_7_TEXT,factor,PreRegUse_text,Other: Text,,,,,,,PreRegUse
+,,,,,,,,,,
 PreregConcern_4,factor,PreRegCon_delay,It might delay data collection,Delays data collection,,,,,,PreRegConcern
 PreregConcern_5,factor,PreRegCon_look,I need to look at my data before I can decide how to best analyse it,Need to look at data to analyse it,,,,,,PreRegConcern
 PreregConcern_6,factor,PreRegCon_prevent_exp,Preregistration prevents exploratory research,Prevents exploratory research,,,,,,PreRegConcern

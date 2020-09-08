@@ -1,6 +1,8 @@
 ---
 title: "Swinburne Open Science Task Force Survey (2019)"
-author: "Jennifer Beaudry, Tom Johnstone, Jordy Kaufman, Lisa Given & Michelle Vincent"
+author: 
+    - "Dr Jennifer Beaudry, A/Prof Jordy Kaufman, Prof Tom Johnstone," 
+    - "Prof Lisa Given & Michelle Vincent"
 date: '`r format (Sys.time(), "%d %B %Y")`'
 output:
   pdf_document: 
@@ -233,11 +235,96 @@ metadata <- here::here("survey", "data", "os_metadata_good.csv") %>%
   read_csv(col_names = TRUE, skip_empty_rows = TRUE) %>% 
   filter(!is.na(OldVariable)) %>% 
   select(-c(MinValue:ImportID)) #does not import the extraneous variables
+
 ```
+
+# Abstract
+
+In late 2018, then Deputy Vice Chancellor - Research & Enterprise, Professor 
+Aleks Subic, officially formed the Swinburne Open Science Task Force in order to 
+generate recommendations for how Swinburne as an institution can most 
+productively engage with open sciences practices. To best inform these 
+recommendations the core working group of the Task Force surveyed our 
+researchers’ current use of open science practices, their perceptions of these 
+practices, and their perceived barriers to adopting these practices. Specifically, 
+we were interested in their attitudes and experiences with (i) study 
+preregistration, (ii) open materials and/or code, (iii) open data, (iv) 
+pre-publication archiving, and (v) open access publishing. 
+Over 200 researchers (n = 239) completed our online survey in September 2019. 
+This document presents an overview of their responses to the various 
+quantitative questions. The key finding was that researchers overall perceived 
+most open science practices as important for their fields; however, most 
+researchers engaged in these practices infrequently or not at all. Our data also 
+revealed some of key barriers researchers felt impeded their use of open science 
+practices.
+
+# Methodology 
+
+Across the university, `r length(df$ParticipantNumber)` researchers started the online survey 
+(run through Qualtrics). Not all respondents completed 
+all questions; thus, we report the sample size for each question. 
+This document summarises their responses to the various quantitative questions. 
+We also asked a number of open-ended questions, which we are currently 
+analysing. The full survey is available at https://osf.io/a4bwp/. 
+
+## Definitions
+
+In the survey, we explained that the umbrella term "open 
+science" ensapsulated various practices, including (i) study preregistration, (ii)
+open materials and/or code, (iii) open data, (iv) pre-publication archiving, and
+(v) open access publishing. As they progressed through the survey, we also offered 
+more detailed definitions of each of these open science practices. 
+
+### Preregistration
+
+We defined study preregistration as documenting and submitting
+to a journal or public repository one's research questions, methodological design, 
+and anlysis plan prior to analysing the data. This time-stamped document is made
+openly available by the time the research is published so that any deviation from 
+the original research plan is visible to the scientific community.
+
+### Open materials and/or code
+
+We defined open materials and/or code as researcher-created resources used 
+while collecting or analyzing data (e.g., survey questions, 
+video stimuli, vignettes, algorithms, coding schemes, analytic code, etc.) that 
+are made openly available to the research community.
+
+### Open data
+
+We used Foster's definition of open data: "online, free of cost, accessible 
+data that can be used, reused and distributed provided that the data source 
+is attributed and shared alike" (Foster Open Science). 
+
+### Pre-publication archiving
+
+We definied pre-publication archiving as making a manuscript openly available 
+*before* it undergoes peer review in an academic journal or other outlet.
+Generally, this is achieved by uploading the manuscript to an archive such as arXiv
+(physics, maths), bioRxiv (biology), SocArxiv (sociology), etc. We explained that
+pre-publication archiving is also known as preprint archiving. 
+
+### Open Access Publishing
+
+Finally, we explained that there are two basic models for open access publishing. 
+First, researchers could pay their publisher a fee (an Article Processing Charge) 
+to make the *final version of record* available for open access in a 
+peer-reviewed journal. Second, researchers could publish under a normal contract 
+in a peer-reviewed journal, and deposit the *final accepted version of the manuscript* 
+(peer-reviewed but not journal-formatted) in an open access repository 
+(e.g., institutional repository or an external subject repository). 
+
+# Demographics 
+
+In terms of respondents' demographic information, we did not collect information 
+about gender or age to provide more anonymity to our respondents. We did, however,
+ask about their academic level and their Discipline (based on 2-digit and 
+4-digit Field of Research codes). 
+
+## Academic Levels 
 
 ```{r demographics_ac_level}
 
-n <- length(df$ParticipantNumber)
 valid_ac_level <- filter(df, AcLevel_Label != "NA")
 nvalid_ac_level <- nrow(valid_ac_level)
 per_ac_level <- perc(x = df$AcLevel_Label, y = nvalid_ac_level) 
@@ -247,67 +334,11 @@ per_ac_level <- perc(x = df$AcLevel_Label, y = nvalid_ac_level)
 
 ```
 
-# Methodology
-
-We, the core working group of the Swinburne Open Science Task Force, conducted 
-a survey in September 2019 to examine our researchers' current use of open 
-science practices, their perceptions of these practices, and their perceived 
-barriers to adopting these practices. 
-
-Across the university, `r n` 
-started the survey, although not all respondents completed all questions; thus, 
-we report the sample size for each question. This document presents an overview 
-of their responses to the various quantitative questions. We also asked a number
-of open-ended questions, which we are currently analysing. The full survey is
-available at https://osf.io/a4bwp/. 
-
-## Definitions
-
-TO SAVE US TIME LATER (JORDY TO DECIDE WHERE THESE GO)
-
-### Prereg
-
-We defined study preregistration for our participants as: "Documenting and submitting
-to a journal or public repository one's research questions, methodological design, 
-and anlysis plan prior to analysing the data. This time-stamped document is made
-openly available by the time the research is published so that any deviation from 
-the original research plan is visible to the scientific community."
-
-### Open materials and/or code
-
-For our purposes, we explained that open materials and/or code referred to researcher-
-created resources used while collecting or analyzing data (e.g., survey questions, 
-video stimuli, vignettes, algorithms, coding schemes, analytic code, etc.) that 
-are made openly available to the research community.
-
-### Open data
-
-The next section of the survey related to the use of open data. 
-For our purposes, we explained that open data can be defined as "online, free of 
-cost, accessible data that can be used, reused and distributed provided that the 
-data source is attributed and shared alike." [FIND SOURCE FROM SURVEY]
-
-### Pre-publication archiving
-
-For our purposes, we explained that pre-publication archiving is also known as 
-preprint archiving, and refers to making a manuscript openly available <em><b>
-before </em></b> it undergoes peer review in an academic journal or other outlet.
-Generally, this is achieved by uploading the manuscript to an archive such as arXiv
-(physics, maths), bioRxiv (biology), SocArxiv (sociology), etc.
-
-# Demographics 
-
-In terms of respondents' demographic information, we did not collect information 
-about gender or age to provide more anonymity to our respondents. We did, however,
-ask about their Academic Level/Type and their Discpline (based on 2-digit and 
-4-digit Field of Research [FOR] codes). 
-
-## Academic Levels 
-
 Of the `r nrow(valid_ac_level)` respondents who provided details about their 
-Academic Level, `r per_ac_level [5]`% were PhD students, `r per_ac_level [7]`% 
+academic level, `r per_ac_level [5]`% were PhD students, `r per_ac_level [7]`% 
 were Professors, and `r per_ac_level [10]`% were Senior Lecturers. 
-Table \ref{tab:ac_level_table} reports the academic levels for all respondents. 
+Table \ref{tab:ac_level_table} reports the academic levels for respondents who 
+answered the questions; 97 respondents chose not to report their academic level.
 
 ```{r ac_level_table}
 
@@ -343,7 +374,7 @@ a <- colSums(FOR_freq[1:18,3])
 
 ## Disciplines
 
-In terms of Field of Research Codes, `r a` respondents classified themselves 
+In terms of Field of Research [FOR] codes, `r a` respondents classified themselves 
 as belonging to one of the two-digit FOR codes from 01 to 20, one person indicated 
 "Other", and `r FOR_freq[20,3]` respondents did not specify their FOR code. We 
 did not have any responses from researchers in Earth Sciences (04), Agricultural 
@@ -352,8 +383,8 @@ Religious Studies (22).
 
 For ease of interpretation and to reduce the identifiability of the respondents,
 we combined similar divisions with smaller numbers of respondents into 
-disciplinary groups (see Appendix 1 for details). Table \ref{tab:discipline_table} 
-shows the breakdown by these disciplinary groups.
+disciplinary groups (see Table \ref{tab:discipline_table}). See Appendix 1 for 
+details of how we combined FOR codes into disciplinary groups. 
 
 
 ```{r discipline_table}
@@ -407,19 +438,21 @@ fig_nums(name = "crisis",
 
 # Estimates of Reproducibility by Perceived Crisis  
 
-Participants were asked if they believed their field is experiencing a
-"reproducibility crisis". Of the `r nvalid_crisis` respondents who answered this 
-question, `r per_crisis[1]`% indicated that they didn't know if there was a crisis, 
-`r per_crisis[2]`% indicated there was no crisis, `r per_crisis[4]`% indicated that 
-there was a slight crisis, and `r per_crisis[3]`% that there was a significant 
-reproducibility crisis in their field.   
+In line with Baker (2016), we asked participants if they believed their field 
+is experiencing a "reproducibility crisis". Of the `r nvalid_crisis` respondents 
+who answered this question, `r per_crisis[1]`% indicated that they didn't know 
+if there was a crisis, `r per_crisis[2]`% indicated there was no crisis, 
+`r per_crisis[4]`% indicated that there was a slight crisis, and 
+`r per_crisis[3]`% that there was a significant reproducibility crisis in their 
+field.  
 
-Participants were also asked to estimate the percentage of research publications 
+\newpage
+
+We also asked participants to estimate the percentage of research publications in 
 their field that are reproducible. In `r fig_nums("crisis", display = "cite")`,
-we plotted participants' reproducibility estimates according to their responses 
-to the perceived crisis in their field (n = `r nvalid_rep_est`). The 
-black bar is the mean estimate of reproducibility by the perceived crisis 
-levels. \newline 
+we plotted participants' reproducibility estimates according to their perceived 
+crisis in their field (n = `r nvalid_rep_est`). The black bar is the mean 
+estimate of reproducibility by the perceived crisis levels. \newline 
 
 ```{r crisis_by_estimate_stripchart}
 
@@ -460,7 +493,6 @@ knitr::include_graphics("figs/reprod_estimates_by_crisis.png")
 
 
 # Views and Use of Open Science Practices
-
   
 ## Overall Experience with Open Science Practices
 
@@ -482,18 +514,11 @@ os_exp <- valid_os_exp %>%
 
 ```
 
-Before we asked participants about their experience with open science practices, 
-we explained that the practices enveloped by the umbrella term of "open science" 
-were (i) study preregistration, (ii) open materials and/or code, (iii) open data, 
-(iv) pre-publication archiving, and (v) open access publishing.   
-
-Table \ref{tab:tables_os_experience}  shows participants' experience with open 
-science practices in general. Of the `r nvalid_os_exp` participants who answered 
-this question, `r os_exp[3,3]`% reported that they were unaware of open 
-science practices; `r os_exp[1,3]`% reported that they were 
-aware of open science practices, but had not used them; `r os_exp[2,3]`%
-reported that they had some experience with open science
-practices; and only `r os_exp[4,3]`% reported that they had
+Before asking participants about individual open science practices, we asked 
+about their experience with open science practices, in general (see 
+Table \ref{tab:tables_os_experience}). Of the `r nvalid_os_exp` participants who 
+answered this question, `r os_exp[3,3]`% reported that they were unaware of open 
+science practices and only `r os_exp[4,3]`% reported that they had
 extensive experience with open science practices. 
 
 ```{r tables_os_experience}
@@ -789,14 +814,82 @@ ggsave(here::here("analysis", "figs", "all_experience.png"), plot = p,
        dpi = "retina")
 ```
 
+\newpage
+
 `r fig_nums("exp_all")`
 
 ```{r exp_all, out.width = '100%'}
 knitr::include_graphics("figs/all_experience.png")
 ```
 
+For participants who reported some experience or extensive experience with 
+each of the four main open science practices, we asked them follow up questions 
+to better understand how they have used the practice in their research activities. 
 
-NEED TO INTRODUCE THIS SECTION FOR THE VARIOUS PRACTICES...
+### Use of Study Preregistration
+
+```{r prereg_use_count}
+
+# wrangle this data so it's in long form & only includes endorsements.
+
+PreRegUse_long <- df %>% 
+  select (c("ParticipantNumber", "AcLevel_Label",
+            "PreRegUse_clinicalTrial":"PreRegUse_other",
+            "FORcode_2_label")) %>%  
+  pivot_longer(c("PreRegUse_clinicalTrial":"PreRegUse_other"),
+               names_to = "PreRegUse", 
+               values_to = "PreRegUse_endorsement") %>% 
+  filter(PreRegUse_endorsement == "1")
+
+# recode the data so the response options have proper labels
+  # there must be a way to only select the rows that "start with" a character string
+  # but for now this works
+
+c <- metadata %>% 
+    filter(Scale == "PreRegUse") %>% 
+    filter (NewVariable != "PreRegUse_text")
+
+d <- full_join(PreRegUse_long, c, by = c("PreRegUse" = "NewVariable")) %>% 
+  rename ("PreRegUse_label" = "ItemText")
+
+# getting a tibble for the counts
+c_prereg_use <- plyr::count(d$PreRegUse)
+
+# to figure out how many respondents shared concerns calculate unique number of participants
+n_prereg_use <- length(unique(d$ParticipantNumber))
+
+# create a tibble with percentages (of respondents who answered this question) & 
+# then reorder them by descending percentages
+tb <- d %>% 
+  dplyr::count(PreRegUse_label) %>% 
+  mutate(Percentage = round (n/n_prereg_use*100)) %>% 
+  dplyr::arrange(desc(n)) 
+
+```
+
+For those participants who reported that they preregister their studies, we asked 
+them for more information about how they have used preregistration in their 
+previous work. Respondents were allowed to select as many uses as applied. 
+Of these `r n_prereg_use` researchers, the most popular response (`r tb[1,3]`%) was 
+that they had preregistered at least one study that was *not* a clinical trial.
+A small percentage of respondents (`r tb[5,3]`%) reported that they had submitted
+a Registered Report---a new type of manuscript format where the proposed method 
+and analytic plan are peer-reviewed *__before__* data collection (for more information
+see the Center for Open Science). 
+
+```{r prereg_use_table}
+
+tb %>%
+  knitr::kable (
+    booktabs = T,
+    linesep = "",
+    col.names = c("Reported Use", "Frequency", "Percentage"),
+    caption = sprintf("Reported Use of Study Preregistration (n = %d)", n_prereg_use),
+    align = 'lcc'
+  ) %>%
+  styler_pdf() 
+```
+
 
 ### Use of Open Materials and/or Code
 
@@ -1244,6 +1337,8 @@ ggsave(here::here("analysis", "figs", "prereg_concerns.png"), plot = p,
 
 ```
 
+\newpage
+
 `r fig_nums("prereg_concerns")`
 
 
@@ -1465,7 +1560,6 @@ ggsave(here::here("analysis", "figs", "data_concerns.png"), plot = p,
 
 `r fig_nums("data_concerns")`
 
-
 ```{r data_concerns, out.width = '100%'}
 knitr::include_graphics("figs/data_concerns.png")
 
@@ -1563,6 +1657,7 @@ ggsave(here::here("analysis", "figs", "prepub_concerns.png"), plot = p,
 
 ```
 
+\newpage
 
 `r fig_nums("prepub_concerns")`
 
@@ -1817,8 +1912,9 @@ ggsave(here::here("analysis", "figs", "os_most.png"), plot = p,
 
 ```
 
-`r fig_nums("os_most")`
+\newpage
 
+`r fig_nums("os_most")`
 
 ```{r os_most, out.width = '100%'}
 knitr::include_graphics("figs/os_most.png")
@@ -2217,5 +2313,13 @@ knitr::kable (booktabs = T, linesep = "",
 
 ```
 
+\newpage
+# References
 
-# The End
+Baker, M. (2016). 1,500 scientists lift the lid on reproducibility. *Nature News, 533*
+(7604). Retrieved from https://www.nature.com/news/1-500-scientists-lift-the-lid-on-reproducibility-1.19970. 
+
+Center for Open Science (nd). Registered Reports. Retrieved from https://www.cos.io/our-services/registered-reports
+
+Foster Open Science (nd). Open data definition. Retrieved from https://www.fosteropenscience.eu/taxonomy/term/110. 
+

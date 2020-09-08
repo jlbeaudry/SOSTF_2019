@@ -643,7 +643,10 @@ always_allow_html: false # true for word; false for pdf (?)
 https://medium.com/@fulowa/latex-font-in-a-ggplot-9120caaa5250
   # this all gets quite complicated though. I can't just knit this file with this 
   # font (though I can just make the figures by running the code, so now I have
-  # to separately load in the figures)
+  # to separately load in the figures) Follow these instructions (don't use the
+  # [Alt text](filepath) approach)
+
+https://stackoverflow.com/questions/25166624/insert-picture-table-in-r-markdown
 
 
 

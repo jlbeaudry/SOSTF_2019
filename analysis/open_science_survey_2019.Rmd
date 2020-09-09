@@ -37,7 +37,6 @@ knitr::opts_knit$set(width = 75)
 
 ```{r library}
 # load the library
-# need to install & load `rmdformats` package before you knit
 library(tinytex)
 library(knitr)
 library(here)
@@ -52,6 +51,7 @@ library(RColorBrewer)
 library(kableExtra)
 library(datapasta) # I don't need this to run the file, so delete when I'm done.
 library(captioner)
+library(stringr)
 
 ```
 
@@ -366,9 +366,9 @@ valid_disc <- filter(df, discipline != "Not Specified")
 nvalid_disc <- nrow(valid_disc)
 valid_per_disc <- perc(x = valid_disc$discipline, y = nvalid_disc) 
 FOR_freq <- df %>% 
-  select (FORcode_2_num, FORcode_2_label) %>% 
-  dplyr::count(FORcode_2_num, FORcode_2_label) %>% 
-  arrange(-desc(FORcode_2_num))
+  select (FORcode_2_num_0, FORcode_2_label) %>% 
+  dplyr::count(FORcode_2_num_0, FORcode_2_label) %>% 
+  arrange(-desc(FORcode_2_num_0))
 
 a <- colSums(FOR_freq[1:18,3])
 ```
@@ -876,7 +876,7 @@ that they had preregistered at least one study that was *not* a clinical trial.
 A small percentage of respondents (`r tb[5,3]`%) reported that they had submitted
 a Registered Report---a new type of manuscript format where the proposed method 
 and analytic plan are peer-reviewed *__before__* data collection (for more information
-see the Center for Open Science). 
+see the [Center for Open Science](https://www.cos.io/our-services/registered-reports)). 
 
 ```{r prereg_use_table}
 
@@ -1288,7 +1288,7 @@ fig_nums(name = "prereg_concerns",
 ```
 
 Of the `r n_prereg_con`
-respondents who answered th question about their concerns for preregistering 
+respondents who answered the question about their concerns for preregistering 
 research studies, `r tb [7,3]`% reported that they do not share any of the listed 
 concerns. `r fig_nums("prereg_concerns", display = "cite")` 
 presents, of those who answered this question, the percentage who selected 
@@ -1394,7 +1394,7 @@ fig_nums(name = "code_concerns",
 ```
 
 A total of `r n_code_con` respondents answered the question about their concerns 
-about making research materials and/or code open. Of those who respondended, 
+about making research materials and/or code open. Of those who responded, 
 `r tb [4,3]`% reported that they do not share any of the listed concerns. 
 `r fig_nums("code_concerns", display = "cite")` presents, of those who answered 
 this question, the percentage who selected each of the concerns.  \newline
@@ -1977,35 +1977,37 @@ knitr::kable(booktabs = T, linesep = "",
 
 As mentioned in Demographics, we merged FOR disciplines into disciplinary groups. 
 Specifically, the new discipline grouping of Arts, Social Sciences, and Humanities 
-(ASSH) included Education (FOR = `r FOR_freq[11,1]`, 
-<em>n</em> = `r FOR_freq[11,3]`); Studies 
-in Human Society (FOR = `r FOR_freq[14,1]`, <em>n</em> = `r FOR_freq[14,3]`); 
-Studies in Creative Arts and Writing (FOR = `r FOR_freq[17,1]`, <em>n</em> =
-`r FOR_freq[17,3]`); and Language, Communication and Culture (FOR = 
-`r FOR_freq[18,1]`, <em>n</em> = `r FOR_freq[18,3]`). The new discipline grouping
-of Business & Law included Economics (FOR = `r FOR_freq[12,1]`, <em>n</em> = 
-`r FOR_freq[12,3]`); Commerce, Management, Tourism and Services (FOR = 
-`r FOR_freq[13,1]`, <em>n</em> = `r FOR_freq[13,3]`), and Law and Legal Studies
-(FOR = `r FOR_freq[16,1]`, <em>n</em> = `r FOR_freq[16,3]`). 
+(ASSH) included Education (FOR `r FOR_freq[11,1]`, 
+n = `r FOR_freq[11,3]`); Studies 
+in Human Society (FOR `r FOR_freq[14,1]`, n = `r FOR_freq[14,3]`); 
+Studies in Creative Arts and Writing (FOR `r FOR_freq[17,1]`, n =
+`r FOR_freq[17,3]`); and Language, Communication and Culture (FOR 
+`r FOR_freq[18,1]`, n = `r FOR_freq[18,3]`). 
+
+The new discipline grouping of Business & Law included Economics 
+(FOR `r FOR_freq[12,1]`, n = `r FOR_freq[12,3]`); Commerce, Management, 
+Tourism and Services (FOR `r FOR_freq[13,1]`, n = `r FOR_freq[13,3]`), and 
+Law and Legal Studies (FOR `r FOR_freq[16,1]`, n = `r FOR_freq[16,3]`). 
+
 The new discipline grouping of Technology & Computer Sciences included Information
-and Computing Sciences (FOR = `r FOR_freq[6,1]`, <em>n</em> = `r FOR_freq[6,3]`),
-and Technology (FOR = `r FOR_freq[8,1]`, <em>n</em> = `r FOR_freq[8,3]`). We 
-allocated Built Environment and Design (FOR = `r FOR_freq[10,1]`, <em>n</em> = 
+and Computing Sciences (FOR `r FOR_freq[6,1]`, n = `r FOR_freq[6,3]`),
+and Technology (FOR `r FOR_freq[8,1]`, n = `r FOR_freq[8,3]`). We 
+allocated Built Environment and Design (FOR `r FOR_freq[10,1]`, n = 
 `r FOR_freq[10,3]`) to the "Other" category. 
   
-We retained the FOR divisions of Engineering (FOR = `r FOR_freq[7,1]`, <em>n</em> 
-= `r FOR_freq[7,3]`); Medical and Health Sciences (FOR = `r FOR_freq[9,1]`,
-<em>n</em> = `r FOR_freq[9,3]`); Physical Sciences (FOR = `r FOR_freq[2,1]`,
-<em>n</em> = `r FOR_freq[2,3]`); and Psychology and Cognitive Sciences (FOR = 
-`r FOR_freq[15,1]`, <em>n</em> = `r FOR_freq[15,3]`) as their own discipline 
+We retained the FOR divisions of Engineering (FOR `r FOR_freq[7,1]`, n 
+= `r FOR_freq[7,3]`); Medical and Health Sciences (FOR `r FOR_freq[9,1]`,
+n = `r FOR_freq[9,3]`); Physical Sciences (FOR `r FOR_freq[2,1]`,
+n = `r FOR_freq[2,3]`); and Psychology and Cognitive Sciences (FOR 
+`r FOR_freq[15,1]`, n = `r FOR_freq[15,3]`) as their own discipline 
 groupings. Table \ref{tab:FOR_table} presents the breakdown for the number of 
 respondents according to discpline groupings.
 
 ```{r FOR_table}
 
 d2 <- df %>% 
-  select (c(FORcode_2_num, FORcode_2_label)) %>% 
-  dplyr::count(FORcode_2_num,FORcode_2_label) %>% 
+  select (c(FORcode_2_num_0, FORcode_2_label)) %>% 
+  dplyr::count(FORcode_2_num_0,FORcode_2_label) %>% 
   mutate (Percentage = round (n/nrow(df)*100))
 
 # specify the exact order of the columns based on d2 (select them according to 
@@ -2013,7 +2015,7 @@ d2 <- df %>%
 # f2 <-d2 [c(12,16,3,8,1,9,7,20,13,2,6,5,4,19,17,11,18,10,15,14),]
   # I don't seem to be using this in this version, replaced with desc
 
-dplyr::arrange(d2,-desc(FORcode_2_num)) %>% 
+dplyr::arrange(d2,-desc(FORcode_2_num_0)) %>% 
 knitr::kable(booktabs = T, linesep = "",
              col.names = c("FOR Code", "Field of Research Division", "Frequency",
                            "Percentage"), 

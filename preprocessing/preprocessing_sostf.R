@@ -113,7 +113,7 @@ df$FORcode_4_num <- as.numeric(df$FORcode_4_num)
 
 df <- df %>% 
   mutate (discipline = ifelse (FORcode_2_num %in% c('14','15','18'), "Business & Law",
-                       ifelse (FORcode_2_num %in% c('13','16','19','20'), "ASSH",
+                       ifelse (FORcode_2_num %in% c('13','16','19','20'), "Arts, Soc Sciences, & Humanities",
                        ifelse (FORcode_2_num %in% '2', "Physical Sciences", 
                        ifelse (FORcode_2_num %in% c('1','3','5','6'), "Math, Chem, Enviro, & Bio Sciences", 
                        ifelse (FORcode_2_num %in% c('8','10'), "Tech & Comp Sciences", 
@@ -122,6 +122,8 @@ df <- df %>%
                        ifelse (FORcode_2_num %in% '17', "Psyc & Cog Sciences",
                        ifelse (FORcode_2_num %in% c('12', '99'), "Other", "Not Specified"))))))))))
 
+# need to add leading zeros for the FOR 2-digit code
+df$FORcode_2_num_0 <- str_pad(df$FORcode_2_num, 2, pad = "0")
 
 # View the mapping from FOR to discipline & see the number of folks in each FOR 
   # code group (and then ungroup again)

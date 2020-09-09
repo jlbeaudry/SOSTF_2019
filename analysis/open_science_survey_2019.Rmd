@@ -256,7 +256,7 @@ This document presents an overview of their responses to the various
 quantitative questions. The key finding was that researchers overall perceived 
 most open science practices as important for their fields; however, most 
 researchers engaged in these practices infrequently or not at all. Our data also 
-revealed some of key barriers researchers felt impeded their use of open science 
+revealed some key barriers that researchers felt impeded their use of open science 
 practices.
 
 # Methodology 

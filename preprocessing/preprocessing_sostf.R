@@ -113,7 +113,7 @@ df$FORcode_4_num <- as.numeric(df$FORcode_4_num)
 
 df <- df %>% 
   mutate (discipline = ifelse (FORcode_2_num %in% c('14','15','18'), "Business & Law",
-                       ifelse (FORcode_2_num %in% c('13','16','19','20'), "ASSH",
+                       ifelse (FORcode_2_num %in% c('13','16','19','20'), "Arts, Social Science, & Humanities",
                        ifelse (FORcode_2_num %in% '2', "Physical Sciences", 
                        ifelse (FORcode_2_num %in% c('1','3','5','6'), "Math, Chem, Enviro, & Bio Sciences", 
                        ifelse (FORcode_2_num %in% c('8','10'), "Tech & Comp Sciences", 

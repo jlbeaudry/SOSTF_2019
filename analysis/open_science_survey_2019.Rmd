@@ -1508,7 +1508,7 @@ fig_nums(name = "data_concerns",
 ```
 
 A total of `r n_data_con` respondents answered this question about concerns 
-they had about making their data open. Of those who respondended, `r tb2 [11,3]`%
+they had about making their data open. Of those who responded, `r tb2 [11,3]`%
 reported that they did not share any of the listed 
 concerns. `r fig_nums("data_concerns", display = "cite")` presents, of those who 
 answered this question, the percentage who selected each of the concerns.\newline
@@ -1612,7 +1612,7 @@ fig_nums(name = "prepub_concerns",
 
 A total of `r n_prepub_con` respondents answered this question about concerns 
 they had about uploading a manuscript to a pre-publication archive before 
-submitting it for peer review. Of those who respondended,
+submitting it for peer review. Of those who responded,
 `r tb [6,3]`% reported that they do not share any of the listed 
 concerns. `r fig_nums("prepub_concerns", display = "cite")` presents, of those 
 who answered this question, the percentage who selected each of the concerns. \newline 

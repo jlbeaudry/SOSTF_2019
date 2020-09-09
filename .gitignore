@@ -1,27 +1,27 @@
+# R files
 .Rproj.user
 .Rhistory
 .Rdata
 .README.html
-data_to_clean.csv
-clean_data.csv
-*.html
-*.xlsx
 *.rds
 *.RData
 *.DS_Store
-scratchpad
-anaylysis/*_files
-analysis/*_files
-analysis/*_cache
-analysis/*.log
-analysis/*.pdf
+
+# data files
 *.csv
-*.tex
-analysis/*_files*
-*.log
+*.xlsx
+
+# cashe directories
+/cache/
+*_cache
+
+# output files
+*.html
 *.pdf
 *.docx
-Rplot.png
-elians_case_when.R
-.png
-figs/
+
+# figures
+/figs/
+
+# miscellaneous files
+scratchpad

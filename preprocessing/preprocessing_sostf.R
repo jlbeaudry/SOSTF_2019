@@ -45,7 +45,7 @@ df_for <- here::here("survey", "data", "OS_Data_ID_Not_Legacy.csv") %>%
 df <- df %>% left_join(df_for, by = "ParticipantNumber")
 
 # load in metadata for concern variables
-metadata <- here::here("survey", "data", "os_metadata_good.csv") %>% 
+metadata <- here::here("survey", "data", "os_metadata_raw_data.csv") %>% 
   read_csv(col_names = TRUE, skip_empty_rows = TRUE) %>% 
   filter(!is.na(OldVariable))
 
@@ -67,6 +67,12 @@ df <- df %>%
   select (-c(V1:V10, consent, Intro, LocationLatitude, LocationLongitude, 
              LocationAccuracy, PreregDef)) 
 
+
+##### RECODE VARIABLE NAMES #####
+
+# recode variable labels according to metadata
+
+df <- meta_rename(df, metadata, old = OldVariable, new = NewVariable)
 
 ################# RECODING VARIABLES ##################
 
@@ -149,19 +155,19 @@ df %>%
 
 df$crisis_num <- factor(df$crisis) 
 
-df$OverallExp_num <- factor(df$OverallExperience) 
+df$OverallExp_num <- factor(df$OverallExp) 
 
 df$PreRegImp_num_o <- factor(df$PreRegImp) #name as 'original' so we can reverse code it next
 
-df$PreRegExp_num <- factor(df$PreregExp1) 
+df$PreRegExp_num <- factor(df$PreRegExp) 
 
 df$CodeImp_num_o <- factor(df$CodeImp) #name as 'original' so we can reverse code it next
 
 df$CodeExp_num <- factor(df$CodeExp) 
 
-df$DataExp_num <- factor(df$OpenDataExp)
+df$DataExp_num <- factor(df$DataExp)
 
-df$DataImp_num_o <- factor(df$OpenDataImp) #name as 'original' so we can reverse code it next
+df$DataImp_num_o <- factor(df$DataImp) #name as 'original' so we can reverse code it next
 
 df$PrePubImp_num_o <- factor(df$PrePubImp) #name as 'original' so we can reverse code it next
 
@@ -198,10 +204,6 @@ df$OAprop_num <- df$OAprop_num_o %>%
     c("1", "2", "3", "4", "0", "5"), 
     c("4", "3", "2", "1", "0", "5"))
 
-# recode Concerns variables (for Preregistration, Code, Data, Pre-publication 
-  # archiving) and Use variables (for PreReg, Code, Data, Pre-publication archiving)
-
-df <- meta_rename(df, metadata, old = OldVariable, new = NewVariable)
 
 # relabel number with text labels for levels
 
@@ -226,6 +228,27 @@ df$PreRegExp <- df$PreRegExp_num %>%
   mapvalues(
     c("1", "2", "3", "4"), 
     c("Unaware", "Aware, But Not Used", "Some Experience", "Reg Use"))
+
+df$PreRegHigh <- df$PreRegHigh %>% 
+  mapvalues(
+    c("1", "2", "3", "4", "5", "6"),
+    c("I have preregistered a study, but have not yet analysed the data", 
+    "I have preregistered a study and am currently writing up the manuscript", 
+    "I have preregistered a study and submitted it for publication",
+    "I have published one preregistered study",
+    "I have published 2 or more preregistered studies", 
+    "Other")
+  )
+
+df$PreRegHigh <- factor(df$PreRegHigh) 
+
+df$PreRegConcerns <- df$PreRegConcerns %>% 
+  mapvalues (
+    c("0", "1"),
+    c("No", "Yes")
+  )
+
+df$PreRegConcerns <- factor(df$PreRegConcerns) 
 
 df$CodeImp <- df$CodeImp_num %>% 
   mapvalues(
@@ -315,12 +338,42 @@ df <- mutate(df, AcLevel_Label = case_when (AcLevel_1 == '1' ~ "Professor",
   # transform into factor
   df$AcLevel_Label <- factor(df$AcLevel_Label) 
   
+###### DELETE THE VARIABLES THAT HAVE BEEN RECODED OR ARE SUPERFLUOUS ######
+  
+df <- df %>%
+  select (-c (OverallExp_num, 
+              PreRegImp_num, PreRegImp_num_o,
+              PreRegExp_num, 
+              CodeDef, OpenDataDef,
+              CodeImp_num, CodeImp_num_o,
+              CodeExp_num,
+              DataImp_num, DataImp_num_o, 
+              DataExp_num))
+
+
+##### DELETE THE QUAL DATA FOR OCT 2020 OSF POSTING #####
+  
+  df <- df %>%
+    select (-c (PreRegConList, 
+                CodeConcernList,
+                
+    ))
+    
+###### REARRANGE THE VARIABLES IN THE TIBBLE TO ALIGN WITH SURVEY ORDER ######
+
+df <- df %>% 
+    relocate (OverallExp, .after = ParticipantNumber) %>% 
+    relocate (PreRegImp, .after = OverallExp) %>% 
+    relocate(PreRegExp, .after = PreRegImp) 
+    
+  
+  
 ################### WRITE DATA TO CSV #############
 
 # when done recoding, write the data to a new file
 # row.names gets rid of the first column from the dataframe.
 
-write.csv(df, here::here("data", "data_sostf.csv"), row.names = FALSE)
+write.csv(df, here::here("data", "data_processed.csv"), row.names = FALSE)
 
 
 

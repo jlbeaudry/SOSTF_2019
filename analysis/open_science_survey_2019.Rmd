@@ -231,7 +231,7 @@ fig_nums <- captioner(prefix = "Figure")
 df <- read_csv (here::here("data", "data_sostf.csv"))
                 
 # import the metadata.
-metadata <- here::here("survey", "data", "os_metadata_good.csv") %>% 
+metadata <- here::here("survey", "data", "os_metadata_raw_data.csv") %>% 
   read_csv(col_names = TRUE, skip_empty_rows = TRUE) %>% 
   filter(!is.na(OldVariable)) %>% 
   select(-c(MinValue:ImportID)) #does not import the extraneous variables

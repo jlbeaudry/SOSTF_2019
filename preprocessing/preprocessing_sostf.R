@@ -65,7 +65,8 @@ df <- df %>%
 
 df <- df %>% 
   select (-c(V1:V10, consent, Intro, LocationLatitude, LocationLongitude, 
-             LocationAccuracy, PreregDef)) 
+             LocationAccuracy, PreregDef, CodeDef, OpenDataDef, PrePubDef, OAdef,
+             Thanks)) 
 
 
 ##### RECODE VARIABLE NAMES #####
@@ -75,12 +76,6 @@ df <- df %>%
 df <- meta_rename(df, metadata, old = OldVariable, new = NewVariable)
 
 ################# RECODING VARIABLES ##################
-
-# rename wonky variable names & change FOR code columns to reflect number of digits. 
-
-df <- df %>% 
-  dplyr::rename(RepEstimate = RepEstimate_1, FORcode_4 = FORcode_2, FORcode_2 = FORcode_1) 
-
 
 # separate FOR code columns into numbers and labels & change case
 
@@ -161,6 +156,8 @@ df$PreRegImp_num_o <- factor(df$PreRegImp) #name as 'original' so we can reverse
 
 df$PreRegExp_num <- factor(df$PreRegExp) 
 
+df$PreRegHigh <- factor(df$PreRegHigh) 
+
 df$CodeImp_num_o <- factor(df$CodeImp) #name as 'original' so we can reverse code it next
 
 df$CodeExp_num <- factor(df$CodeExp) 
@@ -174,6 +171,7 @@ df$PrePubImp_num_o <- factor(df$PrePubImp) #name as 'original' so we can reverse
 df$PrePubExp_num <- factor(df$PrePubExp) 
 
 df$OAprop_num_o <- factor(df$OAprop) #name as 'original' so we can reverse code it next
+
 
 # reverse code `importance` variables so lower values = less importance
 
@@ -229,7 +227,7 @@ df$PreRegExp <- df$PreRegExp_num %>%
     c("1", "2", "3", "4"), 
     c("Unaware", "Aware, But Not Used", "Some Experience", "Reg Use"))
 
-df$PreRegHigh <- df$PreRegHigh %>% 
+df$PreRegHigh <- factor(df$PreRegHigh) %>% 
   mapvalues(
     c("1", "2", "3", "4", "5", "6"),
     c("I have preregistered a study, but have not yet analysed the data", 
@@ -240,15 +238,13 @@ df$PreRegHigh <- df$PreRegHigh %>%
     "Other")
   )
 
-df$PreRegHigh <- factor(df$PreRegHigh) 
 
-df$PreRegConcerns <- df$PreRegConcerns %>% 
+df$PreRegConcerns <- factor(df$PreRegConcerns) %>% 
   mapvalues (
     c("0", "1"),
     c("No", "Yes")
   )
 
-df$PreRegConcerns <- factor(df$PreRegConcerns) 
 
 df$CodeImp <- df$CodeImp_num %>% 
   mapvalues(
@@ -290,6 +286,172 @@ df$OAprop <- df$OAprop_num %>%
     c("4", "3", "2", "1", "0", "5"), 
     c("All", "Most", "Half", "Some", "None", "I don't know"))
 
+df$CodeConcerns <- factor(df$CodeConcerns) %>% 
+  mapvalues (
+    c("0", "1"),
+    c("No", "Yes")
+  )
+
+df$DataConcerns <- factor(df$DataConcerns) %>% 
+  mapvalues (
+    c("0", "1"),
+    c("No", "Yes")
+  )
+
+df$PrePubConcerns <- factor(df$PrePubConcerns) %>% 
+  mapvalues (
+    c("1", "2"),
+    c("No", "Yes")
+  )
+
+df$OSBarriers <- factor(df$OSBarriers) %>% 
+  mapvalues (
+    c("0", "1"),
+    c("No", "Yes")
+  )
+
+df$Funded <- factor(df$Funded) %>% 
+  mapvalues (
+    c("0", "1"),
+    c("No", "Yes")
+  )
+
+df$FundKnow <- factor(df$FundKnow) %>% 
+  mapvalues (
+    c("0", "1"),
+    c("No", "Yes")
+  )
+
+# recode the self_rep questions (I'm sure there's a faster way, but this works)
+
+df$self_rep_own <- df$self_rep_own %>% 
+  mapvalues(
+    c("0", "1", "2"),
+    c("No", "Yes", "I can't remember")
+  )
+
+df$self_rep_other <- df$self_rep_other %>% 
+  mapvalues(
+    c("0", "1", "2"),
+    c("No", "Yes", "I can't remember")
+  )
+
+df$self_rep_pubOtherSuccess <- df$self_rep_pubOtherSuccess %>% 
+  mapvalues(
+    c("0", "1", "2"),
+    c("No", "Yes", "I can't remember")
+  )
+
+df$self_rep_pubOtherFail <- df$self_rep_noPubFail %>% 
+  mapvalues(
+    c("0", "1", "2"),
+    c("No", "Yes", "I can't remember")
+  )
+
+df$self_rep_noPubSuccess <- df$self_rep_noPubSuccess %>% 
+  mapvalues(
+    c("0", "1", "2"),
+    c("No", "Yes", "I can't remember")
+  )
+
+df$self_rep_noPubFail <- df$self_rep_noPubFail %>% 
+  mapvalues(
+    c("0", "1", "2"),
+    c("No", "Yes", "I can't remember")
+  )
+
+# recode the OSTools questions (I'm sure there's a faster way, but this works)
+
+df$OSTools_osf <- df$OSTools_osf %>% 
+  mapvalues(
+    c("0", "1", "2"),
+    c("I'm unaware of this", "I use this", "I'm aware of it, but don't use")
+  )
+
+df$OSTools_github <- df$OSTools_github %>% 
+  mapvalues(
+    c("0", "1", "2"),
+    c("I'm unaware of this", "I use this", "I'm aware of it, but don't use")
+  )
+
+df$OSTools_ardc <- df$OSTools_ardc %>% 
+  mapvalues(
+    c("0", "1", "2"),
+    c("I'm unaware of this", "I use this", "I'm aware of it, but don't use")
+  )
+
+df$OSTools_csiro <- df$OSTools_csiro %>% 
+  mapvalues(
+    c("0", "1", "2"),
+    c("I'm unaware of this", "I use this", "I'm aware of it, but don't use")
+  )
+
+df$OSTools_cloudstor <- df$OSTools_cloudstor %>% 
+  mapvalues(
+    c("0", "1", "2"),
+    c("I'm unaware of this", "I use this", "I'm aware of it, but don't use")
+  )
+
+df$OSTools_embl <- df$OSTools_embl %>% 
+  mapvalues(
+    c("0", "1", "2"),
+    c("I'm unaware of this", "I use this", "I'm aware of it, but don't use")
+  )
+
+df$OSTools_figshare <- df$OSTools_figshare %>% 
+  mapvalues(
+    c("0", "1", "2"),
+    c("I'm unaware of this", "I use this", "I'm aware of it, but don't use")
+  )
+
+df$OSTools_code <- df$OSTools_code %>% 
+  mapvalues(
+    c("0", "1", "2"),
+    c("I'm unaware of this", "I use this", "I'm aware of it, but don't use")
+  )
+
+df$OSTools_datacite <- df$OSTools_datacite %>% 
+  mapvalues(
+    c("0", "1", "2"),
+    c("I'm unaware of this", "I use this", "I'm aware of it, but don't use")
+  )
+
+df$OSTools_toolbox <- df$OSTools_toolbox %>% 
+  mapvalues(
+    c("0", "1", "2"),
+    c("I'm unaware of this", "I use this", "I'm aware of it, but don't use")
+  )
+
+df$OSTools_orcid <- df$OSTools_orcid %>% 
+  mapvalues(
+    c("0", "1", "2"),
+    c("I'm unaware of this", "I use this", "I'm aware of it, but don't use")
+  )
+
+df$OSTools_FAIR <- df$OSTools_FAIR %>% 
+  mapvalues(
+    c("0", "1", "2"),
+    c("I'm unaware of this", "I use this", "I'm aware of it, but don't use")
+  )
+
+df$OSTools_instRepo <- df$OSTools_instRepo %>% 
+  mapvalues(
+    c("0", "1", "2"),
+    c("I'm unaware of this", "I use this", "I'm aware of it, but don't use")
+  )
+
+df$LastStudy <- factor(df$LastStudy) %>% 
+  mapvalues(
+    c ("1", "2", "3", "4", "5", "6", "7"),
+    c ("All info needed is in publication", 
+    "All info needed is openly available",
+    "Need info from research team", 
+    "Not possible because of context", 
+    "Not possible because of other reasons",
+    "I do not conduct research studies",
+    "Other"))
+    
+    
 ## RECODE ACADEMIC LEVELS ##
 
 # notes re: how I dealt with folks who selected more than one option from Academic Levels.
@@ -311,8 +473,8 @@ df$OAprop <- df$OAprop_num %>%
 # deal with the 'other' responses that align with the actual response options.
 
 df <- df %>% 
-  mutate(AcLevel_5 = replace(AcLevel_5, ParticipantNumber == "1065", 1)) %>%  #1065 said 'post doc'
-  mutate(AcLevel_1 = replace(AcLevel_1, ParticipantNumber == "1028", 1)) #1028 said 'emeritus professor'
+  mutate(AcLevel_pd = replace(AcLevel_pd, ParticipantNumber == "1065", 1)) %>%  #1065 said 'post doc'
+  mutate(AcLevel_prof = replace(AcLevel_prof, ParticipantNumber == "1028", 1)) #1028 said 'emeritus professor'
 
 # Recoding Academic Levels. 
   # the coding of the academic levels is not exactly as in the pdf of the survey
@@ -322,21 +484,21 @@ df <- df %>%
   # based on their first response within the survey to resolve the multiple responses.
   
   
-df <- mutate(df, AcLevel_Label = case_when (AcLevel_1 == '1' ~ "Professor", 
-                                             AcLevel_2 == '1' ~ "Associate Professor", 
-                                             AcLevel_3 == '1' ~ "Senior Lecturer",
-                                             AcLevel_4 == '1' ~ "Lecturer", 
-                                             AcLevel_5 == '1' ~ "Postdoc",
-                                             AcLevel_6 == '1' ~ "PhD Student", 
-                                             AcLevel_7 == '1' ~ "Masters Student",
-                                             AcLevel_9 == '1' ~ "Research Assistant",
-                                             AcLevel_10 == '1' ~ "Other", 
-                                             AcLevel_12 == '1' ~ "Senior Research Fellow",
-                                             AcLevel_13 == '1' ~ "Research Fellow",
+df <- mutate(df, AcademicLevel = case_when (AcLevel_prof == '1' ~ "Professor", 
+                                             AcLevel_ap == '1' ~ "Associate Professor", 
+                                             AcLevel_sl == '1' ~ "Senior Lecturer",
+                                             AcLevel_l == '1' ~ "Lecturer", 
+                                             AcLevel_pd == '1' ~ "Postdoc",
+                                             AcLevel_phd == '1' ~ "PhD Student", 
+                                             AcLevel_mast == '1' ~ "Masters Student",
+                                             AcLevel_ra == '1' ~ "Research Assistant",
+                                             AcLevel_other == '1' ~ "Other", 
+                                             AcLevel_srf == '1' ~ "Senior Research Fellow",
+                                             AcLevel_rf == '1' ~ "Research Fellow",
                                              TRUE ~ "NA"))
   
   # transform into factor
-  df$AcLevel_Label <- factor(df$AcLevel_Label) 
+  df$AcademicLevel <- factor(df$AcademicLevel) 
   
 ###### DELETE THE VARIABLES THAT HAVE BEEN RECODED OR ARE SUPERFLUOUS ######
   
@@ -344,21 +506,23 @@ df <- df %>%
   select (-c (OverallExp_num, 
               PreRegImp_num, PreRegImp_num_o,
               PreRegExp_num, 
-              CodeDef, OpenDataDef,
               CodeImp_num, CodeImp_num_o,
               CodeExp_num,
               DataImp_num, DataImp_num_o, 
-              DataExp_num))
-
+              DataExp_num, 
+              PrePubImp_num, PrePubImp_num_o, 
+              PrePubExp_num,
+              OAprop_num, OAprop_num_o,
+              crisis_num)) %>% 
+    select(-contains ("AcLevel"))
 
 ##### DELETE THE QUAL DATA FOR OCT 2020 OSF POSTING #####
   
-  df <- df %>%
-    select (-c (PreRegConList, 
-                CodeConcernList,
-                
-    ))
-    
+  df <- df %>%       
+    select(-contains("text"))
+
+  
+  
 ###### REARRANGE THE VARIABLES IN THE TIBBLE TO ALIGN WITH SURVEY ORDER ######
 
 df <- df %>% 
